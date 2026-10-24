@@ -70,6 +70,10 @@ pub enum Error {
     Format { path: PathBuf, message: String },
     #[error("{launcher} is running; quit it first, or it overwrites the change when it exits")]
     Running { launcher: &'static str },
+    #[error(
+        "{launcher} is running, and a game or its shader processing may be using this; quit it first"
+    )]
+    InUse { launcher: &'static str },
     #[error("no installed game {id}")]
     UnknownGame { id: String },
     #[error("no compatibility tool {id}")]
@@ -413,13 +417,13 @@ fn lutris_games(launchers: &[Launcher]) -> Result<Vec<(String, String)>, Error> 
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use protonhub_manifest::Registry;
 
     use super::*;
     use crate::testutil::TempDir;
 
-    fn write(path: &Path, text: &str) {
+    pub(crate) fn write(path: &Path, text: &str) {
         fs::create_dir_all(path.parent().unwrap()).unwrap();
         fs::write(path, text).unwrap();
     }
@@ -457,7 +461,7 @@ mod tests {
     /// A Steam with two games (one mapped to GE-Proton11-7, one on the
     /// default proton_9), a shortcut, a Proton 9.0 install, and an unused
     /// GE-Proton10-1.
-    fn steam(home: &Path) -> Launcher {
+    pub(crate) fn steam(home: &Path) -> Launcher {
         let root = home.join("Steam");
         let lib2 = home.join("Games");
         write(

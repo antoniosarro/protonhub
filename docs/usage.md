@@ -17,6 +17,9 @@ builds and runs it.
 | `protonhub assign GAME TOOL [--launcher L]` | Set the tool a game runs with. GAME is its id or name, TOOL a tool's id or name from `games`, or `default` (Steam) |
 | `protonhub usage [--launcher L]` | Each installed tool's size and what uses it: games, the default, `unused`, or `-` where ProtonHub can't tell |
 | `protonhub cleanup [--launcher L] [--yes]` | List the tools nothing uses and the space they take; `--yes` deletes them |
+| `protonhub storage list [--launcher L]` | Each Wine prefix and shader cache in Steam's libraries, largest first, with its app's name, and `(uninstalled)` or `(removed from Steam)` for a leftover |
+| `protonhub storage cleanup [--launcher L] [--yes]` | List the prefixes and shader caches of games no longer installed; `--yes` deletes them ([storage](#storage)) |
+| `protonhub storage remove GAME --prefix\|--shader-cache [--launcher L]` | Delete one game's prefix, which resets it, or its shader cache, which Steam builds again |
 | `protonhub channel add TOOL [--launcher L] [--keep N] [--move-games]` | Keep TOOL at its latest release ([channels](#channels)) |
 | `protonhub channel list`, `channel remove TOOL [--launcher L]` | List or stop them |
 | `protonhub update [--check] [--notify]` | Update every channel, or with `--check` only say which have a new release |
@@ -109,6 +112,29 @@ Only directories of tools that games are set to are judged (Steam's
 DXVK and anything in Lutris or Bottles is never called unused. `cleanup`
 deletes tools ProtonHub didn't install too, such as ones added by hand or
 by another app.
+
+## Storage
+
+Steam keeps a Wine prefix (`steamapps/compatdata/<app id>`) and a shader
+cache (`steamapps/shadercache/<app id>`) for each game, in the library
+the game is in, and leaves both behind when the game is uninstalled. A
+folder counts as left over when no installed app or non-Steam shortcut
+has its app id. If a file listing them can't be read, nothing counts as
+left over, so a game's prefix is never taken for a leftover.
+Leftovers are named from Steam's app cache (`appcache/appinfo.vdf`),
+which keeps the names of games no longer installed; a non-Steam shortcut
+removed from Steam has no name left anywhere and shows as one.
+
+A prefix holds the saves and settings of games that don't keep them in
+Steam Cloud: deleting a leftover prefix loses them for good. Deleting is
+refused while Steam runs, since a game or Steam's shader processing could
+be using the folder.
+
+```sh
+protonhub storage cleanup          # what would go
+protonhub storage cleanup --yes    # delete it
+protonhub storage remove "Elden Ring" --shader-cache
+```
 
 ## Choosing a launcher
 

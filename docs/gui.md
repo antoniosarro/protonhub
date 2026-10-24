@@ -8,8 +8,9 @@ manifests as the CLI does ([usage.md](usage.md)).
 The sidebar lists the launchers found: Steam, Heroic, Lutris, Bottles and
 WineZGUI, with "(Flatpak)" or "(Snap)" when that's how they're installed,
 how many games and tools each has, and a mark on one that's running. A
-launcher's page has two views, **Games** and **Tools**; launchers without
-per-game tools (Lutris, Bottles) have only Tools. In a narrow window the
+launcher's page has the views **Games** and **Tools**, and on Steam's
+**Storage**; launchers without per-game tools (Lutris, Bottles) have only
+Tools. In a narrow window the
 sidebar and the page take turns, with a back button.
 
 ## Games
@@ -75,6 +76,22 @@ Enter installs it.
 keep and whether games move to new releases, and **Update** installs the
 latest release now. The daily timer (`protonhub timer enable`) does the
 same unattended.
+
+## Storage
+
+Steam's page has the games' Wine prefixes and shader caches
+([usage.md](usage.md#storage)):
+
+- When uninstalled games left some behind, a row at the top says how much
+  space they take; it opens to list them, and **Clean Up…** deletes them
+  after asking. Saves of games without Steam Cloud are lost with their
+  prefixes.
+- **Games** lists each game's prefix and shader cache with their sizes,
+  the largest first. Its menu resets the prefix (the game makes a new one
+  when it next runs, without the saves and settings kept in the old one)
+  or deletes the shader cache (Steam builds it again).
+
+Both are off while Steam runs.
 
 ## Jobs
 

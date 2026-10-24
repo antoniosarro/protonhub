@@ -1,7 +1,7 @@
 //! Valve's KeyValues formats: the text one (config.vdf, appmanifest_*.acf,
 //! compatibilitytool.vdf), read and written in Steam's own layout so a
 //! rewrite changes only what was edited, and the binary one
-//! (shortcuts.vdf), read only.
+//! (shortcuts.vdf, appinfo.vdf), read only.
 
 use std::fmt::Write;
 
@@ -256,11 +256,23 @@ fn escape(s: &str) -> String {
 /// Parses the binary format (shortcuts.vdf).
 pub fn parse_binary(bytes: &[u8]) -> Result<Obj, ParseError> {
     let mut pos = 0;
-    let obj = binary_obj(bytes, &mut pos, true)?;
+    let obj = binary_obj(bytes, &mut pos, true, None)?;
     Ok(obj)
 }
 
-fn binary_obj(bytes: &[u8], pos: &mut usize, root: bool) -> Result<Obj, ParseError> {
+/// Parses the binary format with each key an index into `keys`, as newer
+/// appinfo.vdf files store them.
+pub fn parse_binary_keyed(bytes: &[u8], keys: &[String]) -> Result<Obj, ParseError> {
+    let mut pos = 0;
+    binary_obj(bytes, &mut pos, true, Some(keys))
+}
+
+fn binary_obj(
+    bytes: &[u8],
+    pos: &mut usize,
+    root: bool,
+    keys: Option<&[String]>,
+) -> Result<Obj, ParseError> {
     let err = |pos: usize, message: &str| ParseError {
         line: 0,
         message: format!("byte {pos}: {message}"),
@@ -273,6 +285,22 @@ fn binary_obj(bytes: &[u8], pos: &mut usize, root: bool) -> Result<Obj, ParseErr
         let s = String::from_utf8_lossy(&bytes[*pos..*pos + len]).into_owned();
         *pos += len + 1;
         Ok(s)
+    };
+    let fixed = |pos: &mut usize, n: usize| -> Result<&[u8], ParseError> {
+        let raw = bytes
+            .get(*pos..*pos + n)
+            .ok_or_else(|| err(*pos, "truncated value"))?;
+        *pos += n;
+        Ok(raw)
+    };
+    let key = |pos: &mut usize| -> Result<String, ParseError> {
+        let Some(keys) = keys else { return cstr(pos) };
+        let at = *pos;
+        let raw = fixed(pos, 4)?;
+        let i = u32::from_le_bytes(raw.try_into().expect("four bytes")) as usize;
+        keys.get(i)
+            .cloned()
+            .ok_or_else(|| err(at, &format!("key {i} is past the key table")))
     };
     let mut obj = Obj::default();
     loop {
@@ -287,22 +315,34 @@ fn binary_obj(bytes: &[u8], pos: &mut usize, root: bool) -> Result<Obj, ParseErr
         match kind {
             0x08 => return Ok(obj),
             0x00 => {
-                let key = cstr(pos)?;
+                let key = key(pos)?;
                 obj.0
-                    .push((key, Value::Obj(binary_obj(bytes, pos, false)?)));
+                    .push((key, Value::Obj(binary_obj(bytes, pos, false, keys)?)));
             }
             0x01 => {
-                let key = cstr(pos)?;
+                let key = key(pos)?;
                 obj.0.push((key, Value::Str(cstr(pos)?)));
             }
-            0x02 => {
-                let key = cstr(pos)?;
-                let raw = bytes
-                    .get(*pos..*pos + 4)
-                    .ok_or_else(|| err(*pos, "truncated integer"))?;
-                *pos += 4;
+            // An int32, a pointer, a color.
+            0x02 | 0x04 | 0x06 => {
+                let key = key(pos)?;
+                let raw = fixed(pos, 4)?;
                 let n = i32::from_le_bytes(raw.try_into().expect("four bytes"));
                 obj.0.push((key, Value::Int(n.into())));
+            }
+            // A float, kept as its text: Value is Eq.
+            0x03 => {
+                let key = key(pos)?;
+                let raw = fixed(pos, 4)?;
+                let f = f32::from_le_bytes(raw.try_into().expect("four bytes"));
+                obj.0.push((key, Value::Str(f.to_string())));
+            }
+            // A uint64, an int64.
+            0x07 | 0x0a => {
+                let key = key(pos)?;
+                let raw = fixed(pos, 8)?;
+                let n = i64::from_le_bytes(raw.try_into().expect("eight bytes"));
+                obj.0.push((key, Value::Int(n)));
             }
             other => return Err(err(*pos - 1, &format!("unknown type {other:#04x}"))),
         }
@@ -405,5 +445,31 @@ mod tests {
         assert_eq!(game.get("AppID"), Some(&Value::Int(-1_234_567_890)));
         assert_eq!(game.str("appname"), Some("My Game"));
         assert!(parse_binary(&b[..b.len() - 6]).is_err());
+    }
+
+    #[test]
+    fn reads_binary_keys_from_a_table() {
+        let keys: Vec<String> = ["appinfo", "common", "name", "gameid"]
+            .map(String::from)
+            .to_vec();
+        let mut b = vec![0x00];
+        b.extend(0u32.to_le_bytes());
+        b.push(0x00);
+        b.extend(1u32.to_le_bytes());
+        b.push(0x01);
+        b.extend(2u32.to_le_bytes());
+        b.extend(b"Hades\0");
+        b.push(0x07);
+        b.extend(3u32.to_le_bytes());
+        b.extend(1_145_360u64.to_le_bytes());
+        b.extend([0x08, 0x08, 0x08]);
+        let obj = parse_binary_keyed(&b, &keys).unwrap();
+        let common = obj.path(&["appinfo", "common"]).unwrap();
+        assert_eq!(common.str("name"), Some("Hades"));
+        assert_eq!(common.get("gameid"), Some(&Value::Int(1_145_360)));
+        assert!(
+            parse_binary_keyed(&b, &keys[..2]).is_err(),
+            "a key past the table"
+        );
     }
 }

@@ -43,6 +43,8 @@ scriptable CLI with JSON output.
   backup.
 - **Usage map**: see which games in any launcher use each tool, and
   delete the ones nothing uses in one step.
+- **Storage**: each Steam game's Wine prefix and shader cache by size,
+  and the gigabytes uninstalled games left behind, deleted in one step.
 - **Release channels**: keep a tool at its latest release, keep the newest
   N versions, move games onto new releases, all from a daily systemd user
   timer with desktop notifications. No daemon.

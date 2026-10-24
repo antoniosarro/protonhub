@@ -11,6 +11,7 @@ pub mod lock;
 pub mod paths;
 pub mod releases;
 pub mod steam;
+pub mod storage;
 pub mod vdf;
 
 pub use protonhub_manifest as manifest;

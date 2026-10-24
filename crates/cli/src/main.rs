@@ -12,6 +12,7 @@ use protonhub_core::lock::{self, Lock};
 use protonhub_core::manifest::{Arch, LauncherKind, Registry, Tool};
 use protonhub_core::paths;
 use protonhub_core::releases::{self, Client, Version};
+use protonhub_core::storage::{self, Kind};
 use serde::Serialize;
 
 mod timer;
@@ -92,6 +93,10 @@ enum Command {
         #[arg(long)]
         yes: bool,
     },
+    /// Steam games' Wine prefixes and shader caches, and those uninstalled
+    /// games left behind
+    #[command(subcommand)]
+    Storage(StorageCommand),
     /// Keep a tool at its latest release in a launcher
     #[command(subcommand)]
     Channel(ChannelCommand),
@@ -154,6 +159,42 @@ enum ChannelCommand {
     /// Stop keeping TOOL updated
     Remove {
         tool: String,
+        #[arg(long)]
+        launcher: Option<String>,
+    },
+}
+
+#[derive(Subcommand)]
+enum StorageCommand {
+    /// List each prefix and shader cache with its size and game, largest
+    /// first
+    List {
+        #[arg(long)]
+        launcher: Option<String>,
+    },
+    /// List the ones of games no longer installed, and with --yes delete
+    /// them; saves not in Steam Cloud are in the prefix
+    Cleanup {
+        #[arg(long)]
+        launcher: Option<String>,
+        /// Delete them
+        #[arg(long)]
+        yes: bool,
+    },
+    /// Delete GAME's (its app id or name) prefix, which resets it, or its
+    /// shader cache, which Steam builds again
+    Remove {
+        game: String,
+        /// The prefix
+        #[arg(
+            long,
+            required_unless_present = "shader_cache",
+            conflicts_with = "shader_cache"
+        )]
+        prefix: bool,
+        /// The shader cache
+        #[arg(long)]
+        shader_cache: bool,
         #[arg(long)]
         launcher: Option<String>,
     },
@@ -479,6 +520,104 @@ fn run(cli: Cli) -> Result<()> {
                 ),
             });
             print(json, text.join("\n"), &unused)
+        }
+        Command::Storage(StorageCommand::List { launcher }) => {
+            #[derive(Serialize)]
+            struct Row {
+                launcher: Launcher,
+                storage: storage::Storage,
+            }
+            let rows = storages(launcher.as_deref())?
+                .into_iter()
+                .map(|(launcher, storage)| Row { launcher, storage })
+                .collect::<Vec<_>>();
+            let mut text = Vec::new();
+            for r in &rows {
+                for p in &r.storage.problems {
+                    eprintln!("protonhub: warning: {p}; no folder is judged left over");
+                }
+                if let Some(e) = &r.storage.names_error {
+                    eprintln!("protonhub: warning: {e}; apps no longer installed have no names");
+                }
+                for i in &r.storage.items {
+                    text.push(format!(
+                        "{}	{}	{}	{}	{}",
+                        r.launcher,
+                        kind(i.kind),
+                        install::human_size(i.size),
+                        i.app,
+                        label(i)
+                    ));
+                }
+            }
+            print(json, text.join("\n"), &rows)
+        }
+        Command::Storage(StorageCommand::Cleanup { launcher, yes }) => {
+            let mut deleted = Vec::new();
+            for (l, s) in storages(launcher.as_deref())? {
+                for p in &s.problems {
+                    eprintln!("protonhub: warning: {p}; no folder is judged left over");
+                }
+                if let Some(e) = &s.names_error {
+                    eprintln!("protonhub: warning: {e}; apps no longer installed have no names");
+                }
+                let orphaned: Vec<_> = s.orphaned().cloned().collect();
+                if yes && !orphaned.is_empty() {
+                    let dirs: Vec<_> = orphaned.iter().map(|i| i.dir.as_path()).collect();
+                    storage::delete(&l, &dirs)?;
+                }
+                deleted.extend(orphaned);
+            }
+            let total: u64 = deleted.iter().map(|i| i.size).sum();
+            let mut text: Vec<_> = deleted
+                .iter()
+                .map(|i| {
+                    format!(
+                        "{}\t{}\t{}",
+                        i.dir.display(),
+                        install::human_size(i.size),
+                        label(i)
+                    )
+                })
+                .collect();
+            text.push(match (deleted.is_empty(), yes) {
+                (true, _) => "nothing left over".into(),
+                (false, true) => format!("freed {}", install::human_size(total)),
+                (false, false) => format!(
+                    "{} left over; run with --yes to delete it",
+                    install::human_size(total)
+                ),
+            });
+            print(json, text.join("\n"), &deleted)
+        }
+        Command::Storage(StorageCommand::Remove {
+            game,
+            prefix,
+            shader_cache: _,
+            launcher,
+        }) => {
+            let target = pick_one(launcher.as_deref(), is_steam, "has prefixes")?;
+            let s = storage::scan(&target)?.expect("a Steam");
+            let want = if prefix {
+                Kind::Prefix
+            } else {
+                Kind::ShaderCache
+            };
+            let item = s
+                .items
+                .iter()
+                .find(|i| i.kind == want && (i.app == game || i.name.as_deref() == Some(&game)))
+                .ok_or_else(|| format!("{target} has no {} for {game}", kind(want)))?;
+            storage::delete(&target, &[&item.dir])?;
+            print(
+                json,
+                format!(
+                    "deleted {} ({})",
+                    item.dir.display(),
+                    install::human_size(item.size)
+                ),
+                item,
+            )
         }
         Command::Channel(cmd) => {
             let path = channels_path()?;
@@ -1000,6 +1139,41 @@ fn launchers(
         .cloned()
         .collect();
     Ok((supported, matching))
+}
+
+fn is_steam(l: &Launcher) -> bool {
+    l.kind == LauncherKind::Steam
+}
+
+/// The prefixes and shader caches of each Steam `spec` names.
+fn storages(spec: Option<&str>) -> Result<Vec<(Launcher, storage::Storage)>> {
+    let mut all = Vec::new();
+    for l in launchers(spec, is_steam)?.1 {
+        let s = storage::scan(&l)?.expect("a Steam");
+        all.push((l, s));
+    }
+    Ok(all)
+}
+
+/// An item's app by name, and for a leftover why it is one.
+fn label(i: &storage::Item) -> String {
+    let name = match &i.name {
+        Some(n) => n.clone(),
+        None if i.shortcut() => "non-Steam game".into(),
+        None => "-".into(),
+    };
+    match (i.orphaned, i.shortcut()) {
+        (false, _) => name,
+        (true, true) => format!("{name} (removed from Steam)"),
+        (true, false) => format!("{name} (uninstalled)"),
+    }
+}
+
+fn kind(kind: Kind) -> &'static str {
+    match kind {
+        Kind::Prefix => "prefix",
+        Kind::ShaderCache => "shader cache",
+    }
 }
 
 /// Launchers that keep a compatibility tool per game.

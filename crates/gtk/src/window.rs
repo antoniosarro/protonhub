@@ -18,6 +18,7 @@ use protonhub_core::manifest::{Arch, LauncherKind, Registry, Tool};
 use protonhub_core::paths;
 use protonhub_core::releases::{self, Client, Version};
 use protonhub_core::steam;
+use protonhub_core::storage;
 
 use crate::i18n::{tr, trn};
 use crate::{errors, page};
@@ -67,6 +68,8 @@ pub struct LauncherState {
     pub info_error: Option<String>,
     /// Valve's Protons, in a Steam, with what uses them.
     pub officials: Result<Vec<games::OfficialUsage>, String>,
+    /// A Steam's prefixes and shader caches; none for another launcher.
+    pub storage: Result<Option<storage::Storage>, String>,
 }
 
 impl Snapshot {
@@ -113,6 +116,7 @@ impl Snapshot {
                     usage: usage.remove(0),
                     library,
                     running: games::is_running(&l),
+                    storage: storage::scan(&l).map_err(|e| e.to_string()),
                     info,
                     info_error,
                     officials: match &officials {
@@ -630,6 +634,23 @@ impl Window {
             for dir in &dirs {
                 install::delete(dir).map_err(|e| e.to_string())?;
             }
+            Ok(tr("Freed {size}", &[("size", &install::human_size(freed))]))
+        });
+    }
+
+    /// Deletes prefixes and shader caches of `launcher`, a Steam; refused
+    /// if Steam started meanwhile.
+    pub fn delete_storage(self: &Rc<Self>, launcher: &Launcher, dirs: Vec<PathBuf>, freed: u64) {
+        let title = trn(
+            "Deleting {n} folder",
+            "Deleting {n} folders",
+            dirs.len(),
+            &[],
+        );
+        let launcher = launcher.clone();
+        self.run(title, move |_| {
+            let dirs: Vec<_> = dirs.iter().map(PathBuf::as_path).collect();
+            storage::delete(&launcher, &dirs).map_err(|e| e.to_string())?;
             Ok(tr("Freed {size}", &[("size", &install::human_size(freed))]))
         });
     }
