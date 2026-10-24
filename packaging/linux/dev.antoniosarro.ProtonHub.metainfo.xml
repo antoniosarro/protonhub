@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>dev.antoniosarro.ProtonHub</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <name>ProtonHub</name>
+  <summary>Manage Proton, Wine, DXVK and VKD3D across game launchers</summary>
+  <developer id="dev.antoniosarro">
+    <name>Antonio Sarro</name>
+  </developer>
+  <description>
+    <p>
+      ProtonHub installs and removes compatibility tools such as GE-Proton,
+      Proton-CachyOS, Wine-GE, DXVK and vkd3d-proton for Steam, Heroic,
+      Lutris, Bottles and WineZGUI, and verifies every download against its
+      published checksum.
+    </p>
+    <ul>
+      <li>Set the tool each Steam and Heroic game runs with, one by one or in bulk</li>
+      <li>See which games use which tool, and delete the tools nothing uses</li>
+      <li>Keep tools at their latest release, daily, and move games onto it</li>
+      <li>See ProtonDB ratings and anti-cheat status for your games</li>
+      <li>Every failure is shown with its reason, ready to copy into a bug report</li>
+    </ul>
+  </description>
+  <launchable type="desktop-id">dev.antoniosarro.ProtonHub.desktop</launchable>
+  <url type="homepage">https://github.com/antoniosarro/protonhub</url>
+  <url type="bugtracker">https://github.com/antoniosarro/protonhub/issues</url>
+  <content_rating type="oars-1.1"/>
+  <supports>
+    <control>keyboard</control>
+    <control>pointing</control>
+    <control>gamepad</control>
+  </supports>
+  <provides>
+    <binary>protonhub</binary>
+    <binary>protonhub-gtk</binary>
+  </provides>
+  <releases>
+    <release version="0.1.0" date="2026-10-24"/>
+  </releases>
+</component>

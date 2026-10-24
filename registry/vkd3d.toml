@@ -1,0 +1,14 @@
+# VKD3D: Direct3D 12 on Vulkan, for Lutris, Heroic and Bottles.
+# Schema: docs/manifests.md
+
+[vkd3d-proton]
+name      = "vkd3d-proton"
+source    = { github = "HansKristian-Work/vkd3d-proton" }
+asset     = { any = '^vkd3d-proton-.*\.tar\.zst$' }
+launchers = { lutris = "runtime/vkd3d", heroic = "tools/vkd3d", bottles = "vkd3d" }
+
+[vkd3d-lutris]
+name      = "vkd3d-lutris"
+source    = { github = "lutris/vkd3d" }
+asset     = { any = '^vkd3d-.*\.tar\.xz$' }
+launchers = { lutris = "runtime/vkd3d", heroic = "tools/vkd3d" }

@@ -1,0 +1,58 @@
+# Maintainer: Antonio Sarro <tech@antoniosarro.dev>
+#
+# The newest commit on main, as AUR's protonhub-git. Build it with
+# `makepkg -si` in this directory.
+pkgname=protonhub-git
+_pkgname=protonhub
+pkgver=0.1.0
+pkgrel=1
+pkgdesc='Install and manage Proton, Wine, DXVK and VKD3D builds across game launchers'
+arch=('x86_64' 'aarch64')
+url='https://github.com/antoniosarro/protonhub'
+license=('MIT')
+depends=('gtk4' 'libadwaita' 'systemd-libs' 'gcc-libs' 'glibc')
+makedepends=('cargo' 'git' 'gettext')
+optdepends=('libnotify: notifications from the update timer')
+provides=("$_pkgname")
+conflicts=("$_pkgname")
+source=("$_pkgname::git+$url.git")
+sha256sums=('SKIP')
+# makepkg's LTO breaks linking ring's C code into the Rust binaries, and
+# release builds carry no debug info for a -debug package.
+options=('!lto' '!debug')
+
+# 1.2.3.r4.gabc1234 four commits past the tag v1.2.3;
+# 0.0.0.r<commits>.g<hash> before the first tag.
+pkgver() {
+  cd "$_pkgname"
+  if d=$(git describe --long --tags --abbrev=7 --match 'v[0-9]*' 2>/dev/null); then
+    echo "$d" | sed 's/^v//;s/-\([0-9]*\)-g/.r\1.g/'
+  else
+    printf '0.0.0.r%s.g%s' "$(git rev-list --count HEAD)" "$(git rev-parse --short=7 HEAD)"
+  fi
+}
+
+prepare() {
+  cd "$_pkgname"
+  export RUSTUP_TOOLCHAIN=stable
+  cargo fetch --locked --target "$(rustc -vV | sed -n 's/host: //p')"
+}
+
+build() {
+  cd "$_pkgname"
+  export RUSTUP_TOOLCHAIN=stable CARGO_TARGET_DIR=target
+  cargo build --frozen --release --workspace
+}
+
+check() {
+  cd "$_pkgname"
+  export RUSTUP_TOOLCHAIN=stable CARGO_TARGET_DIR=target
+  cargo test --frozen --release --workspace
+}
+
+package() {
+  cd "$_pkgname"
+  install -Dm755 target/release/protonhub target/release/protonhub-gtk -t "$pkgdir/usr/bin"
+  sh packaging/install-data.sh "$pkgdir/usr"
+  install -Dm644 LICENSE -t "$pkgdir/usr/share/licenses/$pkgname"
+}

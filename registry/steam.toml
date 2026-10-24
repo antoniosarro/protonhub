@@ -1,0 +1,32 @@
+# Steam-only compatibility tools that aren't Proton: native engines and
+# launch wrappers. Schema: docs/manifests.md
+
+[luxtorpeda]
+name      = "Luxtorpeda"
+source    = { forgejo = "https://codeberg.org/luxtorpeda/luxtorpeda" }
+asset     = { x86_64 = '^luxtorpeda-v.*\.tar\.xz$' }
+checksum  = { pattern = "{asset}.sha512", algo = "sha512" }
+launchers = { steam = "compatibilitytools.d" }
+
+[boxtron]
+name      = "Boxtron"
+source    = { github = "dreamer/boxtron" }
+# The directory is boxtron in every version: a new one replaces the old.
+asset     = { any = '^boxtron\.tar\.xz$' }
+launchers = { steam = "compatibilitytools.d" }
+
+[roberta]
+name      = "Roberta"
+source    = { github = "dreamer/roberta" }
+asset     = { any = '^roberta\.tar\.xz$' }
+requires  = ["scummvm"]
+launchers = { steam = "compatibilitytools.d" }
+
+[steam-play-none]
+name      = "Steam-Play-None"
+# Runs a game's Linux build where Steam would pick Proton; it has no
+# releases, so this is the main branch as it is now.
+source    = { url = "https://github.com/Scrumplex/Steam-Play-None/archive/refs/heads/main.tar.gz", version = "main" }
+asset     = { any = '^main\.tar\.gz$' }
+dir       = "Steam-Play-None"
+launchers = { steam = "compatibilitytools.d" }

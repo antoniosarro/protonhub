@@ -1,0 +1,25 @@
+# Resolves every tool's latest release, for every arch, so an upstream
+# rename (an asset or checksum file that no longer matches its manifest)
+# breaks this job before it reaches users. Nightly, and on changes to the
+# manifests.
+name: registry
+
+on:
+  schedule:
+    - cron: "17 4 * * *"
+  workflow_dispatch:
+  pull_request:
+    paths: ["registry/**"]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: cachix/install-nix-action@v31
+      - run: nix develop -c just registry-verify
+        env:
+          GITHUB_TOKEN: ${{ github.token }} # 5000 API requests an hour, not 60

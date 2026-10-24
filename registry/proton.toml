@@ -1,0 +1,49 @@
+# Proton builds: for Steam (compatibilitytools.d), Heroic, Lutris and Bottles.
+# Schema: docs/manifests.md
+
+[ge-proton]
+name      = "GE-Proton"
+source    = { github = "GloriousEggroll/proton-ge-custom" }
+# GE-Proton11 and later ship one tarball per arch; before that, one
+# GE-ProtonN-M.tar.gz for x86_64. The pattern takes either.
+asset     = { x86_64 = '^GE-Proton[0-9][0-9.-]*(-x86_64)?\.tar\.gz$', aarch64 = '^GE-Proton[0-9][0-9.-]*-aarch64\.tar\.gz$' }
+checksum  = { pattern = "{asset_stem}.sha512sum", algo = "sha512" }
+launchers = { steam = "compatibilitytools.d", heroic = "tools/proton", lutris = "runners/proton", bottles = "runners" }
+
+[proton-cachyos]
+name      = "Proton-CachyOS"
+source    = { github = "CachyOS/proton-cachyos" }
+# Also -x86_64_v3 builds, for newer CPUs; the baseline runs everywhere.
+asset     = { x86_64 = '^proton-cachyos-.*-x86_64\.tar\.xz$', aarch64 = '^proton-cachyos-.*-arm64\.tar\.xz$' }
+checksum  = { pattern = "{asset_stem}.sha512sum", algo = "sha512" }
+launchers = { steam = "compatibilitytools.d", heroic = "tools/proton", lutris = "runners/proton", bottles = "runners" }
+
+[proton-wineland]
+name      = "Proton-Wineland"
+source    = { github = "nanomatters/proton-cachyos" }
+asset     = { x86_64 = '^proton-wineland-.*-x86_64\.tar\.xz$' }
+checksum  = { pattern = "{asset_stem}.sha512sum", algo = "sha512" }
+launchers = { steam = "compatibilitytools.d", heroic = "tools/proton", lutris = "runners/proton", bottles = "runners" }
+
+[dw-proton]
+name      = "DW-Proton"
+# The GitHub mirror of dawn.wine's Forgejo.
+source    = { github = "dawn-winery/dwproton-mirror" }
+asset     = { x86_64 = '^dwproton-.*-x86_64\.tar\.xz$' }
+checksum  = { pattern = "{asset_stem}.sha512sum", algo = "sha512" }
+launchers = { steam = "compatibilitytools.d", heroic = "tools/proton", lutris = "runners/proton", bottles = "runners" }
+
+[proton-rtsp]
+name      = "Proton-RTSP"
+source    = { github = "SpookySkeletons/proton-rtsp" }
+asset     = { x86_64 = '^proton-rtsp-.*\.tar\.gz$' }
+checksum  = { pattern = "{asset}.sha512sum", algo = "sha512" }
+launchers = { steam = "compatibilitytools.d", heroic = "tools/proton", lutris = "runners/proton", bottles = "runners" }
+
+[proton-em]
+name      = "Proton-EM"
+# Formerly Etaash-mathamsetty/Proton.
+source    = { github = "BananaWorks07/Proton" }
+asset     = { x86_64 = '^proton-EM-.*\.tar\.xz$' }
+checksum  = { pattern = "{asset_stem}.sha256sum", algo = "sha256" }
+launchers = { steam = "compatibilitytools.d", heroic = "tools/proton", lutris = "runners/proton", bottles = "runners" }

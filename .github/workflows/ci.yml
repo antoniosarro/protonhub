@@ -1,0 +1,16 @@
+# Format, lint, and test every push and pull request, in the flake's dev shell.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: cachix/install-nix-action@v31
+      - run: nix develop -c cargo fmt --all --check
+      - run: nix develop -c just lint gui-check registry-check test

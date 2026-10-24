@@ -1,0 +1,51 @@
+# The Flatpak of protonhub: the GUI, with the CLI inside
+# (flatpak run --command=protonhub dev.antoniosarro.ProtonHub).
+# Build: just pkg flatpak. After changing Cargo.lock: just pkg flatpak-sources.
+app-id: dev.antoniosarro.ProtonHub
+runtime: org.gnome.Platform
+runtime-version: "51"
+sdk: org.gnome.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.rust-stable
+command: protonhub-gtk
+finish-args:
+  - --share=network
+  - --share=ipc
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --device=dri
+  # Gamepads.
+  - --device=input
+  - --talk-name=org.freedesktop.Notifications
+  # Each launcher's data directory, native, Flatpak and Snap, as
+  # crates/core/src/launcher.rs looks for them.
+  - --filesystem=~/.local/share/Steam
+  - --filesystem=~/.steam
+  - --filesystem=~/.var/app/com.valvesoftware.Steam/data/Steam
+  - --filesystem=~/snap/steam/common/.local/share/Steam
+  - --filesystem=~/.config/heroic
+  - --filesystem=~/.var/app/com.heroicgameslauncher.hgl/config/heroic
+  - --filesystem=~/.local/share/lutris
+  - --filesystem=~/.config/lutris:ro
+  - --filesystem=~/.var/app/net.lutris.Lutris/data/lutris
+  - --filesystem=~/.local/share/bottles
+  - --filesystem=~/.var/app/com.usebottles.bottles/data/bottles
+  - --filesystem=~/.local/share/winezgui
+  - --filesystem=~/.var/app/io.github.fastrizwaan.WineZGUI/data/winezgui
+build-options:
+  append-path: /usr/lib/sdk/rust-stable/bin
+  env:
+    CARGO_HOME: /run/build/protonhub/cargo
+    CARGO_NET_OFFLINE: "true"
+modules:
+  - name: protonhub
+    buildsystem: simple
+    build-commands:
+      - cargo build --release --workspace
+      - install -Dm755 target/release/protonhub target/release/protonhub-gtk -t /app/bin
+      - sh packaging/install-data.sh /app
+    sources:
+      - type: dir
+        path: ../..
+        skip: [target, dist, result, .direnv]
+      - cargo-sources.json

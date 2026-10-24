@@ -1,0 +1,7 @@
+/target/
+/result
+/dist/
+/debian/
+/.flatpak-builder/
+.direnv/
+.claude/

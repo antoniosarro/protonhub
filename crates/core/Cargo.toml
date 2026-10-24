@@ -1,0 +1,21 @@
+[package]
+name = "protonhub-core"
+description = "Launchers, the installer pipeline, and launcher config IO"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+flate2 = "1.1.10"
+liblzma = "0.4.8"
+protonhub-manifest.workspace = true
+regex.workspace = true
+ruzstd = "0.9.0"
+serde.workspace = true
+serde_json.workspace = true
+sha2 = "0.11.0"
+tar = "0.4.46"
+thiserror.workspace = true
+toml.workspace = true
+ureq = "3.4.2"
+

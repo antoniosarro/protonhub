@@ -1,0 +1,28 @@
+#!/usr/bin/make -f
+# Builds a .deb from a checkout; see packaging/README.md. The crates come
+# from crates.io, so the build needs the network.
+
+export CARGO_HOME = $(CURDIR)/debian/cargo
+export CARGO_TARGET_DIR = $(CURDIR)/debian/target
+
+%:
+	dh $@
+
+override_dh_auto_configure:
+	cargo fetch --locked
+
+override_dh_auto_build:
+	cargo build --frozen --release --workspace
+
+override_dh_auto_test:
+ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
+	cargo test --frozen --release --workspace
+endif
+
+override_dh_auto_install:
+	install -Dm755 $(CARGO_TARGET_DIR)/release/protonhub $(CARGO_TARGET_DIR)/release/protonhub-gtk \
+		-t debian/protonhub/usr/bin
+	sh packaging/install-data.sh debian/protonhub/usr
+
+override_dh_auto_clean:
+	rm -rf debian/cargo debian/target

@@ -1,0 +1,37 @@
+/* Small rounded labels: ratings, statuses, marks. */
+.pill {
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 0.8em;
+  font-weight: 700;
+  background-color: alpha(currentColor, 0.14);
+}
+.pill.accent { color: var(--accent-color, @accent_color); }
+
+/* ProtonDB's tiers, in its own colors, readable on light and dark: the
+   band at the start of a game's row and the legend's dots. */
+.tier-platinum { color: #7f9bb8; }
+.tier-gold { color: #c99a06; }
+.tier-silver { color: #8a8a8a; }
+.tier-bronze { color: #b8692e; }
+.tier-borked { color: #e01b24; }
+.tier-pending, .tier-none { color: transparent; }
+.band, .dot { background-color: currentColor; }
+.band { border-radius: 0 3px 3px 0; }
+.dot { border-radius: 999px; }
+
+/* A game's picture, and the icon behind it while it loads. */
+.thumbnail {
+  min-width: 96px;
+  min-height: 45px;
+  border-radius: 6px;
+  background-color: alpha(currentColor, 0.08);
+}
+.thumbnail > image { opacity: 0.4; }
+window.narrow .thumbnail { min-width: 45px; }
+
+.job-card {
+  padding: 12px;
+  border-radius: 12px;
+  background-color: alpha(currentColor, 0.06);
+}

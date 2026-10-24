@@ -1,0 +1,23 @@
+# DXVK and its variants: Direct3D 8-11 on Vulkan, for Lutris, Heroic and
+# Bottles. Schema: docs/manifests.md
+
+[dxvk]
+name      = "DXVK"
+source    = { github = "doitsujin/dxvk" }
+# Not dxvk-native-*, the Linux-native build.
+asset     = { any = '^dxvk-[0-9][0-9.]*\.tar\.gz$' }
+launchers = { lutris = "runtime/dxvk", heroic = "tools/dxvk", bottles = "dxvk" }
+
+[dxvk-gplasync]
+name      = "DXVK GPL-Async"
+source    = { gitlab = "https://gitlab.com/Ph42oN/dxvk-gplasync" }
+asset     = { any = '^dxvk-gplasync-v.*\.tar\.gz$' }
+launchers = { lutris = "runtime/dxvk", bottles = "dxvk" }
+
+[dxvk-nvapi]
+name      = "DXVK-NVAPI"
+source    = { github = "jp7677/dxvk-nvapi" }
+asset     = { any = '^dxvk-nvapi-v.*\.tar\.gz$' }
+# Its archives hold x32/ and x64/ with no directory around them.
+dir       = "dxvk-nvapi-{tag}"
+launchers = { lutris = "runtime/dxvk-nvapi", heroic = "tools/dxvk-nvapi", bottles = "nvapi" }

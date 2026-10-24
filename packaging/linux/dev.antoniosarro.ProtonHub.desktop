@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=ProtonHub
+GenericName=Compatibility Tool Manager
+Comment=Install and manage Proton, Wine, DXVK and VKD3D for your game launchers
+Comment[it]=Installa e gestisci Proton, Wine, DXVK e VKD3D per i tuoi launcher di giochi
+Exec=protonhub-gtk
+Icon=dev.antoniosarro.ProtonHub
+Terminal=false
+Categories=Game;
+Keywords=Proton;Wine;DXVK;VKD3D;Steam;Heroic;Lutris;Bottles;GE-Proton;
+StartupNotify=true

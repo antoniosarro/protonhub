@@ -1,0 +1,43 @@
+# Packages of protonhub; run from the repository root as `just pkg <recipe>`
+# (see packaging/README.md). Artifacts go to dist/ or ./result.
+
+set working-directory := '..'
+
+# 1.2.3 at the tag v1.2.3; 1.2.3.r4.gabc1234 four commits past it;
+# 0.0.0.r<commits>.g<hash> before the first tag.
+version := `d=$(git describe --tags --long --match 'v[0-9]*' 2>/dev/null) && { n=${d%-g*}; n=${n##*-}; t=${d%-*-g*}; t=${t#v}; if [ "$n" = 0 ]; then echo "$t"; else echo "$t.r$n.g${d##*-g}"; fi; } || echo "0.0.0.r$(git rev-list --count HEAD 2>/dev/null || echo 0).g$(git rev-parse --short HEAD 2>/dev/null || echo none)"`
+
+default:
+    @just --list pkg
+
+# print the version packages get
+version:
+    @echo {{version}}
+
+# build and install the CLI, the GUI and their data under PREFIX, ~/.local by default
+install prefix=(home_directory() / ".local"):
+    cargo build --release --workspace
+    install -Dm755 target/release/protonhub target/release/protonhub-gtk -t "{{prefix}}/bin"
+    sh packaging/install-data.sh "{{prefix}}"
+
+# the Nix package (CLI and GUI), as ./result
+nix:
+    nix build .#default
+
+# regenerate packaging/flatpak/cargo-sources.json from Cargo.lock (flatpak-builder-tools' generator)
+flatpak-sources:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    gen=$(mktemp -d)/flatpak-cargo-generator.py
+    curl -sSfL https://raw.githubusercontent.com/flatpak/flatpak-builder-tools/master/cargo/flatpak-cargo-generator.py -o "$gen"
+    nix shell --impure --expr 'with (builtins.getFlake (toString ./.)).inputs.nixpkgs.legacyPackages.${builtins.currentSystem}; python3.withPackages (p: [ p.aiohttp p.tomlkit ])' \
+        -c python3 -I "$gen" Cargo.lock -o packaging/flatpak/cargo-sources.json
+
+# build and install the Flatpak for this user (needs flatpak-builder and Flathub)
+flatpak:
+    flatpak-builder --user --install --install-deps-from=flathub --force-clean \
+        dist/flatpak packaging/flatpak/dev.antoniosarro.ProtonHub.yml
+
+# remove dist/ and ./result
+clean:
+    rm -rf dist result

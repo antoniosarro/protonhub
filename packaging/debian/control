@@ -1,0 +1,30 @@
+Source: protonhub
+Section: games
+Priority: optional
+Maintainer: Antonio Sarro <tech@antoniosarro.dev>
+Build-Depends: debhelper-compat (= 13),
+               cargo (>= 1.92),
+               rustc (>= 1.92),
+               pkgconf,
+               libgtk-4-dev (>= 4.12),
+               libadwaita-1-dev (>= 1.6),
+               libudev-dev,
+               gettext
+Standards-Version: 4.7.0
+Homepage: https://github.com/antoniosarro/protonhub
+Rules-Requires-Root: no
+
+Package: protonhub
+Architecture: amd64 arm64
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Recommends: libnotify-bin
+Description: install and manage Proton, Wine, DXVK and VKD3D builds
+ ProtonHub installs and removes compatibility tools such as GE-Proton,
+ Proton-CachyOS, Wine-GE, DXVK and vkd3d-proton for Steam, Heroic, Lutris,
+ Bottles and WineZGUI, verifying every download against its published
+ checksum. It sets the tool each Steam and Heroic game runs with, finds the
+ tools nothing uses, and keeps tools at their latest release with a daily
+ systemd user timer.
+ .
+ It comes as a GTK 4 + libadwaita app (protonhub-gtk) and a scriptable
+ command line (protonhub).

@@ -1,0 +1,22 @@
+[workspace]
+resolver = "3"
+members = ["crates/manifest", "crates/core", "crates/cli", "crates/gtk"]
+# The GUI links GTK 4 and libadwaita; plain cargo commands build and test only the core.
+default-members = ["crates/manifest", "crates/core", "crates/cli"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.92"
+license = "MIT"
+repository = "https://github.com/antoniosarro/protonhub"
+
+[workspace.dependencies]
+protonhub-manifest = { path = "crates/manifest" }
+protonhub-core = { path = "crates/core" }
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order"] }
+thiserror = "2"
+toml = "1"
+regex = "1"
+clap = { version = "4", features = ["derive"] }

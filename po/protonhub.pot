@@ -1,0 +1,696 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the protonhub package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: protonhub\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-24 21:40+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: crates/gtk/src/details.rs:65
+#, rust-format
+msgid "{size} · installed by Steam"
+msgstr ""
+
+#: crates/gtk/src/details.rs:69
+#, rust-format
+msgid "{size} · installed by ProtonHub"
+msgstr ""
+
+#: crates/gtk/src/details.rs:73
+#, rust-format
+msgid "{size} · added outside ProtonHub"
+msgstr ""
+
+#: crates/gtk/src/details.rs:86
+msgid "Folder"
+msgstr ""
+
+#: crates/gtk/src/details.rs:92
+msgid "Open the folder"
+msgstr ""
+
+#: crates/gtk/src/details.rs:114
+msgid "Steam App"
+msgstr ""
+
+#: crates/gtk/src/details.rs:123
+msgid "Checksum"
+msgstr ""
+
+#: crates/gtk/src/details.rs:125
+msgid "Verified when installed"
+msgstr ""
+
+#: crates/gtk/src/details.rs:127
+msgid "Not verified: the release publishes none"
+msgstr ""
+
+#: crates/gtk/src/details.rs:135
+msgid "Used By"
+msgstr ""
+
+#: crates/gtk/src/details.rs:139
+msgid "ProtonHub can't tell what uses a tool like this one"
+msgstr ""
+
+#: crates/gtk/src/details.rs:143
+msgid "No game in any launcher"
+msgstr ""
+
+#: crates/gtk/src/details.rs:148
+msgid "The launcher's default"
+msgstr ""
+
+#: crates/gtk/src/details.rs:149
+msgid "Games without a tool of their own"
+msgstr ""
+
+#: crates/gtk/src/details.rs:167
+msgid "Delete…"
+msgstr ""
+
+#: crates/gtk/src/details.rs:178
+msgid "Quit Steam to delete it: Steam would undo it"
+msgstr ""
+
+#: crates/gtk/src/details.rs:234
+#, rust-format
+msgid ""
+"{n} game runs with it and won't start until you choose another tool for it:"
+msgid_plural ""
+"{n} games run with it and won't start until you choose another tool for them:"
+msgstr[0] ""
+msgstr[1] ""
+
+#: crates/gtk/src/details.rs:243
+msgid ""
+"It's the launcher's default: games without a tool of their own will need a "
+"new default."
+msgstr ""
+
+#: crates/gtk/src/details.rs:248
+msgid "Steam downloads it again when one of them starts."
+msgstr ""
+
+#: crates/gtk/src/details.rs:251
+msgid "Nothing uses it. This can't be undone."
+msgstr ""
+
+#: crates/gtk/src/details.rs:253
+msgid "This can't be undone."
+msgstr ""
+
+#: crates/gtk/src/details.rs:256
+#, rust-format
+msgid "Delete {tool}?"
+msgstr ""
+
+#: crates/gtk/src/details.rs:260 crates/gtk/src/page.rs:976
+msgid "Cancel"
+msgstr ""
+
+#: crates/gtk/src/details.rs:261 crates/gtk/src/page.rs:977
+msgid "Delete"
+msgstr ""
+
+#: crates/gtk/src/errors.rs:61
+msgid "Copy diagnostics"
+msgstr ""
+
+#: crates/gtk/src/errors.rs:99
+msgid "Copy All"
+msgstr ""
+
+#: crates/gtk/src/errors.rs:101
+msgid "Clear"
+msgstr ""
+
+#: crates/gtk/src/errors.rs:114
+msgid "No errors"
+msgstr ""
+
+#: crates/gtk/src/errors.rs:126
+msgid "Errors"
+msgstr ""
+
+#: crates/gtk/src/i18n.rs:64 crates/gtk/src/window.rs:758
+#, rust-format
+msgid "{game} now runs with {tool}"
+msgstr ""
+
+#: crates/gtk/src/i18n.rs:69 crates/gtk/src/i18n.rs:70
+#: crates/gtk/src/page.rs:940 crates/gtk/src/window.rs:855
+#, rust-format
+msgid "{n} game"
+msgid_plural "{n} games"
+msgstr[0] ""
+msgstr[1] ""
+
+#: crates/gtk/src/page.rs:29
+#, rust-format
+msgid ""
+"{launcher} is running: quit it to change a game's tool, or it will undo the "
+"change"
+msgstr ""
+
+#: crates/gtk/src/page.rs:34
+#, rust-format
+msgid ""
+"Quit {launcher} before changing a game's tool: from inside a Flatpak, "
+"ProtonHub can't tell whether it's running"
+msgstr ""
+
+#: crates/gtk/src/page.rs:46 crates/gtk/src/page.rs:55
+msgid "Games"
+msgstr ""
+
+#: crates/gtk/src/page.rs:53
+msgid "Can't read the games"
+msgstr ""
+
+#: crates/gtk/src/page.rs:62
+msgid "Can't read the tool directories"
+msgstr ""
+
+#: crates/gtk/src/page.rs:67
+msgid "Tools"
+msgstr ""
+
+#: crates/gtk/src/page.rs:152
+msgid "No games installed"
+msgstr ""
+
+#: crates/gtk/src/page.rs:154
+#, rust-format
+msgid "Games installed with {launcher} show up here"
+msgstr ""
+
+#: crates/gtk/src/page.rs:163
+msgid "Search games"
+msgstr ""
+
+#: crates/gtk/src/page.rs:170
+msgid "Move Games…"
+msgstr ""
+
+#: crates/gtk/src/page.rs:174
+msgid "Move every game set to one tool to another"
+msgstr ""
+
+#: crates/gtk/src/page.rs:197
+msgid "Some ratings or anti-cheat statuses are missing"
+msgstr ""
+
+#: crates/gtk/src/page.rs:209
+msgid "Left out: a file couldn't be read"
+msgstr ""
+
+#: crates/gtk/src/page.rs:219
+msgid "No games match"
+msgstr ""
+
+#: crates/gtk/src/page.rs:257
+msgid "ProtonDB rating:"
+msgstr ""
+
+#: crates/gtk/src/page.rs:279
+msgid "Platinum"
+msgstr ""
+
+#: crates/gtk/src/page.rs:280
+msgid "Gold"
+msgstr ""
+
+#: crates/gtk/src/page.rs:281
+msgid "Silver"
+msgstr ""
+
+#: crates/gtk/src/page.rs:282
+msgid "Bronze"
+msgstr ""
+
+#: crates/gtk/src/page.rs:283
+msgid "Borked"
+msgstr ""
+
+#: crates/gtk/src/page.rs:284
+msgid "Pending"
+msgstr ""
+
+#: crates/gtk/src/page.rs:330
+#, rust-format
+msgid "Anti-cheat: {names}"
+msgstr ""
+
+#: crates/gtk/src/page.rs:353
+#, rust-format
+msgid "ProtonDB: {tier}, from {n} report"
+msgid_plural "ProtonDB: {tier}, from {n} reports"
+msgstr[0] ""
+msgstr[1] ""
+
+#: crates/gtk/src/page.rs:385
+msgid "The tool it runs with"
+msgstr ""
+
+#: crates/gtk/src/page.rs:420
+msgid "ProtonDB Reports"
+msgstr ""
+
+#: crates/gtk/src/page.rs:424
+msgid "SteamDB"
+msgstr ""
+
+#: crates/gtk/src/page.rs:428
+msgid "Steam Store"
+msgstr ""
+
+#: crates/gtk/src/page.rs:454
+msgid "Open on the web"
+msgstr ""
+
+#: crates/gtk/src/page.rs:544
+#, rust-format
+msgid "{n} unused tool takes {size}"
+msgid_plural "{n} unused tools take {size}"
+msgstr[0] ""
+msgstr[1] ""
+
+#: crates/gtk/src/page.rs:549
+msgid "No game in any launcher runs it"
+msgstr ""
+
+#: crates/gtk/src/page.rs:553
+msgid "Clean Up…"
+msgstr ""
+
+#: crates/gtk/src/page.rs:579 crates/gtk/src/tool.rs:326
+msgid "Installed"
+msgstr ""
+
+#: crates/gtk/src/page.rs:583
+msgid "No tools installed yet"
+msgstr ""
+
+#: crates/gtk/src/page.rs:584
+msgid "Install one from the list below"
+msgstr ""
+
+#: crates/gtk/src/page.rs:592
+#, rust-format
+msgid "{n} tool · {size}"
+msgid_plural "{n} tools · {size}"
+msgstr[0] ""
+msgstr[1] ""
+
+#: crates/gtk/src/page.rs:645
+msgid "Default"
+msgstr ""
+
+#: crates/gtk/src/page.rs:647
+msgid "Unused"
+msgstr ""
+
+#: crates/gtk/src/page.rs:651 crates/gtk/src/window.rs:537
+msgid "Details"
+msgstr ""
+
+#: crates/gtk/src/page.rs:678
+msgid "From Steam"
+msgstr ""
+
+#: crates/gtk/src/page.rs:679
+msgid "Valve's Protons, which Steam installs and updates"
+msgstr ""
+
+#: crates/gtk/src/page.rs:685
+msgid "Can't read Steam's Protons"
+msgstr ""
+
+#: crates/gtk/src/page.rs:724
+msgid "Available"
+msgstr ""
+
+#: crates/gtk/src/page.rs:725
+msgid "Install a release, or keep a tool up to date"
+msgstr ""
+
+#: crates/gtk/src/page.rs:735
+#, rust-format
+msgid "{n} installed"
+msgid_plural "{n} installed"
+msgstr[0] ""
+msgstr[1] ""
+
+#: crates/gtk/src/page.rs:748
+msgid "Auto-update"
+msgstr ""
+
+#: crates/gtk/src/page.rs:829
+#, rust-format
+msgid "{tool} ({n} game)"
+msgid_plural "{tool} ({n} games)"
+msgstr[0] ""
+msgstr[1] ""
+
+#: crates/gtk/src/page.rs:837
+msgid "From"
+msgstr ""
+
+#: crates/gtk/src/page.rs:844
+msgid "To"
+msgstr ""
+
+#: crates/gtk/src/page.rs:848
+msgid "Games on the launcher's default stay on it"
+msgstr ""
+
+#: crates/gtk/src/page.rs:855
+msgid "Move"
+msgstr ""
+
+#: crates/gtk/src/page.rs:863
+msgid "Move Games"
+msgstr ""
+
+#: crates/gtk/src/page.rs:902
+#, rust-format
+msgid "Default ({tool})"
+msgstr ""
+
+#: crates/gtk/src/page.rs:903
+msgid "Default (none)"
+msgstr ""
+
+#: crates/gtk/src/page.rs:943
+msgid "unused"
+msgstr ""
+
+#: crates/gtk/src/page.rs:944
+msgid "used by the default"
+msgstr ""
+
+#: crates/gtk/src/page.rs:945
+#, rust-format
+msgid "used by {games}"
+msgstr ""
+
+#: crates/gtk/src/page.rs:946
+#, rust-format
+msgid "used by the default and {games}"
+msgstr ""
+
+#: crates/gtk/src/page.rs:953
+msgid "Non-Steam game"
+msgstr ""
+
+#: crates/gtk/src/page.rs:957
+msgid "Sideloaded"
+msgstr ""
+
+#: crates/gtk/src/page.rs:965
+#, rust-format
+msgid "Delete {n} unused tool?"
+msgid_plural "Delete {n} unused tools?"
+msgstr[0] ""
+msgstr[1] ""
+
+#: crates/gtk/src/page.rs:971
+#, rust-format
+msgid ""
+"This frees {size}:\n"
+"\n"
+"{tools}"
+msgstr ""
+
+#: crates/gtk/src/tool.rs:48
+#, rust-format
+msgid "Installs into {dir}"
+msgstr ""
+
+#: crates/gtk/src/tool.rs:77
+msgid "Updates"
+msgstr ""
+
+#: crates/gtk/src/tool.rs:83
+msgid "Releases"
+msgstr ""
+
+#: crates/gtk/src/tool.rs:86
+msgid "Looking for releases…"
+msgstr ""
+
+#: crates/gtk/src/tool.rs:138
+msgid "Keep up to date"
+msgstr ""
+
+#: crates/gtk/src/tool.rs:140
+msgid ""
+"Install new releases as they come out, with the daily timer (protonhub timer "
+"enable)"
+msgstr ""
+
+#: crates/gtk/src/tool.rs:148
+msgid "Versions to keep"
+msgstr ""
+
+#: crates/gtk/src/tool.rs:149
+msgid "Older ones are deleted once no game uses them"
+msgstr ""
+
+#: crates/gtk/src/tool.rs:152
+msgid "Move games to new releases"
+msgstr ""
+
+#: crates/gtk/src/tool.rs:154
+msgid "Games set to an older version switch to the new one"
+msgstr ""
+
+#: crates/gtk/src/tool.rs:160
+msgid "Update now"
+msgstr ""
+
+#: crates/gtk/src/tool.rs:163
+msgid "Update"
+msgstr ""
+
+#: crates/gtk/src/tool.rs:274
+msgid "Can't list the releases"
+msgstr ""
+
+#: crates/gtk/src/tool.rs:278
+#, rust-format
+msgid "Listing {tool} releases"
+msgstr ""
+
+#: crates/gtk/src/tool.rs:286
+msgid "No releases"
+msgstr ""
+
+#: crates/gtk/src/tool.rs:287
+msgid "The repository has published none for this tool"
+msgstr ""
+
+#: crates/gtk/src/tool.rs:303
+msgid "Latest"
+msgstr ""
+
+#: crates/gtk/src/tool.rs:305
+msgid "Prerelease"
+msgstr ""
+
+#: crates/gtk/src/tool.rs:310
+msgid "Release notes"
+msgstr ""
+
+#: crates/gtk/src/tool.rs:334
+msgid "Install"
+msgstr ""
+
+#: crates/gtk/src/window.rs:191
+msgid "Finding the release"
+msgstr ""
+
+#: crates/gtk/src/window.rs:192
+msgid "Downloading"
+msgstr ""
+
+#: crates/gtk/src/window.rs:193
+msgid "Verifying the checksum"
+msgstr ""
+
+#: crates/gtk/src/window.rs:194
+msgid "Extracting"
+msgstr ""
+
+#: crates/gtk/src/window.rs:205
+#, rust-format
+msgid "{step} · {done} of {total}"
+msgstr ""
+
+#: crates/gtk/src/window.rs:245
+msgid "Look for launchers and tools again (Ctrl+R)"
+msgstr ""
+
+#: crates/gtk/src/window.rs:470
+msgid "ProtonHub can't start"
+msgstr ""
+
+#: crates/gtk/src/window.rs:492
+msgid "No launchers found"
+msgstr ""
+
+#: crates/gtk/src/window.rs:494
+msgid ""
+"ProtonHub looks for Steam, Heroic, Lutris, Bottles and WineZGUI, native, "
+"Flatpak or Snap."
+msgstr ""
+
+#: crates/gtk/src/window.rs:534
+#, rust-format
+msgid "{n} error"
+msgid_plural "{n} errors"
+msgstr[0] ""
+msgstr[1] ""
+
+#: crates/gtk/src/window.rs:536
+#, rust-format
+msgid "{operation} failed"
+msgstr ""
+
+#: crates/gtk/src/window.rs:560
+#, rust-format
+msgid "Installing the latest {tool}"
+msgstr ""
+
+#: crates/gtk/src/window.rs:562
+#, rust-format
+msgid "Installing {version}"
+msgstr ""
+
+#: crates/gtk/src/window.rs:579
+#, rust-format
+msgid "Installed {version}; it needs {programs}, which isn't installed"
+msgstr ""
+
+#: crates/gtk/src/window.rs:584
+#, rust-format
+msgid "Installed {version}; restart Steam to use it"
+msgstr ""
+
+#: crates/gtk/src/window.rs:588
+#, rust-format
+msgid "Installed {version}"
+msgstr ""
+
+#: crates/gtk/src/window.rs:595 crates/gtk/src/window.rs:610
+#, rust-format
+msgid "Deleting {tool}"
+msgstr ""
+
+#: crates/gtk/src/window.rs:598 crates/gtk/src/window.rs:617
+#, rust-format
+msgid "Deleted {tool}"
+msgstr ""
+
+#: crates/gtk/src/window.rs:614
+msgid "Steam is running: quit it first"
+msgstr ""
+
+#: crates/gtk/src/window.rs:624
+#, rust-format
+msgid "Deleting {n} unused tool"
+msgid_plural "Deleting {n} unused tools"
+msgstr[0] ""
+msgstr[1] ""
+
+#: crates/gtk/src/window.rs:633
+#, rust-format
+msgid "Freed {size}"
+msgstr ""
+
+#: crates/gtk/src/window.rs:640
+#, rust-format
+msgid "Updating {tool}"
+msgstr ""
+
+#: crates/gtk/src/window.rs:662
+#, rust-format
+msgid "installed {version}"
+msgstr ""
+
+#: crates/gtk/src/window.rs:666
+#, rust-format
+msgid "moved {n} game onto it"
+msgid_plural "moved {n} games onto it"
+msgstr[0] ""
+msgstr[1] ""
+
+#: crates/gtk/src/window.rs:674
+#, rust-format
+msgid "deleted {n} old version"
+msgid_plural "deleted {n} old versions"
+msgstr[0] ""
+msgstr[1] ""
+
+#: crates/gtk/src/window.rs:682
+#, rust-format
+msgid "{version} is up to date"
+msgstr ""
+
+#: crates/gtk/src/window.rs:702
+msgid "Reading the channels"
+msgstr ""
+
+#: crates/gtk/src/window.rs:711 crates/gtk/src/window.rs:719
+msgid "Saving the channels"
+msgstr ""
+
+#: crates/gtk/src/window.rs:734
+#, rust-format
+msgid "Moved {n} game to {tool}"
+msgid_plural "Moved {n} games to {tool}"
+msgstr[0] ""
+msgstr[1] ""
+
+#: crates/gtk/src/window.rs:740
+#, rust-format
+msgid "Moving games to {tool}"
+msgstr ""
+
+#: crates/gtk/src/window.rs:761
+#, rust-format
+msgid "{game} now runs with the default"
+msgstr ""
+
+#: crates/gtk/src/window.rs:765
+#, rust-format
+msgid "Setting the tool of {game}"
+msgstr ""
+
+#: crates/gtk/src/window.rs:781
+msgid "Wait for the current job to finish"
+msgstr ""
+
+#: crates/gtk/src/window.rs:857
+#, rust-format
+msgid "{n} tool"
+msgid_plural "{n} tools"
+msgstr[0] ""
+msgstr[1] ""
+
+#: crates/gtk/src/window.rs:883
+msgid "Running"
+msgstr ""
