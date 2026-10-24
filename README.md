@@ -69,11 +69,15 @@ scriptable CLI with JSON output.
 
 ## Install
 
+Each [release](https://github.com/antoniosarro/protonhub/releases) has an
+Arch package, a `.deb` (Debian 13+, Ubuntu 24.10+), an `.rpm` (Fedora) and a
+Flatpak bundle, for x86_64. To build one yourself:
+
 | | |
 |---|---|
 | **Arch Linux** | `makepkg -si` in [`packaging/arch`](packaging/arch/PKGBUILD) (`protonhub-git`) |
-| **Fedora** | `rpmbuild -bb` [`packaging/rpm/protonhub.spec`](packaging/rpm/protonhub.spec) |
-| **Debian, Ubuntu** | `dpkg-buildpackage -b` with [`packaging/debian`](packaging/debian) |
+| **Fedora** | `packaging/build.sh rpm` ([spec](packaging/rpm/protonhub.spec)) |
+| **Debian, Ubuntu** | `packaging/build.sh deb` ([`debian/`](packaging/debian)) |
 | **NixOS, Nix** | the flake's package, overlay, NixOS and home-manager modules |
 | **Flatpak** | `just pkg flatpak` ([manifest](packaging/flatpak/dev.antoniosarro.ProtonHub.yml)) |
 | **From source** | `just pkg install` (to `~/.local`) |

@@ -7,7 +7,8 @@ Everything that turns protonhub into something to install. The recipes in
 ```
 packaging/
 ├── install-data.sh    installs everything but the binaries; every package calls it
-├── justfile           just pkg: version, install, nix, flatpak, flatpak-sources, clean
+├── build.sh           builds the Arch, Debian or Fedora package of the checkout
+├── justfile           just pkg: install, nix, flatpak, flatpak-sources, clean
 ├── linux/             desktop entry, AppStream metainfo, icon
 ├── arch/PKGBUILD      Arch Linux: protonhub-git
 ├── rpm/protonhub.spec Fedora
@@ -33,13 +34,25 @@ it. The GUI links GTK 4 (4.12+), libadwaita (1.6+) and libudev (gamepads);
 building needs Rust 1.92+ and gettext's `msgfmt`. `notify-send` (libnotify)
 is optional, for the update timer's notifications.
 
-## Version
+## Releases
 
-`just pkg version` prints the version from git: `1.2.3` at the tag
-`v1.2.3`, `1.2.3.r4.gabc1234` four commits past it, and
-`0.0.0.r<commits>.g<hash>` before the first tag. The Arch package uses the
-same scheme, with `.r0.g<hash>` at a tag. The Nix package reads `VERSION` (flakes can't see tags); the
-RPM spec and `debian/changelog` name it themselves.
+The version is the workspace's in `Cargo.toml`; the binaries report it
+(`protonhub --version`), the Nix package reads it, and `build.sh` writes
+it into the PKGBUILD, the RPM spec and `debian/changelog`. To release:
+
+1. Set `version` in `Cargo.toml`, and add a `<release>` for it to
+   `linux/dev.antoniosarro.ProtonHub.metainfo.xml`.
+2. Commit, then tag and push: `git tag v1.2.3 && git push origin v1.2.3`.
+
+`.github/workflows/release.yml` then builds the Arch, Debian, Fedora and
+Flatpak packages (x86_64), checks that the Nix package builds, and
+publishes them as the GitHub release `v1.2.3` with a `SHA256SUMS` file. It
+refuses a tag that isn't `v` + Cargo.toml's version, and a version without
+a `<release>`. Run it by hand from the Actions tab to build the packages
+as artifacts without releasing.
+
+`build.sh arch|deb|rpm` builds one of them on that distribution, with the
+build dependencies below installed; the package lands in `dist/`.
 
 ## From source
 
@@ -50,23 +63,27 @@ just pkg install ~/apps          # any PREFIX you can write to
 
 ## Arch Linux
 
-`arch/PKGBUILD` builds the newest commit, as AUR's `protonhub-git` would:
+`arch/PKGBUILD` builds main's newest commit, as AUR's `protonhub-git`;
+its version is `<last tag>.r<commits>.g<hash>`, or `0.0.0.r…` before the
+first tag. `build.sh arch` builds the checkout as `protonhub` instead.
 
 ```sh
+sudo pacman -S --needed base-devel rust gtk4 libadwaita gettext
 cd packaging/arch && makepkg -si
 ```
 
 ## Fedora
 
-`rpm/protonhub.spec` builds the release tagged `v<Version>`. The crates
-come from crates.io during `%prep`, so the build needs the network (on
-COPR, enable it for the project).
+`rpm/protonhub.spec` builds the release tagged `v<Version>` from GitHub,
+as COPR would; `build.sh rpm` builds the checkout. The crates come from
+crates.io during `%prep`, so the build needs the network (on COPR, enable
+it for the project).
 
 ```sh
 sudo dnf install rpm-build rpmdevtools
 sudo dnf builddep packaging/rpm/protonhub.spec
-spectool -g -R packaging/rpm/protonhub.spec
-rpmbuild -bb packaging/rpm/protonhub.spec
+packaging/build.sh rpm                                     # the checkout
+spectool -g -R packaging/rpm/protonhub.spec && rpmbuild -bb packaging/rpm/protonhub.spec   # a release
 ```
 
 ## Debian and Ubuntu
@@ -82,8 +99,8 @@ archive.
 ```sh
 sudo apt install build-essential debhelper cargo rustc pkgconf \
     libgtk-4-dev libadwaita-1-dev libudev-dev gettext
-cp -r packaging/debian . && dpkg-buildpackage -us -uc -b    # add -d with rustup
-sudo apt install ../protonhub_*.deb
+packaging/build.sh deb             # add -d with rustup
+sudo apt install ./dist/protonhub_*.deb
 ```
 
 ## Nix

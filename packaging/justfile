@@ -3,16 +3,8 @@
 
 set working-directory := '..'
 
-# 1.2.3 at the tag v1.2.3; 1.2.3.r4.gabc1234 four commits past it;
-# 0.0.0.r<commits>.g<hash> before the first tag.
-version := `d=$(git describe --tags --long --match 'v[0-9]*' 2>/dev/null) && { n=${d%-g*}; n=${n##*-}; t=${d%-*-g*}; t=${t#v}; if [ "$n" = 0 ]; then echo "$t"; else echo "$t.r$n.g${d##*-g}"; fi; } || echo "0.0.0.r$(git rev-list --count HEAD 2>/dev/null || echo 0).g$(git rev-parse --short HEAD 2>/dev/null || echo none)"`
-
 default:
     @just --list pkg
-
-# print the version packages get
-version:
-    @echo {{version}}
 
 # build and install the CLI, the GUI and their data under PREFIX, ~/.local by default
 install prefix=(home_directory() / ".local"):

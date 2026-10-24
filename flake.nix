@@ -13,9 +13,8 @@
       flake-utils,
     }:
     let
-      # Packaging lives in packaging/ (packaging/README.md). Flakes can't see
-      # git tags, so the version comes from VERSION.
-      version = nixpkgs.lib.trim (builtins.readFile ./VERSION);
+      # Packaging lives in packaging/ (packaging/README.md).
+      version = (builtins.fromTOML (builtins.readFile ./Cargo.toml)).workspace.package.version;
       protonhub = pkgs: pkgs.callPackage ./packaging/nix/package.nix { inherit version; };
     in
     flake-utils.lib.eachDefaultSystem (
