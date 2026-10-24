@@ -57,7 +57,7 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/dev.antoniosar
 %{_datadir}/protonhub/
 %{_datadir}/applications/dev.antoniosarro.ProtonHub.desktop
 %{_metainfodir}/dev.antoniosarro.ProtonHub.metainfo.xml
-%{_datadir}/icons/hicolor/scalable/apps/dev.antoniosarro.ProtonHub.svg
+%{_datadir}/icons/hicolor/512x512/apps/dev.antoniosarro.ProtonHub.png
 
 %changelog
 * Sat Oct 24 2026 Antonio Sarro <tech@antoniosarro.dev> - 0.1.0-1

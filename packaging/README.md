@@ -26,7 +26,7 @@ packaging/
 | `share/locale/*/LC_MESSAGES/protonhub.mo` | the translations; the GUI looks for them at `../share/locale` |
 | `share/applications/dev.antoniosarro.ProtonHub.desktop` | the desktop entry |
 | `share/metainfo/dev.antoniosarro.ProtonHub.metainfo.xml` | the AppStream metadata |
-| `share/icons/hicolor/scalable/apps/dev.antoniosarro.ProtonHub.svg` | the icon |
+| `share/icons/hicolor/512x512/apps/dev.antoniosarro.ProtonHub.png` | the icon |
 
 `install-data.sh PREFIX` installs all but `bin/`, so a package builds with
 `cargo build --release --workspace`, installs the two binaries, and runs

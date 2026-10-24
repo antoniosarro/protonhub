@@ -22,4 +22,4 @@ for po in po/*.po; do
 done
 install -Dm644 "packaging/linux/$id.desktop" -t "$prefix/share/applications"
 install -Dm644 "packaging/linux/$id.metainfo.xml" -t "$prefix/share/metainfo"
-install -Dm644 "packaging/linux/$id.svg" -t "$prefix/share/icons/hicolor/scalable/apps"
+install -Dm644 "packaging/linux/$id.png" -t "$prefix/share/icons/hicolor/512x512/apps"

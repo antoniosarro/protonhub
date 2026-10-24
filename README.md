@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="packaging/linux/dev.antoniosarro.ProtonHub.svg" width="96" alt="">
+<img src="packaging/linux/dev.antoniosarro.ProtonHub.png" width="128" alt="">
 
 # ProtonHub
 
