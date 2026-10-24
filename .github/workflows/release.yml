@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     container: archlinux:latest
     steps:
-      - run: pacman -Syu --noconfirm --needed base-devel rust gtk4 libadwaita gettext systemd-libs
+      - run: pacman -Syu --noconfirm --needed base-devel git rust gtk4 libadwaita gettext systemd-libs
       - uses: actions/checkout@v7
       # makepkg refuses to run as root.
       - run: |
@@ -84,6 +84,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
+          # Ubuntu's Flatpak predates --device=input (1.15.6); the PPA's doesn't.
+          sudo add-apt-repository -y ppa:flatpak/stable
           sudo apt-get update
           sudo apt-get install -y flatpak flatpak-builder
           flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
