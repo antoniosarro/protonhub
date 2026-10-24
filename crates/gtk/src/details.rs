@@ -87,26 +87,7 @@ pub fn show(
         .subtitle(glib::markup_escape_text(&tilde(&dir, &env.home)))
         .subtitle_selectable(true)
         .build();
-    let open = gtk::Button::builder()
-        .icon_name("folder-open-symbolic")
-        .tooltip_text(tr("Open the folder", &[]))
-        .valign(gtk::Align::Center)
-        .build();
-    open.add_css_class("flat");
-    open.connect_clicked(glib::clone!(
-        #[strong]
-        win,
-        #[strong]
-        dir,
-        move |_| {
-            gtk::FileLauncher::new(Some(&gio::File::for_path(&dir))).launch(
-                Some(&win.window),
-                None::<&gio::Cancellable>,
-                |_| {},
-            );
-        }
-    ));
-    place.add_suffix(&open);
+    place.add_suffix(&open_button(win, &dir));
     about.add(&place);
     if let Removal::Steam { official, .. } = &removal {
         about.add(
@@ -210,6 +191,29 @@ pub fn show(
         move |_| confirm(&win, &dialog, &name, &dir, &games, default, &removal)
     ));
     dialog.present(Some(&win.window));
+}
+
+/// A button that opens `dir` in the file manager.
+pub fn open_button(win: &Rc<Window>, dir: &std::path::Path) -> gtk::Button {
+    let open = gtk::Button::builder()
+        .icon_name("folder-open-symbolic")
+        .tooltip_text(tr("Open the folder", &[]))
+        .valign(gtk::Align::Center)
+        .build();
+    open.add_css_class("flat");
+    let dir = dir.to_owned();
+    open.connect_clicked(glib::clone!(
+        #[strong]
+        win,
+        move |_| {
+            gtk::FileLauncher::new(Some(&gio::File::for_path(&dir))).launch(
+                Some(&win.window),
+                None::<&gio::Cancellable>,
+                |_| {},
+            );
+        }
+    ));
+    open
 }
 
 fn dim_row(title: &str) -> adw::ActionRow {

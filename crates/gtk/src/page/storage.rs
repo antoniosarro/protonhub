@@ -7,6 +7,7 @@ use std::rc::Rc;
 use adw::prelude::*;
 use gtk::{gio, glib};
 use protonhub_core::install::human_size;
+use protonhub_core::launcher::Launcher;
 use protonhub_core::storage::{Item, Kind, Storage};
 
 use super::game_row::thumbnail;
@@ -154,7 +155,7 @@ fn games_group(
             .subtitle(subtitle.join(" · "))
             .build();
         let game = games.and_then(|l| l.games.iter().find(|g| g.id == app));
-        row.add_prefix(&thumbnail(env, game.and_then(|g| g.art.as_deref())));
+        row.add_prefix(&thumbnail(env, game.and_then(|g| g.art.as_deref()), 192));
         row.add_suffix(&menu(win, state, &items));
         group.add(&row);
     }
@@ -166,35 +167,11 @@ fn menu(win: &Rc<Window>, state: &LauncherState, items: &[&Item]) -> gtk::MenuBu
     let menu = gio::Menu::new();
     let mut asks = Vec::new();
     for (i, item) in items.iter().enumerate() {
-        let name = app_name(item);
-        let (label, heading, body) = match item.kind {
-            Kind::Prefix => (
-                tr("Reset Prefix…", &[]),
-                tr("Reset the prefix of {game}?", &[("game", &name)]),
-                tr(
-                    "It starts with a new prefix the next time it runs. Saves and settings kept in it, not in Steam Cloud, are lost.",
-                    &[],
-                ),
-            ),
-            Kind::ShaderCache => (
-                tr("Delete Shader Cache…", &[]),
-                tr("Delete the shader cache of {game}?", &[("game", &name)]),
-                tr(
-                    "Steam builds it again; until it does, the game may stutter.",
-                    &[],
-                ),
-            ),
-        };
+        let (label, ask) = ask(&state.launcher, item);
         let entry = gio::MenuItem::new(Some(&label), None);
         entry.set_action_and_target_value(Some("storage.delete"), Some(&(i as u32).to_variant()));
         menu.append_item(&entry);
-        asks.push(Confirm {
-            heading,
-            body,
-            launcher: state.launcher.clone(),
-            dirs: vec![item.dir.clone()],
-            size: item.size,
-        });
+        asks.push(ask);
     }
     let delete = gio::SimpleAction::new("delete", Some(glib::VariantTy::UINT32));
     delete.connect_activate(glib::clone!(
@@ -237,16 +214,48 @@ fn delete_button(win: &Rc<Window>, state: &LauncherState, label: &str) -> gtk::B
     button
 }
 
+/// How deleting one of an app's prefix and shader cache is offered: a
+/// button's label, and the confirmation.
+pub(super) fn ask(launcher: &Launcher, item: &Item) -> (String, Confirm) {
+    let name = app_name(item);
+    let (label, heading, body) = match item.kind {
+        Kind::Prefix => (
+            tr("Reset Prefix…", &[]),
+            tr("Reset the prefix of {game}?", &[("game", &name)]),
+            tr(
+                "It starts with a new prefix the next time it runs. Saves and settings kept in it, not in Steam Cloud, are lost.",
+                &[],
+            ),
+        ),
+        Kind::ShaderCache => (
+            tr("Delete Shader Cache…", &[]),
+            tr("Delete the shader cache of {game}?", &[("game", &name)]),
+            tr(
+                "Steam builds it again; until it does, the game may stutter.",
+                &[],
+            ),
+        ),
+    };
+    let ask = Confirm {
+        heading,
+        body,
+        launcher: launcher.clone(),
+        dirs: vec![item.dir.clone()],
+        size: item.size,
+    };
+    (label, ask)
+}
+
 /// A deletion to confirm: what the dialog says, and what it deletes.
-struct Confirm {
+pub(super) struct Confirm {
     heading: String,
     body: String,
-    launcher: protonhub_core::launcher::Launcher,
+    launcher: Launcher,
     dirs: Vec<PathBuf>,
     size: u64,
 }
 
-fn confirm(win: &Rc<Window>, ask: &Confirm) {
+pub(super) fn confirm(win: &Rc<Window>, ask: &Confirm) {
     let dialog = adw::AlertDialog::new(
         Some(&ask.heading),
         Some(&format!(
@@ -287,7 +296,7 @@ fn app_name(item: &Item) -> String {
     }
 }
 
-fn kind_name(kind: Kind) -> String {
+pub(super) fn kind_name(kind: Kind) -> String {
     match kind {
         Kind::Prefix => tr("Prefix", &[]),
         Kind::ShaderCache => tr("Shader cache", &[]),

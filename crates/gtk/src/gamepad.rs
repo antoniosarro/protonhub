@@ -1,6 +1,7 @@
 //! Gamepad navigation, for the Steam Deck and the couch: the D-pad or left
-//! stick moves the focus, A activates, B closes a dialog, and the shoulder
-//! buttons switch tabs. Pads are read on the main loop, between frames.
+//! stick moves the focus, A activates, B closes a dialog or leaves a game's
+//! page, and the shoulder buttons switch tabs. Pads are read on the main
+//! loop, between frames.
 
 use std::rc::Rc;
 use std::time::Duration;
@@ -127,11 +128,12 @@ fn apply(win: &Rc<Window>, nav: Nav) {
                 w.activate();
             }
         }
-        Nav::Back => {
-            if let Some(d) = window.visible_dialog() {
+        Nav::Back => match window.visible_dialog() {
+            Some(d) => {
                 d.close();
             }
-        }
+            None => win.back(),
+        },
         Nav::Tab(delta) => win.switch_tab(delta),
     }
 }

@@ -235,6 +235,9 @@ pub struct Window {
     busy: Cell<bool>,
     /// The view (games or tools) launcher pages open on, kept across redraws.
     pub view: RefCell<Option<String>>,
+    /// The game whose page is shown over its launcher's, kept across
+    /// redraws.
+    pub game: RefCell<Option<(Launcher, String)>>,
     pub errors: RefCell<Vec<errors::Entry>>,
     pub env: Result<Env, String>,
     snapshot: RefCell<Option<Rc<Snapshot>>>,
@@ -324,6 +327,7 @@ impl Window {
             job,
             busy: Cell::new(false),
             view: RefCell::default(),
+            game: RefCell::default(),
             errors: RefCell::default(),
             env: Env::load(),
             snapshot: RefCell::default(),
@@ -521,6 +525,22 @@ impl Window {
             })
             .or_else(|| self.sidebar.row_at_index(0));
         self.sidebar.select_row(row.as_ref());
+    }
+
+    /// Goes back from a game's page to its launcher's.
+    pub fn back(&self) {
+        if let Some(nav) = self
+            .pages
+            .visible_child()
+            .and_downcast::<adw::NavigationView>()
+        {
+            nav.pop();
+        }
+    }
+
+    /// What was last read, if anything has been.
+    pub fn snapshot(&self) -> Option<Rc<Snapshot>> {
+        self.snapshot.borrow().clone()
     }
 
     pub fn toast(&self, text: &str) {

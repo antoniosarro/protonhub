@@ -72,6 +72,17 @@ enum Command {
         #[arg(long)]
         info: bool,
     },
+    /// Show GAME (its id or name): its tool, and its prefix and shader
+    /// cache (Steam)
+    Game {
+        game: String,
+        #[arg(long)]
+        launcher: Option<String>,
+        /// Add ProtonDB's rating and Are We Anti-Cheat Yet's status (network,
+        /// cached for a day)
+        #[arg(long)]
+        info: bool,
+    },
     /// Set the tool GAME (its id or name) runs with: a tool's id or name,
     /// or "default" for the launcher's default
     Assign {
@@ -425,6 +436,111 @@ fn run(cli: Cli) -> Result<()> {
                 }
             }
             print(json, text.join("\n"), &rows)
+        }
+        Command::Game {
+            game,
+            launcher,
+            info,
+        } => {
+            // Read only, so every launcher is searched; a name in several
+            // needs --launcher.
+            let mut found = Vec::new();
+            for l in launchers(launcher.as_deref(), has_games)?.1 {
+                let library = games::library(&l)?.expect("steam and heroic have games");
+                if let Some(g) = library
+                    .games
+                    .iter()
+                    .find(|g| g.id == game || g.name.eq_ignore_ascii_case(&game))
+                {
+                    found.push((l.clone(), g.clone()));
+                }
+            }
+            let (target, g) = match found.len() {
+                1 => found.remove(0),
+                0 => {
+                    return Err(
+                        format!("no installed game {game}; `protonhub games` lists them").into(),
+                    );
+                }
+                _ => {
+                    let names: Vec<_> = found.iter().map(|(l, _)| l.to_string()).collect();
+                    return Err(format!(
+                        "{game} is in {}; choose one with --launcher",
+                        names.join(", ")
+                    )
+                    .into());
+                }
+            };
+            let g = &g;
+            let details = if info {
+                let c = client()?;
+                let anticheat = AntiCheatList::fetch(&c, info::AWACY)?;
+                Some(info::Info {
+                    protondb: info::protondb(&c, info::PROTONDB, g)?,
+                    anticheat: anticheat.find(g),
+                })
+            } else {
+                None
+            };
+            let storage: Vec<_> = storage::scan(&target)?
+                .into_iter()
+                .flat_map(|s| s.items)
+                .filter(|i| i.app == g.id)
+                .collect();
+            #[derive(Serialize)]
+            struct Out<'a> {
+                launcher: &'a Launcher,
+                #[serde(flatten)]
+                game: &'a games::Game,
+                #[serde(skip_serializing_if = "Option::is_none")]
+                info: Option<info::Info>,
+                #[serde(skip_serializing_if = "Vec::is_empty")]
+                storage: Vec<storage::Item>,
+            }
+            let mut text = vec![
+                format!("name\t{}", g.name),
+                format!("id\t{}", g.id),
+                format!("source\t{}", g.source),
+                format!(
+                    "tool\t{}",
+                    match (&g.tool, g.explicit) {
+                        (Some(t), true) => t.name.clone(),
+                        (Some(t), false) => format!("{} (default)", t.name),
+                        (None, _) => "-".into(),
+                    }
+                ),
+            ];
+            if let Some(i) = &details {
+                text.push(format!(
+                    "protondb\t{}",
+                    i.protondb
+                        .as_ref()
+                        .map_or("-".into(), |r| format!("{} ({} reports)", r.tier, r.total))
+                ));
+                text.push(format!(
+                    "anti-cheat\t{}",
+                    i.anticheat.as_ref().map_or("-".into(), |a| format!(
+                        "{}: {}",
+                        a.status,
+                        a.anticheats.join(", ")
+                    ))
+                ));
+            }
+            for i in &storage {
+                text.push(format!(
+                    "{}\t{}\t{}",
+                    kind(i.kind),
+                    install::human_size(i.size),
+                    i.dir.display()
+                ));
+            }
+            let out = Out {
+                launcher: &target,
+                game: g,
+                info: details,
+                storage,
+            };
+            print(json, text.join("\n"), &out)
         }
         Command::Assign {
             game,

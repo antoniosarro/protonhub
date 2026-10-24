@@ -97,6 +97,19 @@ pub(super) fn view(
         .build();
     none.add_css_class("dim-label");
     list.set_placeholder(Some(&none));
+    // A row opens the game's page; its tool list and button stay its own.
+    let ids: Vec<String> = lib.games.iter().map(|g| g.id.clone()).collect();
+    list.connect_row_activated(glib::clone!(
+        #[strong]
+        win,
+        #[strong]
+        launcher,
+        move |_, row| {
+            if let Some(id) = usize::try_from(row.index()).ok().and_then(|i| ids.get(i)) {
+                super::game::open(&win, row, &launcher, id);
+            }
+        }
+    ));
     for game in &lib.games {
         let info = state
             .info

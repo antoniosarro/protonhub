@@ -4,7 +4,7 @@
 use std::rc::Rc;
 
 use adw::prelude::*;
-use gtk::{gio, glib};
+use gtk::glib;
 use protonhub_core::games::{Choice, Game, Library};
 use protonhub_core::info::Info;
 use protonhub_core::launcher::Launcher;
@@ -96,11 +96,11 @@ pub(super) fn game_row(
         .margin_end(12)
         .build();
     content.append(&band);
-    content.append(&thumbnail(env, game.art.as_deref()));
+    content.append(&thumbnail(env, game.art.as_deref(), 192));
     content.append(&text);
     let row = gtk::ListBoxRow::builder()
         .child(&content)
-        .activatable(false)
+        .activatable(true)
         .name(game.name.to_lowercase())
         .build();
 
@@ -118,7 +118,21 @@ pub(super) fn game_row(
     if let Some(i) = selected {
         tools.set_selected(i as u32);
     }
-    let links = links(win, game);
+    let details = gtk::Button::builder()
+        .icon_name("info-outline-symbolic")
+        .tooltip_text(tr("Details", &[]))
+        .valign(gtk::Align::Center)
+        .build();
+    details.add_css_class("flat");
+    details.connect_clicked(glib::clone!(
+        #[strong]
+        win,
+        #[strong]
+        launcher,
+        #[strong(rename_to = id)]
+        game.id,
+        move |b| super::game::open(&win, b, &launcher, &id)
+    ));
     let game = game.clone();
     tools.connect_selected_notify(glib::clone!(
         #[strong]
@@ -131,64 +145,9 @@ pub(super) fn game_row(
             }
         }
     ));
-    if let Some(links) = links {
-        content.append(&links);
-    }
     content.append(&tools);
+    content.append(&details);
     row
-}
-
-/// A menu of a Steam game's pages on the web: ProtonDB's reports, SteamDB
-/// and the store; none for other games, which those sites don't know.
-fn links(win: &Rc<Window>, game: &Game) -> Option<gtk::MenuButton> {
-    if game.source != "steam" {
-        return None;
-    }
-    let id = &game.id;
-    let menu = gio::Menu::new();
-    for (label, uri) in [
-        (
-            tr("ProtonDB Reports", &[]),
-            format!("https://www.protondb.com/app/{id}"),
-        ),
-        (
-            tr("SteamDB", &[]),
-            format!("https://steamdb.info/app/{id}/"),
-        ),
-        (
-            tr("Steam Store", &[]),
-            format!("https://store.steampowered.com/app/{id}/"),
-        ),
-    ] {
-        let item = gio::MenuItem::new(Some(&label), None);
-        item.set_action_and_target_value(Some("game.open"), Some(&uri.to_variant()));
-        menu.append_item(&item);
-    }
-    let open = gio::SimpleAction::new("open", Some(glib::VariantTy::STRING));
-    open.connect_activate(glib::clone!(
-        #[strong]
-        win,
-        move |_, uri| {
-            if let Some(uri) = uri.and_then(|u| u.get::<String>()) {
-                gtk::UriLauncher::new(&uri).launch(
-                    Some(&win.window),
-                    None::<&gio::Cancellable>,
-                    |_| {},
-                );
-            }
-        }
-    ));
-    let actions = gio::SimpleActionGroup::new();
-    actions.add_action(&open);
-    let button = gtk::MenuButton::builder()
-        .icon_name("web-browser-symbolic")
-        .tooltip_text(tr("Open on the web", &[]))
-        .menu_model(&menu)
-        .valign(gtk::Align::Center)
-        .build();
-    button.add_css_class("flat");
-    button.insert_action_group("game", Some(&actions));
-    Some(button)
 }
 
 /// Shows a list of strings as labels; `short` ones all take the same width,
@@ -219,7 +178,8 @@ fn labels_factory(short: bool) -> gtk::SignalListItemFactory {
 }
 
 /// A game's picture, from a file or a URL, or an icon where it has none.
-pub(super) fn thumbnail(env: &Env, art: Option<&str>) -> gtk::Widget {
+/// `width` is what it's decoded to.
+pub(super) fn thumbnail(env: &Env, art: Option<&str>, width: i32) -> gtk::Widget {
     let frame = gtk::Overlay::builder()
         .valign(gtk::Align::Center)
         .overflow(gtk::Overflow::Hidden)
@@ -237,7 +197,7 @@ pub(super) fn thumbnail(env: &Env, art: Option<&str>) -> gtk::Widget {
             .build();
         frame.add_overlay(&picture);
         let weak = picture.downgrade();
-        art::load(&env.client, art, 192, move |t| {
+        art::load(&env.client, art, width, move |t| {
             if let Some(p) = weak.upgrade() {
                 p.set_paintable(Some(t));
             }
@@ -248,7 +208,7 @@ pub(super) fn thumbnail(env: &Env, art: Option<&str>) -> gtk::Widget {
 
 /// The tools a game's list offers, their labels, and which is the game's
 /// current one.
-fn options(
+pub(super) fn options(
     kind: LauncherKind,
     lib: &Library,
     game: &Game,
@@ -291,7 +251,7 @@ fn options(
     (options, labels, selected)
 }
 
-fn source(source: &str) -> String {
+pub(super) fn source(source: &str) -> String {
     match source {
         "steam" => "Steam".into(),
         "shortcut" => tr("Non-Steam game", &[]),

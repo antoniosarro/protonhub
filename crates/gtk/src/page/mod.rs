@@ -3,6 +3,7 @@
 //! its games' prefixes and shader caches ([`storage`]). The helpers here
 //! are what the tabs share.
 
+mod game;
 mod game_row;
 mod games;
 mod storage;
@@ -108,7 +109,29 @@ pub fn build(win: &Rc<Window>, env: &Env, state: &LauncherState) -> gtk::Widget 
         header.set_title_widget(Some(&adw::WindowTitle::new(&launcher.title(), "")));
     }
     view.set_content(Some(&stack));
-    view.upcast()
+
+    // A game's page goes over this one. The one shown before a redraw
+    // (after a job) is shown again, with what was just read.
+    let nav = adw::NavigationView::new();
+    let root = adw::NavigationPage::new(&view, &launcher.title());
+    let game = win
+        .game
+        .borrow()
+        .clone()
+        .filter(|(l, _)| l == launcher)
+        .and_then(|(_, id)| game::page(win, launcher, &id));
+    match game {
+        Some(page) => nav.replace(&[root, page]),
+        None => nav.add(&root),
+    }
+    nav.connect_popped(glib::clone!(
+        #[strong]
+        win,
+        move |_, _| {
+            win.game.replace(None);
+        }
+    ));
+    nav.upcast()
 }
 
 fn banner(text: &str) -> adw::Banner {

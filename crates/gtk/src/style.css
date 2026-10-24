@@ -29,6 +29,12 @@
 }
 .thumbnail > image { opacity: 0.4; }
 window.narrow .thumbnail { min-width: 45px; }
+/* The same, large, at the top of a game's page, in a narrow window too. */
+.thumbnail.hero, window.narrow .thumbnail.hero {
+  min-width: 320px;
+  min-height: 150px;
+  border-radius: 12px;
+}
 
 .job-card {
   padding: 12px;

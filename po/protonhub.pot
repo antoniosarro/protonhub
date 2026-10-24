@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: protonhub\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-25 00:20+0200\n"
+"POT-Creation-Date: 2026-10-25 00:34+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -37,55 +37,55 @@ msgstr ""
 msgid "Folder"
 msgstr ""
 
-#: crates/gtk/src/details.rs:92
-msgid "Open the folder"
-msgstr ""
-
-#: crates/gtk/src/details.rs:114
+#: crates/gtk/src/details.rs:95
 msgid "Steam App"
 msgstr ""
 
-#: crates/gtk/src/details.rs:123
+#: crates/gtk/src/details.rs:104
 msgid "Checksum"
 msgstr ""
 
-#: crates/gtk/src/details.rs:125
+#: crates/gtk/src/details.rs:106
 msgid "Verified when installed"
 msgstr ""
 
-#: crates/gtk/src/details.rs:127
+#: crates/gtk/src/details.rs:108
 msgid "Not verified: the release publishes none"
 msgstr ""
 
-#: crates/gtk/src/details.rs:135
+#: crates/gtk/src/details.rs:116
 msgid "Used By"
 msgstr ""
 
-#: crates/gtk/src/details.rs:139
+#: crates/gtk/src/details.rs:120
 msgid "ProtonHub can't tell what uses a tool like this one"
 msgstr ""
 
-#: crates/gtk/src/details.rs:143
+#: crates/gtk/src/details.rs:124
 msgid "No game in any launcher"
 msgstr ""
 
-#: crates/gtk/src/details.rs:148
+#: crates/gtk/src/details.rs:129
 msgid "The launcher's default"
 msgstr ""
 
-#: crates/gtk/src/details.rs:149
+#: crates/gtk/src/details.rs:130
 msgid "Games without a tool of their own"
 msgstr ""
 
-#: crates/gtk/src/details.rs:167
+#: crates/gtk/src/details.rs:148
 msgid "Delete…"
 msgstr ""
 
-#: crates/gtk/src/details.rs:178
+#: crates/gtk/src/details.rs:159
 msgid "Quit Steam to delete it: Steam would undo it"
 msgstr ""
 
-#: crates/gtk/src/details.rs:234
+#: crates/gtk/src/details.rs:200
+msgid "Open the folder"
+msgstr ""
+
+#: crates/gtk/src/details.rs:238
 #, rust-format
 msgid ""
 "{n} game runs with it and won't start until you choose another tool for it:"
@@ -94,35 +94,35 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: crates/gtk/src/details.rs:243
+#: crates/gtk/src/details.rs:247
 msgid ""
 "It's the launcher's default: games without a tool of their own will need a "
 "new default."
 msgstr ""
 
-#: crates/gtk/src/details.rs:248
+#: crates/gtk/src/details.rs:252
 msgid "Steam downloads it again when one of them starts."
 msgstr ""
 
-#: crates/gtk/src/details.rs:251
+#: crates/gtk/src/details.rs:255
 msgid "Nothing uses it. This can't be undone."
 msgstr ""
 
-#: crates/gtk/src/details.rs:253
+#: crates/gtk/src/details.rs:257
 msgid "This can't be undone."
 msgstr ""
 
-#: crates/gtk/src/details.rs:256
+#: crates/gtk/src/details.rs:260
 #, rust-format
 msgid "Delete {tool}?"
 msgstr ""
 
-#: crates/gtk/src/details.rs:260 crates/gtk/src/page/storage.rs:259
+#: crates/gtk/src/details.rs:264 crates/gtk/src/page/storage.rs:268
 #: crates/gtk/src/page/tools.rs:346
 msgid "Cancel"
 msgstr ""
 
-#: crates/gtk/src/details.rs:261 crates/gtk/src/page/storage.rs:260
+#: crates/gtk/src/details.rs:265 crates/gtk/src/page/storage.rs:269
 #: crates/gtk/src/page/tools.rs:347
 msgid "Delete"
 msgstr ""
@@ -147,18 +147,86 @@ msgstr ""
 msgid "Errors"
 msgstr ""
 
-#: crates/gtk/src/i18n.rs:64 crates/gtk/src/window.rs:779
+#: crates/gtk/src/i18n.rs:64 crates/gtk/src/window.rs:799
 #, rust-format
 msgid "{game} now runs with {tool}"
 msgstr ""
 
 #: crates/gtk/src/i18n.rs:69 crates/gtk/src/i18n.rs:70
-#: crates/gtk/src/page/tools.rs:322 crates/gtk/src/window.rs:876
+#: crates/gtk/src/page/tools.rs:322 crates/gtk/src/window.rs:896
 #, rust-format
 msgid "{n} game"
 msgid_plural "{n} games"
 msgstr[0] ""
 msgstr[1] ""
+
+#: crates/gtk/src/page/game.rs:87 crates/gtk/src/page/mod.rs:84
+msgid "Storage"
+msgstr ""
+
+#: crates/gtk/src/page/game.rs:92 crates/gtk/src/page/storage.rs:137
+msgid "No prefixes or shader caches"
+msgstr ""
+
+#: crates/gtk/src/page/game.rs:93 crates/gtk/src/page/storage.rs:138
+msgid "Steam makes them when a game first runs"
+msgstr ""
+
+#: crates/gtk/src/page/game.rs:133
+msgid "Steam App ID"
+msgstr ""
+
+#: crates/gtk/src/page/game.rs:134
+msgid "Heroic App Name"
+msgstr ""
+
+#: crates/gtk/src/page/game.rs:160
+msgid "On Linux"
+msgstr ""
+
+#: crates/gtk/src/page/game.rs:164
+msgid "ProtonDB"
+msgstr ""
+
+#: crates/gtk/src/page/game.rs:166
+#, rust-format
+msgid "{tier}, from {n} report"
+msgid_plural "{tier}, from {n} reports"
+msgstr[0] ""
+msgstr[1] ""
+
+#: crates/gtk/src/page/game.rs:184
+msgid "Anti-cheat"
+msgstr ""
+
+#: crates/gtk/src/page/game.rs:205
+msgid "Compatibility Tool"
+msgstr ""
+
+#: crates/gtk/src/page/game.rs:209
+msgid "Runs With"
+msgstr ""
+
+#: crates/gtk/src/page/game.rs:220
+#, rust-format
+msgid "Quit {launcher} to change it"
+msgstr ""
+
+#: crates/gtk/src/page/game.rs:248
+msgid "On the Web"
+msgstr ""
+
+#: crates/gtk/src/page/game.rs:252
+msgid "ProtonDB Reports"
+msgstr ""
+
+#: crates/gtk/src/page/game.rs:256
+msgid "SteamDB"
+msgstr ""
+
+#: crates/gtk/src/page/game.rs:260
+msgid "Steam Store"
+msgstr ""
 
 #: crates/gtk/src/page/game_row.rs:20
 msgid "Platinum"
@@ -200,36 +268,25 @@ msgstr[1] ""
 msgid "The tool it runs with"
 msgstr ""
 
-#: crates/gtk/src/page/game_row.rs:151
-msgid "ProtonDB Reports"
+#: crates/gtk/src/page/game_row.rs:123 crates/gtk/src/page/tools.rs:157
+#: crates/gtk/src/window.rs:561
+msgid "Details"
 msgstr ""
 
-#: crates/gtk/src/page/game_row.rs:155
-msgid "SteamDB"
-msgstr ""
-
-#: crates/gtk/src/page/game_row.rs:159
-msgid "Steam Store"
-msgstr ""
-
-#: crates/gtk/src/page/game_row.rs:185
-msgid "Open on the web"
-msgstr ""
-
-#: crates/gtk/src/page/game_row.rs:262
+#: crates/gtk/src/page/game_row.rs:222
 #, rust-format
 msgid "Default ({tool})"
 msgstr ""
 
-#: crates/gtk/src/page/game_row.rs:263
+#: crates/gtk/src/page/game_row.rs:223
 msgid "Default (none)"
 msgstr ""
 
-#: crates/gtk/src/page/game_row.rs:297 crates/gtk/src/page/storage.rs:285
+#: crates/gtk/src/page/game_row.rs:257 crates/gtk/src/page/storage.rs:294
 msgid "Non-Steam game"
 msgstr ""
 
-#: crates/gtk/src/page/game_row.rs:301
+#: crates/gtk/src/page/game_row.rs:261
 msgid "Sideloaded"
 msgstr ""
 
@@ -266,184 +323,172 @@ msgstr ""
 msgid "No games match"
 msgstr ""
 
-#: crates/gtk/src/page/games.rs:134
+#: crates/gtk/src/page/games.rs:147
 msgid "ProtonDB rating:"
 msgstr ""
 
-#: crates/gtk/src/page/games.rs:172
+#: crates/gtk/src/page/games.rs:185
 #, rust-format
 msgid "{tool} ({n} game)"
 msgid_plural "{tool} ({n} games)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: crates/gtk/src/page/games.rs:180
+#: crates/gtk/src/page/games.rs:193
 msgid "From"
 msgstr ""
 
-#: crates/gtk/src/page/games.rs:187
+#: crates/gtk/src/page/games.rs:200
 msgid "To"
 msgstr ""
 
-#: crates/gtk/src/page/games.rs:191
+#: crates/gtk/src/page/games.rs:204
 msgid "Games on the launcher's default stay on it"
 msgstr ""
 
-#: crates/gtk/src/page/games.rs:198
+#: crates/gtk/src/page/games.rs:211
 msgid "Move"
 msgstr ""
 
-#: crates/gtk/src/page/games.rs:206
+#: crates/gtk/src/page/games.rs:219
 msgid "Move Games"
 msgstr ""
 
-#: crates/gtk/src/page/mod.rs:30
+#: crates/gtk/src/page/mod.rs:31
 #, rust-format
 msgid ""
 "{launcher} is running: quit it to change a game's tool, or it will undo the "
 "change"
 msgstr ""
 
-#: crates/gtk/src/page/mod.rs:35
+#: crates/gtk/src/page/mod.rs:36
 #, rust-format
 msgid ""
 "Quit {launcher} before changing a game's tool: from inside a Flatpak, "
 "ProtonHub can't tell whether it's running"
 msgstr ""
 
-#: crates/gtk/src/page/mod.rs:47 crates/gtk/src/page/mod.rs:56
-#: crates/gtk/src/page/storage.rs:124
+#: crates/gtk/src/page/mod.rs:48 crates/gtk/src/page/mod.rs:57
+#: crates/gtk/src/page/storage.rs:125
 msgid "Games"
 msgstr ""
 
-#: crates/gtk/src/page/mod.rs:54
+#: crates/gtk/src/page/mod.rs:55
 msgid "Can't read the games"
 msgstr ""
 
-#: crates/gtk/src/page/mod.rs:63
+#: crates/gtk/src/page/mod.rs:64
 msgid "Can't read the tool directories"
 msgstr ""
 
-#: crates/gtk/src/page/mod.rs:68
+#: crates/gtk/src/page/mod.rs:69
 msgid "Tools"
 msgstr ""
 
-#: crates/gtk/src/page/mod.rs:75
+#: crates/gtk/src/page/mod.rs:76
 msgid "Can't read the prefixes and shader caches"
 msgstr ""
 
-#: crates/gtk/src/page/mod.rs:83
-msgid "Storage"
-msgstr ""
-
-#: crates/gtk/src/page/storage.rs:27
+#: crates/gtk/src/page/storage.rs:28
 msgid "Nothing is marked left over: a file couldn't be read"
 msgstr ""
 
-#: crates/gtk/src/page/storage.rs:33
+#: crates/gtk/src/page/storage.rs:34
 msgid "Games no longer installed are shown without names"
 msgstr ""
 
-#: crates/gtk/src/page/storage.rs:58
+#: crates/gtk/src/page/storage.rs:59
 #, rust-format
 msgid "{n} folder of uninstalled games takes {size}"
 msgid_plural "{n} folders of uninstalled games take {size}"
 msgstr[0] ""
 msgstr[1] ""
 
-#: crates/gtk/src/page/storage.rs:64
+#: crates/gtk/src/page/storage.rs:65
 msgid "Saves of games without Steam Cloud are in their prefixes"
 msgstr ""
 
-#: crates/gtk/src/page/storage.rs:72
+#: crates/gtk/src/page/storage.rs:73
 msgid "Removed from Steam"
 msgstr ""
 
-#: crates/gtk/src/page/storage.rs:74
+#: crates/gtk/src/page/storage.rs:75
 msgid "No longer installed"
 msgstr ""
 
-#: crates/gtk/src/page/storage.rs:87 crates/gtk/src/page/tools.rs:59
+#: crates/gtk/src/page/storage.rs:88 crates/gtk/src/page/tools.rs:59
 msgid "Clean Up…"
 msgstr ""
 
-#: crates/gtk/src/page/storage.rs:91
+#: crates/gtk/src/page/storage.rs:92
 #, rust-format
 msgid "Delete {n} leftover folder?"
 msgid_plural "Delete {n} leftover folders?"
 msgstr[0] ""
 msgstr[1] ""
 
-#: crates/gtk/src/page/storage.rs:97
+#: crates/gtk/src/page/storage.rs:98
 msgid ""
 "Their games are no longer installed. Saves not in Steam Cloud are lost with "
 "their prefixes."
 msgstr ""
 
-#: crates/gtk/src/page/storage.rs:136
-msgid "No prefixes or shader caches"
-msgstr ""
-
-#: crates/gtk/src/page/storage.rs:137
-msgid "Steam makes them when a game first runs"
-msgstr ""
-
-#: crates/gtk/src/page/storage.rs:145
+#: crates/gtk/src/page/storage.rs:146
 #, rust-format
 msgid "{size} in all"
 msgstr ""
 
-#: crates/gtk/src/page/storage.rs:172
+#: crates/gtk/src/page/storage.rs:193
+msgid "Free space"
+msgstr ""
+
+#: crates/gtk/src/page/storage.rs:211
+msgid "Quit Steam first"
+msgstr ""
+
+#: crates/gtk/src/page/storage.rs:223
 msgid "Reset Prefix…"
 msgstr ""
 
-#: crates/gtk/src/page/storage.rs:173
+#: crates/gtk/src/page/storage.rs:224
 #, rust-format
 msgid "Reset the prefix of {game}?"
 msgstr ""
 
-#: crates/gtk/src/page/storage.rs:175
+#: crates/gtk/src/page/storage.rs:226
 msgid ""
 "It starts with a new prefix the next time it runs. Saves and settings kept "
 "in it, not in Steam Cloud, are lost."
 msgstr ""
 
-#: crates/gtk/src/page/storage.rs:180
+#: crates/gtk/src/page/storage.rs:231
 msgid "Delete Shader Cache…"
 msgstr ""
 
-#: crates/gtk/src/page/storage.rs:181
+#: crates/gtk/src/page/storage.rs:232
 #, rust-format
 msgid "Delete the shader cache of {game}?"
 msgstr ""
 
-#: crates/gtk/src/page/storage.rs:183
+#: crates/gtk/src/page/storage.rs:234
 msgid "Steam builds it again; until it does, the game may stutter."
 msgstr ""
 
-#: crates/gtk/src/page/storage.rs:216
-msgid "Free space"
-msgstr ""
-
-#: crates/gtk/src/page/storage.rs:234
-msgid "Quit Steam first"
-msgstr ""
-
-#: crates/gtk/src/page/storage.rs:255
+#: crates/gtk/src/page/storage.rs:264
 #, rust-format
 msgid "This frees {size}."
 msgstr ""
 
-#: crates/gtk/src/page/storage.rs:286
+#: crates/gtk/src/page/storage.rs:295
 #, rust-format
 msgid "Steam app {id}"
 msgstr ""
 
-#: crates/gtk/src/page/storage.rs:292
+#: crates/gtk/src/page/storage.rs:301
 msgid "Prefix"
 msgstr ""
 
-#: crates/gtk/src/page/storage.rs:293
+#: crates/gtk/src/page/storage.rs:302
 msgid "Shader cache"
 msgstr ""
 
@@ -483,10 +528,6 @@ msgstr ""
 
 #: crates/gtk/src/page/tools.rs:153
 msgid "Unused"
-msgstr ""
-
-#: crates/gtk/src/page/tools.rs:157 crates/gtk/src/window.rs:541
-msgid "Details"
 msgstr ""
 
 #: crates/gtk/src/page/tools.rs:184
@@ -658,164 +699,164 @@ msgstr ""
 msgid "{step} · {done} of {total}"
 msgstr ""
 
-#: crates/gtk/src/window.rs:249
+#: crates/gtk/src/window.rs:252
 msgid "Look for launchers and tools again (Ctrl+R)"
 msgstr ""
 
-#: crates/gtk/src/window.rs:474
+#: crates/gtk/src/window.rs:478
 msgid "ProtonHub can't start"
 msgstr ""
 
-#: crates/gtk/src/window.rs:496
+#: crates/gtk/src/window.rs:500
 msgid "No launchers found"
 msgstr ""
 
-#: crates/gtk/src/window.rs:498
+#: crates/gtk/src/window.rs:502
 msgid ""
 "ProtonHub looks for Steam, Heroic, Lutris, Bottles and WineZGUI, native, "
 "Flatpak or Snap."
 msgstr ""
 
-#: crates/gtk/src/window.rs:538
+#: crates/gtk/src/window.rs:558
 #, rust-format
 msgid "{n} error"
 msgid_plural "{n} errors"
 msgstr[0] ""
 msgstr[1] ""
 
-#: crates/gtk/src/window.rs:540
+#: crates/gtk/src/window.rs:560
 #, rust-format
 msgid "{operation} failed"
 msgstr ""
 
-#: crates/gtk/src/window.rs:564
+#: crates/gtk/src/window.rs:584
 #, rust-format
 msgid "Installing the latest {tool}"
 msgstr ""
 
-#: crates/gtk/src/window.rs:566
+#: crates/gtk/src/window.rs:586
 #, rust-format
 msgid "Installing {version}"
 msgstr ""
 
-#: crates/gtk/src/window.rs:583
+#: crates/gtk/src/window.rs:603
 #, rust-format
 msgid "Installed {version}; it needs {programs}, which isn't installed"
 msgstr ""
 
-#: crates/gtk/src/window.rs:588
+#: crates/gtk/src/window.rs:608
 #, rust-format
 msgid "Installed {version}; restart Steam to use it"
 msgstr ""
 
-#: crates/gtk/src/window.rs:592
+#: crates/gtk/src/window.rs:612
 #, rust-format
 msgid "Installed {version}"
 msgstr ""
 
-#: crates/gtk/src/window.rs:599 crates/gtk/src/window.rs:614
+#: crates/gtk/src/window.rs:619 crates/gtk/src/window.rs:634
 #, rust-format
 msgid "Deleting {tool}"
 msgstr ""
 
-#: crates/gtk/src/window.rs:602 crates/gtk/src/window.rs:621
+#: crates/gtk/src/window.rs:622 crates/gtk/src/window.rs:641
 #, rust-format
 msgid "Deleted {tool}"
 msgstr ""
 
-#: crates/gtk/src/window.rs:618
+#: crates/gtk/src/window.rs:638
 msgid "Steam is running: quit it first"
 msgstr ""
 
-#: crates/gtk/src/window.rs:628
+#: crates/gtk/src/window.rs:648
 #, rust-format
 msgid "Deleting {n} unused tool"
 msgid_plural "Deleting {n} unused tools"
 msgstr[0] ""
 msgstr[1] ""
 
-#: crates/gtk/src/window.rs:637 crates/gtk/src/window.rs:654
+#: crates/gtk/src/window.rs:657 crates/gtk/src/window.rs:674
 #, rust-format
 msgid "Freed {size}"
 msgstr ""
 
-#: crates/gtk/src/window.rs:645
+#: crates/gtk/src/window.rs:665
 #, rust-format
 msgid "Deleting {n} folder"
 msgid_plural "Deleting {n} folders"
 msgstr[0] ""
 msgstr[1] ""
 
-#: crates/gtk/src/window.rs:661
+#: crates/gtk/src/window.rs:681
 #, rust-format
 msgid "Updating {tool}"
 msgstr ""
 
-#: crates/gtk/src/window.rs:683
+#: crates/gtk/src/window.rs:703
 #, rust-format
 msgid "installed {version}"
 msgstr ""
 
-#: crates/gtk/src/window.rs:687
+#: crates/gtk/src/window.rs:707
 #, rust-format
 msgid "moved {n} game onto it"
 msgid_plural "moved {n} games onto it"
 msgstr[0] ""
 msgstr[1] ""
 
-#: crates/gtk/src/window.rs:695
+#: crates/gtk/src/window.rs:715
 #, rust-format
 msgid "deleted {n} old version"
 msgid_plural "deleted {n} old versions"
 msgstr[0] ""
 msgstr[1] ""
 
-#: crates/gtk/src/window.rs:703
+#: crates/gtk/src/window.rs:723
 #, rust-format
 msgid "{version} is up to date"
 msgstr ""
 
-#: crates/gtk/src/window.rs:723
+#: crates/gtk/src/window.rs:743
 msgid "Reading the channels"
 msgstr ""
 
-#: crates/gtk/src/window.rs:732 crates/gtk/src/window.rs:740
+#: crates/gtk/src/window.rs:752 crates/gtk/src/window.rs:760
 msgid "Saving the channels"
 msgstr ""
 
-#: crates/gtk/src/window.rs:755
+#: crates/gtk/src/window.rs:775
 #, rust-format
 msgid "Moved {n} game to {tool}"
 msgid_plural "Moved {n} games to {tool}"
 msgstr[0] ""
 msgstr[1] ""
 
-#: crates/gtk/src/window.rs:761
+#: crates/gtk/src/window.rs:781
 #, rust-format
 msgid "Moving games to {tool}"
 msgstr ""
 
-#: crates/gtk/src/window.rs:782
+#: crates/gtk/src/window.rs:802
 #, rust-format
 msgid "{game} now runs with the default"
 msgstr ""
 
-#: crates/gtk/src/window.rs:786
+#: crates/gtk/src/window.rs:806
 #, rust-format
 msgid "Setting the tool of {game}"
 msgstr ""
 
-#: crates/gtk/src/window.rs:802
+#: crates/gtk/src/window.rs:822
 msgid "Wait for the current job to finish"
 msgstr ""
 
-#: crates/gtk/src/window.rs:878
+#: crates/gtk/src/window.rs:898
 #, rust-format
 msgid "{n} tool"
 msgid_plural "{n} tools"
 msgstr[0] ""
 msgstr[1] ""
 
-#: crates/gtk/src/window.rs:904
+#: crates/gtk/src/window.rs:924
 msgid "Running"
 msgstr ""

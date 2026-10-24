@@ -21,8 +21,7 @@ of the legend above the list; hovering it shows the tier and the number
 of reports. Under the name, a shield shows its anti-cheat status from Are
 We Anti-Cheat Yet (Supported, Running, Planned, Broken or Denied), when
 the game has anti-cheat. Both are cached for a day; if a source is down,
-the page says so and shows the rest. A Steam game's web button opens
-its ProtonDB reports, its SteamDB page or its Steam store page. Pictures come from Steam's library
+the page says so and shows the rest. Pictures come from Steam's library
 cache, else Steam's CDN, and from Heroic's library; downloaded ones are
 cached in `~/.cache/protonhub/files`.
 
@@ -35,6 +34,14 @@ or "(Lutris)" where Heroic has the same version. **Search games** filters
 the list.
 **Move Games…** moves every game set to one tool to another at once. Each
 change keeps the previous settings file as `<name>.protonhub-backup`.
+
+A game's row, or its info button, opens its page over the list, with a
+back button at the top left (or Escape, Alt+←, or B on a gamepad): its picture, its
+ProtonDB rating and anti-cheat status, the tool it runs with (to change,
+as in its row), its prefix and shader cache on Steam (each with its size,
+a button to open its folder and one to delete it, as in
+[Storage](#storage)), its ProtonDB, SteamDB and Steam store pages, and
+its app id.
 
 While Steam or Heroic runs, its games can't be changed (it would overwrite
 the change when it exits), and a banner says so. A Heroic game needs its

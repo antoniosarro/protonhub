@@ -14,6 +14,7 @@ builds and runs it.
 | `protonhub list` | What is in each launcher's tool directories, and which of it protonhub installed |
 | `protonhub remove TOOL@VERSION [--launcher L]` | Remove a version protonhub installed |
 | `protonhub games [--launcher L] [--info]` | Steam's and Heroic's installed games and the tool each runs with ("(default)" when it's the launcher's default); `--info` adds ProtonDB's rating and the anti-cheat status (network, cached for a day) |
+| `protonhub game GAME [--launcher L] [--info]` | One game: its id, source and tool, its prefix and shader cache (Steam), and with `--info` its ProtonDB rating and anti-cheat status. Every launcher is searched; `--launcher` is needed only when several have a game of that name |
 | `protonhub assign GAME TOOL [--launcher L]` | Set the tool a game runs with. GAME is its id or name, TOOL a tool's id or name from `games`, or `default` (Steam) |
 | `protonhub usage [--launcher L]` | Each installed tool's size and what uses it: games, the default, `unused`, or `-` where ProtonHub can't tell |
 | `protonhub cleanup [--launcher L] [--yes]` | List the tools nothing uses and the space they take; `--yes` deletes them |
