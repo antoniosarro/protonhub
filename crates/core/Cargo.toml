@@ -14,6 +14,7 @@ ruzstd = "0.9.0"
 serde.workspace = true
 serde_json.workspace = true
 sha2 = "0.11.0"
+shlex = "2.0.1"
 tar = "0.4.46"
 thiserror.workspace = true
 toml.workspace = true

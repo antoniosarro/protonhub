@@ -41,6 +41,10 @@ scriptable CLI with JSON output.
 - **Per-game tools**: set the tool each Steam and Heroic game runs with,
   one at a time or in bulk, with the previous settings file kept as a
   backup.
+- **Launch options**: edit a Steam game's launch options, with switches
+  for MangoHud, GameMode, Native Wayland, HDR, NTSync, FSR 4 and DLSS
+  upgrades and Proton's log, defined as data in
+  [`presets.toml`](crates/core/presets.toml).
 - **Usage map**: see which games in any launcher use each tool, and
   delete the ones nothing uses in one step.
 - **Storage**: each Steam game's Wine prefix and shader cache by size,
@@ -137,6 +141,8 @@ libadwaita 1.6+, libudev and gettext. [`just`](justfile) lists the recipes:
 
 - Per-game tools are set for Steam and Heroic only; Lutris, Bottles and
   WineZGUI get installs and removals.
+- Launch options are set for Steam games only, not yet for Heroic or for
+  non-Steam shortcuts.
 - Tools only released as CI artifacts (Proton-Tkg, Wine-Tkg, DXVK
   nightly) and SteamTinkerLaunch are not covered.
 - The manifests ship with the app; fetching them from this repository, so

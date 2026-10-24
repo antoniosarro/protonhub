@@ -6,6 +6,7 @@ pub mod games;
 pub mod heroic;
 pub mod info;
 pub mod install;
+pub mod launch;
 pub mod launcher;
 pub mod lock;
 pub mod paths;

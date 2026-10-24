@@ -2,18 +2,21 @@
 //! picture and ratings, the tool it runs with, its prefix and shader cache,
 //! and its pages on the web.
 
+use std::cell::Cell;
 use std::rc::Rc;
 
 use adw::prelude::*;
 use gtk::{gio, glib};
 use protonhub_core::games::{Game, Library};
 use protonhub_core::install::human_size;
+use protonhub_core::launch::{self, Options};
 use protonhub_core::launcher::Launcher;
 
 use super::game_row::{options, source, thumbnail, tier_name};
 use super::storage::{self, kind_name};
 use super::tilde;
 use crate::details::open_button;
+use crate::errors;
 use crate::i18n::{tr, trn};
 use crate::window::{Env, LauncherState, Window};
 
@@ -82,6 +85,9 @@ fn build(
         page.add(&group);
     }
     page.add(&tool_group(win, state, lib, game));
+    if let Some(group) = launch_group(win, state, game) {
+        page.add(&group);
+    }
     if let Ok(Some(storage)) = &state.storage {
         let group = adw::PreferencesGroup::builder()
             .title(tr("Storage", &[]))
@@ -235,6 +241,155 @@ fn tool_group(
     ));
     group.add(&row);
     group
+}
+
+/// The game's launch options as text, and a switch per preset that edits
+/// it; Apply saves it. None for a launcher ProtonHub can't read them from.
+fn launch_group(
+    win: &Rc<Window>,
+    state: &LauncherState,
+    game: &Game,
+) -> Option<adw::PreferencesGroup> {
+    let group = adw::PreferencesGroup::builder()
+        .title(tr("Launch Options", &[]))
+        .build();
+    let all = match &state.launch {
+        Ok(Some(all)) => all,
+        Ok(None) => return None,
+        Err(e) => {
+            group.add(&errors::row(&tr("Can't read the launch options", &[]), e));
+            return Some(group);
+        }
+    };
+    if game.source == "shortcut" {
+        let row = adw::ActionRow::builder()
+            .title(tr(
+                "Set a non-Steam game's launch options in its properties in Steam",
+                &[],
+            ))
+            .build();
+        row.add_css_class("dim-label");
+        group.add(&row);
+        return Some(group);
+    }
+    group.set_description(Some(&tr(
+        "The switches edit the text; save it to change the game. Not every Proton build reads every option.",
+        &[],
+    )));
+    let running = state.running;
+    let current = all
+        .iter()
+        .find(|(id, _)| *id == game.id)
+        .map_or("", |(_, o)| o.as_str());
+    let entry = adw::EntryRow::builder()
+        .title(tr("Launch options", &[]))
+        .text(current)
+        .sensitive(!running)
+        .build();
+    entry.add_css_class("monospace");
+    // Not the row's own apply button: it shows only after typing, not
+    // after a switch changed the text.
+    let save = gtk::Button::builder()
+        .label(tr("Save", &[]))
+        .valign(gtk::Align::Center)
+        .sensitive(false)
+        .build();
+    save.add_css_class("suggested-action");
+    entry.add_suffix(&save);
+    let apply = glib::clone!(
+        #[strong]
+        win,
+        #[strong(rename_to = launcher)]
+        state.launcher,
+        #[strong]
+        game,
+        #[weak]
+        entry,
+        move || win.set_launch(&launcher, &game, &entry.text())
+    );
+    save.connect_clicked(glib::clone!(
+        #[strong]
+        apply,
+        move |_| apply()
+    ));
+    entry.connect_entry_activated(glib::clone!(
+        #[weak]
+        save,
+        move |_| {
+            if save.is_sensitive() {
+                apply();
+            }
+        }
+    ));
+    let saved = current.to_owned();
+    entry.connect_changed(glib::clone!(
+        #[weak]
+        save,
+        move |e| save.set_sensitive(!running && e.text() != saved)
+    ));
+    group.add(&entry);
+
+    let mut switches = Vec::new();
+    for preset in launch::presets() {
+        // Inside a Flatpak, the host's programs aren't on PATH to look for.
+        let missing = preset.wrapper.as_deref().filter(|w| {
+            protonhub_core::games::sees_launchers() && !protonhub_core::install::on_path(w)
+        });
+        let subtitle = match missing {
+            Some(w) => tr(
+                "{program} isn't installed: the game won't start with it",
+                &[("program", w)],
+            ),
+            None => preset.description.clone(),
+        };
+        let row = adw::SwitchRow::builder()
+            .title(glib::markup_escape_text(&preset.name))
+            .subtitle(glib::markup_escape_text(&subtitle))
+            .build();
+        group.add(&row);
+        switches.push((preset, row));
+    }
+    // The switches show what the text sets, and change it; while they're
+    // set to match it, changing them changes nothing.
+    let switches = Rc::new(switches);
+    let syncing = Rc::new(Cell::new(false));
+    let sync = glib::clone!(
+        #[strong]
+        switches,
+        #[strong]
+        syncing,
+        move |text: &str| {
+            let options = Options::parse(text);
+            syncing.set(true);
+            for (preset, row) in switches.iter() {
+                row.set_sensitive(!running && options.is_some());
+                row.set_active(options.as_ref().is_some_and(|o| o.has(preset)));
+            }
+            syncing.set(false);
+        }
+    );
+    sync(current);
+    entry.connect_changed(move |e| sync(&e.text()));
+    for (preset, row) in switches.iter() {
+        row.connect_active_notify(glib::clone!(
+            #[weak]
+            entry,
+            #[strong]
+            syncing,
+            #[strong]
+            preset,
+            move |row| {
+                if syncing.get() {
+                    return;
+                }
+                if let Some(mut options) = Options::parse(&entry.text()) {
+                    options.set(&preset, row.is_active());
+                    entry.set_text(&options.to_string());
+                }
+            }
+        ));
+    }
+    Some(group)
 }
 
 /// A Steam game's pages on ProtonDB, SteamDB and the store; none for other

@@ -13,6 +13,7 @@ use protonhub_core::channels::{self, Channel, Channels};
 use protonhub_core::games;
 use protonhub_core::info;
 use protonhub_core::install::{self, Step};
+use protonhub_core::launch;
 use protonhub_core::launcher::{self, Launcher};
 use protonhub_core::manifest::{Arch, LauncherKind, Registry, Tool};
 use protonhub_core::paths;
@@ -70,6 +71,8 @@ pub struct LauncherState {
     pub officials: Result<Vec<games::OfficialUsage>, String>,
     /// A Steam's prefixes and shader caches; none for another launcher.
     pub storage: Result<Option<storage::Storage>, String>,
+    /// Each game's launch options, by id; none where they can't be read.
+    pub launch: Result<Option<Vec<(String, String)>>, String>,
 }
 
 impl Snapshot {
@@ -117,6 +120,7 @@ impl Snapshot {
                     library,
                     running: games::is_running(&l),
                     storage: storage::scan(&l).map_err(|e| e.to_string()),
+                    launch: launch::all(&l).map_err(|e| e.to_string()),
                     info,
                     info_error,
                     officials: match &officials {
@@ -786,6 +790,31 @@ impl Window {
     }
 
     /// Sets the tool `game` runs with; quick enough for the main thread.
+    /// Sets `game`'s launch options to `text`; empty removes them.
+    pub fn set_launch(self: &Rc<Self>, launcher: &Launcher, game: &games::Game, text: &str) {
+        match launch::set(launcher, &game.id, text) {
+            Ok(()) => self.toast(&if text.is_empty() {
+                tr(
+                    "{game} now launches without options",
+                    &[("game", &game.name)],
+                )
+            } else {
+                tr(
+                    "Saved the launch options of {game}",
+                    &[("game", &game.name)],
+                )
+            }),
+            Err(e) => self.report(
+                tr(
+                    "Setting the launch options of {game}",
+                    &[("game", &game.name)],
+                ),
+                e.to_string(),
+            ),
+        }
+        self.reload();
+    }
+
     pub fn assign(
         self: &Rc<Self>,
         launcher: &Launcher,

@@ -86,6 +86,10 @@ pub enum Error {
     NeedsTool,
     #[error("ProtonHub can't set the tool of {launcher} games")]
     Unsupported { launcher: &'static str },
+    #[error(
+        "ProtonHub can't change a non-Steam game's launch options yet; set them in its properties in Steam"
+    )]
+    Shortcut,
     #[error(transparent)]
     Install(#[from] install::Error),
 }

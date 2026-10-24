@@ -1,0 +1,52 @@
+# Launch option presets: the switches on a game's page. Each sets
+# environment variables before the game (`env`), runs it inside a program
+# (`wrapper`), or both. Proton's variables change between releases, and not
+# every build reads every one: say which do in the description.
+
+[[preset]]
+id = "mangohud"
+name = "MangoHud"
+description = "An overlay of the frame rate, frame times and temperatures"
+wrapper = "mangohud"
+
+[[preset]]
+id = "gamemode"
+name = "GameMode"
+description = "Tunes the CPU governor and more while the game runs"
+wrapper = "gamemoderun"
+
+[[preset]]
+id = "wayland"
+name = "Native Wayland"
+description = "Wine's Wayland driver instead of XWayland, in Proton builds that have it"
+env = { PROTON_ENABLE_WAYLAND = "1" }
+
+[[preset]]
+id = "hdr"
+name = "HDR"
+description = "HDR output, with Native Wayland, in Proton builds that have it"
+env = { PROTON_ENABLE_HDR = "1" }
+
+[[preset]]
+id = "ntsync"
+name = "NTSync"
+description = "Windows' synchronization in the kernel, for GE-Proton and Proton-CachyOS"
+env = { PROTON_USE_NTSYNC = "1" }
+
+[[preset]]
+id = "fsr4"
+name = "FSR 4 Upgrade"
+description = "Upgrades FSR 3.1 to FSR 4 on AMD GPUs that have it, for GE-Proton and Proton-CachyOS"
+env = { PROTON_FSR4_UPGRADE = "1" }
+
+[[preset]]
+id = "dlss"
+name = "DLSS Upgrade"
+description = "Upgrades DLSS to its newest version on NVIDIA GPUs, for GE-Proton and Proton-CachyOS"
+env = { PROTON_DLSS_UPGRADE = "1" }
+
+[[preset]]
+id = "log"
+name = "Proton Log"
+description = "Writes steam-<app id>.log to your home folder, for a bug report"
+env = { PROTON_LOG = "1" }

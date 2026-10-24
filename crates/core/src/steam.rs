@@ -21,6 +21,10 @@ const MAPPING: [&str; 5] = [
     "CompatToolMapping",
 ];
 
+/// Where in a user's localconfig.vdf each app's settings are, its launch
+/// options among them.
+const APPS: [&str; 5] = ["UserLocalConfigStore", "Software", "Valve", "Steam", "apps"];
+
 /// Steam apps that are tools, not games.
 const NOT_GAMES: [&str; 3] = [
     "Proton ",
@@ -348,6 +352,91 @@ fn installed(
         }
     }
     Ok(games)
+}
+
+/// The launch options of each game that has some, by app id, from the
+/// settings of the user `local_config` picks.
+pub fn launch_options(root: &Path) -> Result<Vec<(String, String)>, Error> {
+    let Some(config) = read_text(&local_config(root)?)? else {
+        return Ok(Vec::new());
+    };
+    let apps = config
+        .path(&APPS)
+        .map(|a| a.0.as_slice())
+        .unwrap_or_default();
+    Ok(apps
+        .iter()
+        .filter_map(|(id, app)| {
+            let options = app.as_obj()?.str("LaunchOptions")?;
+            (!options.is_empty()).then(|| (id.clone(), options.to_owned()))
+        })
+        .collect())
+}
+
+/// Sets `game`'s launch options to `text`, or with an empty one removes
+/// them. A shortcut's are in shortcuts.vdf, which ProtonHub doesn't write.
+pub fn set_launch_options(root: &Path, game: &str, text: &str) -> Result<(), Error> {
+    let lib = library(root)?;
+    let found = lib
+        .games
+        .iter()
+        .find(|g| g.id == game)
+        .ok_or_else(|| Error::UnknownGame {
+            id: game.to_owned(),
+        })?;
+    if found.source == "shortcut" {
+        return Err(Error::Shortcut);
+    }
+    let path = local_config(root)?;
+    let mut config = read_text(&path)?.ok_or_else(|| Error::Format {
+        path: path.clone(),
+        message: "missing; start Steam once to make it".into(),
+    })?;
+    let mut keys = APPS.to_vec();
+    keys.push(game);
+    let app = config.path_mut(&keys);
+    if text.is_empty() {
+        app.remove("LaunchOptions");
+    } else {
+        app.set("LaunchOptions", Value::Str(text.to_owned()));
+    }
+    crate::games::write_with_backup(&path, vdf::to_string(&config).as_bytes())
+}
+
+/// The localconfig.vdf of the user last signed in (MostRecent in
+/// loginusers.vdf, keyed by SteamID64, whose low 32 bits are the account id
+/// that names their userdata directory), else of the only user.
+fn local_config(root: &Path) -> Result<PathBuf, Error> {
+    let file = |account: &str| root.join(format!("userdata/{account}/config/localconfig.vdf"));
+    let logins = root.join("config/loginusers.vdf");
+    let users = read_text(&logins)?;
+    let recent = users
+        .as_ref()
+        .and_then(|u| u.obj("users"))
+        .map(|u| u.0.as_slice())
+        .unwrap_or_default()
+        .iter()
+        .find(|(_, u)| u.as_obj().and_then(|u| u.str("MostRecent")) == Some("1"))
+        .and_then(|(id, _)| id.parse::<u64>().ok());
+    if let Some(id) = recent {
+        return Ok(file(&(id & 0xffff_ffff).to_string()));
+    }
+    // "0" is no one's: Steam's, signed out.
+    let accounts: Vec<_> = subdirs(&root.join("userdata"))?
+        .into_iter()
+        .filter_map(|d| Some(d.file_name()?.to_string_lossy().into_owned()))
+        .filter(|a| a != "0" && file(a).is_file())
+        .collect();
+    match &accounts[..] {
+        [one] => Ok(file(one)),
+        _ => Err(Error::Format {
+            path: logins,
+            message: format!(
+                "no user is marked as signed in last, and there are {} with settings; sign in to Steam once",
+                accounts.len()
+            ),
+        }),
+    }
 }
 
 /// The id of every app installed in any library, games or not, from its

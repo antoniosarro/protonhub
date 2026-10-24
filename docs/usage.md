@@ -15,6 +15,8 @@ builds and runs it.
 | `protonhub remove TOOL@VERSION [--launcher L]` | Remove a version protonhub installed |
 | `protonhub games [--launcher L] [--info]` | Steam's and Heroic's installed games and the tool each runs with ("(default)" when it's the launcher's default); `--info` adds ProtonDB's rating and the anti-cheat status (network, cached for a day) |
 | `protonhub game GAME [--launcher L] [--info]` | One game: its id, source and tool, its prefix and shader cache (Steam), and with `--info` its ProtonDB rating and anti-cheat status. Every launcher is searched; `--launcher` is needed only when several have a game of that name |
+| `protonhub launch GAME [--set TEXT \| --on ID… --off ID…] [--launcher L]` | A Steam game's launch options and the presets they have on; `--set` replaces them (`""` removes them), `--on` and `--off` switch presets ([launch options](#launch-options)) |
+| `protonhub presets` | The launch option presets: their id, name, what each sets, and what it's for |
 | `protonhub assign GAME TOOL [--launcher L]` | Set the tool a game runs with. GAME is its id or name, TOOL a tool's id or name from `games`, or `default` (Steam) |
 | `protonhub usage [--launcher L]` | Each installed tool's size and what uses it: games, the default, `unused`, or `-` where ProtonHub can't tell |
 | `protonhub cleanup [--launcher L] [--yes]` | List the tools nothing uses and the space they take; `--yes` deletes them |
@@ -93,6 +95,26 @@ changed since the export, and `apply` removes it again and fails.
 ```sh
 protonhub export -o protonhub.lock     # desktop
 protonhub apply protonhub.lock         # laptop
+```
+
+## Launch options
+
+Steam keeps a game's launch options per user, in
+`userdata/<account>/config/localconfig.vdf`; ProtonHub changes those of
+the user signed in last. They read `VAR=value… program… %command%
+arguments…`: variables, the programs the game runs in, and after
+`%command%` the game's own arguments. A preset sets variables, adds a
+program (MangoHud's `mangohud`, GameMode's `gamemoderun`), or both;
+switching it off takes them out again and leaves everything else as it
+was. Presets are data, in [`presets.toml`](../crates/core/presets.toml).
+
+Like `assign`, changing them is refused while Steam runs, and the previous
+`localconfig.vdf` is kept as `localconfig.vdf.protonhub-backup`.
+
+```sh
+protonhub launch "Elden Ring"                      # what it has
+protonhub launch "Elden Ring" --on mangohud --on wayland
+protonhub launch "Elden Ring" --set "PROTON_LOG=1 %command% -windowed"
 ```
 
 ## Games and tools

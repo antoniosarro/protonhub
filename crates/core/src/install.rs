@@ -308,12 +308,17 @@ fn find(tools_dir: &Path, tool: &str, version: &str) -> Result<Option<Entry>, Er
 /// The programs `tool` requires that aren't on PATH; the tool installs
 /// without them, but won't run.
 pub fn missing(tool: &Tool) -> Vec<String> {
-    let path = std::env::var_os("PATH").unwrap_or_default();
     tool.requires
         .iter()
-        .filter(|cmd| !std::env::split_paths(&path).any(|dir| dir.join(cmd).is_file()))
+        .filter(|cmd| !on_path(cmd))
         .cloned()
         .collect()
+}
+
+/// Whether the program `cmd` is in a directory of `$PATH`.
+pub fn on_path(cmd: &str) -> bool {
+    let path = std::env::var_os("PATH").unwrap_or_default();
+    std::env::split_paths(&path).any(|dir| dir.join(cmd).is_file())
 }
 
 /// Removes a version protonhub installed, and returns its directory. It is

@@ -7,6 +7,7 @@ use protonhub_core::channels::{self, Channel, Channels};
 use protonhub_core::games;
 use protonhub_core::info::{self, AntiCheatList};
 use protonhub_core::install::{self, Step};
+use protonhub_core::launch;
 use protonhub_core::launcher::{self, Launcher};
 use protonhub_core::lock::{self, Lock};
 use protonhub_core::manifest::{Arch, LauncherKind, Registry, Tool};
@@ -83,6 +84,24 @@ enum Command {
         #[arg(long)]
         info: bool,
     },
+    /// Show GAME's launch options (Steam), or change them: --set replaces
+    /// them, --on and --off switch presets
+    Launch {
+        game: String,
+        /// The whole launch options; "" removes them
+        #[arg(long, conflicts_with_all = ["on", "off"])]
+        set: Option<String>,
+        /// Switch a preset on (`protonhub presets` lists them); repeatable
+        #[arg(long)]
+        on: Vec<String>,
+        /// Switch a preset off; repeatable
+        #[arg(long)]
+        off: Vec<String>,
+        #[arg(long)]
+        launcher: Option<String>,
+    },
+    /// List the launch option presets and what each sets
+    Presets,
     /// Set the tool GAME (its id or name) runs with: a tool's id or name,
     /// or "default" for the launcher's default
     Assign {
@@ -442,35 +461,7 @@ fn run(cli: Cli) -> Result<()> {
             launcher,
             info,
         } => {
-            // Read only, so every launcher is searched; a name in several
-            // needs --launcher.
-            let mut found = Vec::new();
-            for l in launchers(launcher.as_deref(), has_games)?.1 {
-                let library = games::library(&l)?.expect("steam and heroic have games");
-                if let Some(g) = library
-                    .games
-                    .iter()
-                    .find(|g| g.id == game || g.name.eq_ignore_ascii_case(&game))
-                {
-                    found.push((l.clone(), g.clone()));
-                }
-            }
-            let (target, g) = match found.len() {
-                1 => found.remove(0),
-                0 => {
-                    return Err(
-                        format!("no installed game {game}; `protonhub games` lists them").into(),
-                    );
-                }
-                _ => {
-                    let names: Vec<_> = found.iter().map(|(l, _)| l.to_string()).collect();
-                    return Err(format!(
-                        "{game} is in {}; choose one with --launcher",
-                        names.join(", ")
-                    )
-                    .into());
-                }
-            };
+            let (target, g) = locate(launcher.as_deref(), &game)?;
             let g = &g;
             let details = if info {
                 let c = client()?;
@@ -482,6 +473,11 @@ fn run(cli: Cli) -> Result<()> {
             } else {
                 None
             };
+            let launch_options = launch::all(&target)?
+                .into_iter()
+                .flatten()
+                .find(|(id, _)| *id == g.id)
+                .map(|(_, o)| o);
             let storage: Vec<_> = storage::scan(&target)?
                 .into_iter()
                 .flat_map(|s| s.items)
@@ -494,6 +490,8 @@ fn run(cli: Cli) -> Result<()> {
                 game: &'a games::Game,
                 #[serde(skip_serializing_if = "Option::is_none")]
                 info: Option<info::Info>,
+                #[serde(skip_serializing_if = "Option::is_none")]
+                launch_options: Option<String>,
                 #[serde(skip_serializing_if = "Vec::is_empty")]
                 storage: Vec<storage::Item>,
             }
@@ -510,6 +508,9 @@ fn run(cli: Cli) -> Result<()> {
                     }
                 ),
             ];
+            if let Some(o) = &launch_options {
+                text.push(format!("launch\t{o}"));
+            }
             if let Some(i) = &details {
                 text.push(format!(
                     "protondb\t{}",
@@ -538,9 +539,101 @@ fn run(cli: Cli) -> Result<()> {
                 launcher: &target,
                 game: g,
                 info: details,
+                launch_options,
                 storage,
             };
             print(json, text.join("\n"), &out)
+        }
+        Command::Launch {
+            game,
+            set,
+            on,
+            off,
+            launcher,
+        } => {
+            let (target, g) = locate(launcher.as_deref(), &game)?;
+            let current = launch::all(&target)?
+                .ok_or_else(|| format!("ProtonHub can't read {target}'s launch options yet"))?
+                .into_iter()
+                .find(|(id, _)| *id == g.id)
+                .map(|(_, o)| o)
+                .unwrap_or_default();
+            let presets = launch::presets();
+            let changed = match set {
+                Some(text) => Some(text),
+                None if on.is_empty() && off.is_empty() => None,
+                None => {
+                    let mut o = launch::Options::parse(&current).ok_or_else(|| {
+                        format!(
+                            "{}'s launch options have an unclosed quote; replace them with --set",
+                            g.name
+                        )
+                    })?;
+                    for (ids, state) in [(&on, true), (&off, false)] {
+                        for id in ids {
+                            let p = presets.iter().find(|p| p.id == *id).ok_or_else(|| {
+                                format!("no preset {id}; `protonhub presets` lists them")
+                            })?;
+                            o.set(p, state);
+                        }
+                    }
+                    Some(o.to_string())
+                }
+            };
+            if let Some(text) = &changed {
+                if !games::sees_launchers() {
+                    eprintln!(
+                        "protonhub: warning: inside the Flatpak, ProtonHub can't tell whether {target} is running; \
+                         if it is, it overwrites this change when it exits"
+                    );
+                }
+                launch::set(&target, &g.id, text)?;
+            }
+            let options = changed.unwrap_or(current);
+            let active: Vec<&str> = launch::Options::parse(&options)
+                .map(|o| {
+                    presets
+                        .iter()
+                        .filter(|p| o.has(p))
+                        .map(|p| p.id.as_str())
+                        .collect()
+                })
+                .unwrap_or_default();
+            #[derive(Serialize)]
+            struct Out<'a> {
+                game: &'a str,
+                options: &'a str,
+                presets: &'a [&'a str],
+            }
+            let shown = if options.is_empty() { "-" } else { &options };
+            let text = format!("options\t{shown}\npresets\t{}", active.join(", "));
+            print(
+                json,
+                text,
+                &Out {
+                    game: &g.id,
+                    options: &options,
+                    presets: &active,
+                },
+            )
+        }
+        Command::Presets => {
+            let presets = launch::presets();
+            let text: Vec<_> = presets
+                .iter()
+                .map(|p| {
+                    let mut sets: Vec<_> = p.env.iter().map(|(k, v)| format!("{k}={v}")).collect();
+                    sets.extend(p.wrapper.clone());
+                    format!(
+                        "{}\t{}\t{}\t{}",
+                        p.id,
+                        p.name,
+                        sets.join(" "),
+                        p.description
+                    )
+                })
+                .collect();
+            print(json, text.join("\n"), &presets)
         }
         Command::Assign {
             game,
@@ -1352,6 +1445,35 @@ impl Progress {
     fn finish(&self) {
         if self.tty && !self.label.is_empty() {
             eprintln!();
+        }
+    }
+}
+
+/// The launcher with an installed game whose id or name is `game`, and
+/// the game: every launcher `spec` names is searched, and the game must be
+/// in exactly one.
+fn locate(spec: Option<&str>, game: &str) -> Result<(Launcher, games::Game)> {
+    let mut found = Vec::new();
+    for l in launchers(spec, has_games)?.1 {
+        let library = games::library(&l)?.expect("steam and heroic have games");
+        if let Some(g) = library
+            .games
+            .iter()
+            .find(|g| g.id == game || g.name.eq_ignore_ascii_case(game))
+        {
+            found.push((l, g.clone()));
+        }
+    }
+    match found.len() {
+        1 => Ok(found.remove(0)),
+        0 => Err(format!("no installed game {game}; `protonhub games` lists them").into()),
+        _ => {
+            let names: Vec<_> = found.iter().map(|(l, _)| l.to_string()).collect();
+            Err(format!(
+                "{game} is in {}; choose one with --launcher",
+                names.join(", ")
+            )
+            .into())
         }
     }
 }
