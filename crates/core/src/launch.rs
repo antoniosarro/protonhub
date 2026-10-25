@@ -275,14 +275,22 @@ pub fn all(launcher: &Launcher) -> Result<Option<Vec<(String, String)>>, Error> 
 /// Sets `game`'s launch options to `text`, as it is; empty removes them.
 /// Refused while the launcher runs, which would write its own back.
 pub fn set(launcher: &Launcher, game: &str, text: &str) -> Result<(), Error> {
+    set_many(launcher, &[(game, text)])
+}
+
+/// Sets several games' launch options, as `set` does each, writing each
+/// file once.
+pub fn set_many(launcher: &Launcher, changes: &[(&str, &str)]) -> Result<(), Error> {
     if games::is_running(launcher) {
         return Err(Error::Running {
             launcher: launcher.kind.title(),
         });
     }
     match launcher.kind {
-        LauncherKind::Steam => steam::set_launch_options(&launcher.root, game, text),
-        LauncherKind::Heroic => heroic::set_launch_options(&launcher.root, game, text),
+        LauncherKind::Steam => steam::set_launch_options(&launcher.root, changes),
+        LauncherKind::Heroic => changes
+            .iter()
+            .try_for_each(|&(game, text)| heroic::set_launch_options(&launcher.root, game, text)),
         kind => Err(Error::Unsupported {
             launcher: kind.title(),
         }),
@@ -488,6 +496,38 @@ mod tests {
         let shortcuts = crate::steam::shortcuts(&l.root).unwrap();
         assert_eq!(shortcuts[0].1.name, "My Shortcut", "the rest kept");
         assert!(matches!(set(&l, "99", "x"), Err(Error::UnknownGame { .. })));
+    }
+
+    #[test]
+    fn sets_many_games_in_one_write() {
+        let home = TempDir::new("launch-many");
+        let l = steam(&home);
+        let path = local_config(&l.root, "1", "");
+        set_many(
+            &l,
+            &[("10", "-a %command%"), ("20", "MANGOHUD=1 %command%")],
+        )
+        .unwrap();
+        let options = all(&l).unwrap().unwrap();
+        assert!(options.contains(&("10".into(), "-a %command%".into())));
+        assert!(options.contains(&("20".into(), "MANGOHUD=1 %command%".into())));
+        let backup =
+            fs::read_to_string(path.with_file_name("localconfig.vdf.protonhub-backup")).unwrap();
+        assert!(
+            !backup.contains("LaunchOptions"),
+            "the backup is from before them all"
+        );
+        assert!(matches!(
+            set_many(&l, &[("10", "x"), ("99", "y")]),
+            Err(Error::UnknownGame { .. })
+        ));
+        assert!(
+            all(&l)
+                .unwrap()
+                .unwrap()
+                .contains(&("10".into(), "-a %command%".into())),
+            "nothing written"
+        );
     }
 
     #[test]

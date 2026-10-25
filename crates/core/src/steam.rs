@@ -635,39 +635,61 @@ pub fn add_shortcut(root: &Path, add: &Shortcut, icon: &str) -> Result<bool, Err
     Ok(true)
 }
 
-/// Sets `game`'s launch options to `text`, or with an empty one removes
-/// them: a Steam game's in the user's settings, a shortcut's in its entry.
-pub fn set_launch_options(root: &Path, game: &str, text: &str) -> Result<(), Error> {
+/// Sets each game's launch options to its text, or with an empty one
+/// removes them: a Steam game's in the user's settings, all in one write,
+/// a shortcut's in its entry. Nothing is written unless every game is
+/// known.
+pub fn set_launch_options(root: &Path, changes: &[(&str, &str)]) -> Result<(), Error> {
     let lib = library(root)?;
-    let found = lib
-        .games
-        .iter()
-        .find(|g| g.id == game)
-        .ok_or_else(|| Error::UnknownGame {
-            id: game.to_owned(),
-        })?;
-    if found.source == "shortcut" {
-        let (_, mut shortcut) = shortcuts(root)?
-            .into_iter()
-            .find(|(id, _)| id == game)
+    let mut own = Vec::new();
+    let mut of_shortcuts = Vec::new();
+    for &(game, text) in changes {
+        let found = lib
+            .games
+            .iter()
+            .find(|g| g.id == game)
             .ok_or_else(|| Error::UnknownGame {
                 id: game.to_owned(),
             })?;
-        shortcut.launch_options = text.to_owned();
-        return set_shortcut(root, game, &shortcut);
+        if found.source == "shortcut" {
+            of_shortcuts.push((game, text));
+        } else {
+            own.push((game, text));
+        }
+    }
+    if !of_shortcuts.is_empty() {
+        let all = shortcuts(root)?;
+        for (game, text) in of_shortcuts {
+            let (_, shortcut) =
+                all.iter()
+                    .find(|(id, _)| id == game)
+                    .ok_or_else(|| Error::UnknownGame {
+                        id: game.to_owned(),
+                    })?;
+            let shortcut = Shortcut {
+                launch_options: text.to_owned(),
+                ..shortcut.clone()
+            };
+            set_shortcut(root, game, &shortcut)?;
+        }
+    }
+    if own.is_empty() {
+        return Ok(());
     }
     let path = local_config(root)?;
     let mut config = read_text(&path)?.ok_or_else(|| Error::Format {
         path: path.clone(),
         message: "missing; start Steam once to make it".into(),
     })?;
-    let mut keys = APPS.to_vec();
-    keys.push(game);
-    let app = config.path_mut(&keys);
-    if text.is_empty() {
-        app.remove("LaunchOptions");
-    } else {
-        app.set("LaunchOptions", Value::Str(text.to_owned()));
+    for (game, text) in own {
+        let mut keys = APPS.to_vec();
+        keys.push(game);
+        let app = config.path_mut(&keys);
+        if text.is_empty() {
+            app.remove("LaunchOptions");
+        } else {
+            app.set("LaunchOptions", Value::Str(text.to_owned()));
+        }
     }
     crate::games::write_with_backup(&path, vdf::to_string(&config).as_bytes())
 }

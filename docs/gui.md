@@ -35,7 +35,11 @@ Protons in compatibilitytools.d (Valve's Protons too, when Heroic's "show
 Valve Proton" setting is on) and Lutris's Wine builds, marked "(Steam)"
 or "(Lutris)" where Heroic has the same version. **Search games** filters
 the list.
-**Move Games…** moves every game set to one tool to another at once. On
+**Move Games…** moves every game set to one tool to another at once.
+**Launch Options…** (Steam and Heroic) switches presets on or off for the
+games ticked, each switch Unchanged, On or Off, leaving the rest of each
+game's options as they are; Steam's settings are written once for them
+all. On
 Steam and Faugus Launcher, **Default Tool** above the list sets the
 default, what games without a tool of their own run with, or on Steam
 none to turn Steam Play off for them. Each change keeps the previous settings file as

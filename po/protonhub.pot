@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: protonhub\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-25 16:01+0100\n"
+"POT-Creation-Date: 2026-10-25 16:08+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -147,13 +147,13 @@ msgstr ""
 msgid "Errors"
 msgstr ""
 
-#: crates/gtk/src/i18n.rs:64 crates/gtk/src/window.rs:1015
+#: crates/gtk/src/i18n.rs:64 crates/gtk/src/window.rs:1051
 #, rust-format
 msgid "{game} now runs with {tool}"
 msgstr ""
 
 #: crates/gtk/src/i18n.rs:69 crates/gtk/src/i18n.rs:70
-#: crates/gtk/src/page/tools.rs:322 crates/gtk/src/window.rs:1161
+#: crates/gtk/src/page/tools.rs:322 crates/gtk/src/window.rs:1197
 #, rust-format
 msgid "{n} game"
 msgid_plural "{n} games"
@@ -274,7 +274,7 @@ msgstr ""
 msgid "Quit {launcher} to change it"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:342
+#: crates/gtk/src/page/game.rs:342 crates/gtk/src/page/games.rs:453
 msgid "Launch Options"
 msgstr ""
 
@@ -316,7 +316,7 @@ msgstr ""
 msgid "Value"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:577
+#: crates/gtk/src/page/game.rs:577 crates/gtk/src/page/games.rs:358
 msgid "None"
 msgstr ""
 
@@ -457,80 +457,117 @@ msgstr ""
 msgid "Sideloaded"
 msgstr ""
 
-#: crates/gtk/src/page/games.rs:30
+#: crates/gtk/src/page/games.rs:31
 msgid "No games installed"
 msgstr ""
 
-#: crates/gtk/src/page/games.rs:32
+#: crates/gtk/src/page/games.rs:33
 #, rust-format
 msgid "Games installed with {launcher} show up here"
 msgstr ""
 
-#: crates/gtk/src/page/games.rs:41
+#: crates/gtk/src/page/games.rs:42
 msgid "Search games"
 msgstr ""
 
-#: crates/gtk/src/page/games.rs:48
+#: crates/gtk/src/page/games.rs:49
 msgid "Move Games…"
 msgstr ""
 
-#: crates/gtk/src/page/games.rs:52
+#: crates/gtk/src/page/games.rs:53
 msgid "Move every game set to one tool to another"
 msgstr ""
 
+#: crates/gtk/src/page/games.rs:73
+msgid "Launch Options…"
+msgstr ""
+
 #: crates/gtk/src/page/games.rs:78
+msgid "Switch launch options on or off for several games at once"
+msgstr ""
+
+#: crates/gtk/src/page/games.rs:107
 msgid "Some ratings or anti-cheat statuses are missing"
 msgstr ""
 
-#: crates/gtk/src/page/games.rs:90
+#: crates/gtk/src/page/games.rs:119
 msgid "Left out: a file couldn't be read"
 msgstr ""
 
-#: crates/gtk/src/page/games.rs:100
+#: crates/gtk/src/page/games.rs:129
 msgid "No games match"
 msgstr ""
 
-#: crates/gtk/src/page/games.rs:166
+#: crates/gtk/src/page/games.rs:195
 msgid "None: Steam Play off"
 msgstr ""
 
-#: crates/gtk/src/page/games.rs:174
+#: crates/gtk/src/page/games.rs:203
 msgid "Default Tool"
 msgstr ""
 
-#: crates/gtk/src/page/games.rs:175
+#: crates/gtk/src/page/games.rs:204
 msgid "What games without a tool of their own run with"
 msgstr ""
 
-#: crates/gtk/src/page/games.rs:204
+#: crates/gtk/src/page/games.rs:233
 msgid "ProtonDB rating:"
 msgstr ""
 
-#: crates/gtk/src/page/games.rs:242
+#: crates/gtk/src/page/games.rs:271
 #, rust-format
 msgid "{tool} ({n} game)"
 msgid_plural "{tool} ({n} games)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: crates/gtk/src/page/games.rs:250
+#: crates/gtk/src/page/games.rs:279
 msgid "From"
 msgstr ""
 
-#: crates/gtk/src/page/games.rs:257
+#: crates/gtk/src/page/games.rs:286
 msgid "To"
 msgstr ""
 
-#: crates/gtk/src/page/games.rs:261
+#: crates/gtk/src/page/games.rs:290
 msgid "Games on the launcher's default stay on it"
 msgstr ""
 
-#: crates/gtk/src/page/games.rs:268
+#: crates/gtk/src/page/games.rs:297
 msgid "Move"
 msgstr ""
 
-#: crates/gtk/src/page/games.rs:276
+#: crates/gtk/src/page/games.rs:305
 msgid "Move Games"
+msgstr ""
+
+#: crates/gtk/src/page/games.rs:340
+msgid "Apply"
+msgstr ""
+
+#: crates/gtk/src/page/games.rs:349 crates/gtk/src/page/mod.rs:79
+#: crates/gtk/src/page/mod.rs:88 crates/gtk/src/page/storage.rs:125
+msgid "Games"
+msgstr ""
+
+#: crates/gtk/src/page/games.rs:353
+msgid "All Games"
+msgstr ""
+
+#: crates/gtk/src/page/games.rs:381
+msgid "Off"
+msgstr ""
+
+#: crates/gtk/src/page/games.rs:381
+msgid "On"
+msgstr ""
+
+#: crates/gtk/src/page/games.rs:381
+msgid "Unchanged"
+msgstr ""
+
+#: crates/gtk/src/page/games.rs:383
+msgid "Switches"
 msgstr ""
 
 #: crates/gtk/src/page/gamescope.rs:27
@@ -623,11 +660,6 @@ msgstr ""
 msgid ""
 "Quit {launcher} before changing a game's tool: from inside a Flatpak, "
 "ProtonHub can't tell whether it's running"
-msgstr ""
-
-#: crates/gtk/src/page/mod.rs:79 crates/gtk/src/page/mod.rs:88
-#: crates/gtk/src/page/storage.rs:125
-msgid "Games"
 msgstr ""
 
 #: crates/gtk/src/page/mod.rs:86
@@ -1287,70 +1319,88 @@ msgstr[1] ""
 msgid "Moving games to {tool}"
 msgstr ""
 
-#: crates/gtk/src/window.rs:944
+#: crates/gtk/src/window.rs:954
+#, rust-format
+msgid "Changed the launch options of {n} game"
+msgid_plural "Changed the launch options of {n} games"
+msgstr[0] ""
+msgstr[1] ""
+
+#: crates/gtk/src/window.rs:962
+#, rust-format
+msgid "left {n} alone: its options have an unclosed quote"
+msgid_plural "left {n} alone: their options have an unclosed quote"
+msgstr[0] ""
+msgstr[1] ""
+
+#: crates/gtk/src/window.rs:970
+msgid "Changing launch options"
+msgstr ""
+
+#: crates/gtk/src/window.rs:980
 #, rust-format
 msgid "{game} now launches without options"
 msgstr ""
 
-#: crates/gtk/src/window.rs:949
+#: crates/gtk/src/window.rs:985
 #, rust-format
 msgid "Saved the launch options of {game}"
 msgstr ""
 
-#: crates/gtk/src/window.rs:955
+#: crates/gtk/src/window.rs:991
 #, rust-format
 msgid "Setting the launch options of {game}"
 msgstr ""
 
-#: crates/gtk/src/window.rs:969
+#: crates/gtk/src/window.rs:1005
 #, rust-format
 msgid "Installing {verbs} into {game}"
 msgstr ""
 
-#: crates/gtk/src/window.rs:973
+#: crates/gtk/src/window.rs:1009
 #, rust-format
 msgid "Installed {verbs} into {game}"
 msgstr ""
 
-#: crates/gtk/src/window.rs:976
+#: crates/gtk/src/window.rs:1012
 #, rust-format
 msgid "Stopped installing into {game}"
 msgstr ""
 
-#: crates/gtk/src/window.rs:1018
+#: crates/gtk/src/window.rs:1054
 #, rust-format
 msgid "{game} now runs with the default"
 msgstr ""
 
-#: crates/gtk/src/window.rs:1022
+#: crates/gtk/src/window.rs:1058
 #, rust-format
 msgid "Setting the tool of {game}"
 msgstr ""
 
-#: crates/gtk/src/window.rs:1036
+#: crates/gtk/src/window.rs:1072
 #, rust-format
 msgid "Games without a tool of their own now run with {tool}"
 msgstr ""
 
-#: crates/gtk/src/window.rs:1040
+#: crates/gtk/src/window.rs:1076
 msgid "Steam Play is off for games without a tool of their own"
 msgstr ""
 
-#: crates/gtk/src/window.rs:1044
+#: crates/gtk/src/window.rs:1080
 msgid "Setting the default tool"
 msgstr ""
 
-#: crates/gtk/src/window.rs:1067
+#: crates/gtk/src/window.rs:1103
 msgid "Wait for the current job to finish"
 msgstr ""
 
-#: crates/gtk/src/window.rs:1163
+#: crates/gtk/src/window.rs:1199
 #, rust-format
 msgid "{n} tool"
 msgid_plural "{n} tools"
 msgstr[0] ""
 msgstr[1] ""
 
-#: crates/gtk/src/window.rs:1189
+#: crates/gtk/src/window.rs:1225
 msgid "Running"
 msgstr ""

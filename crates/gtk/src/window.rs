@@ -936,6 +936,42 @@ impl Window {
         self.reload();
     }
 
+    /// Sets several games' launch options at once; `skipped` games had
+    /// options that couldn't be read, and were left alone.
+    pub fn set_launch_many(
+        self: &Rc<Self>,
+        launcher: &Launcher,
+        changes: &[(String, String)],
+        skipped: usize,
+    ) {
+        let pairs: Vec<(&str, &str)> = changes
+            .iter()
+            .map(|(id, text)| (id.as_str(), text.as_str()))
+            .collect();
+        match launch::set_many(launcher, &pairs) {
+            Ok(()) => {
+                let mut text = trn(
+                    "Changed the launch options of {n} game",
+                    "Changed the launch options of {n} games",
+                    changes.len(),
+                    &[],
+                );
+                if skipped > 0 {
+                    text.push_str("; ");
+                    text.push_str(&trn(
+                        "left {n} alone: its options have an unclosed quote",
+                        "left {n} alone: their options have an unclosed quote",
+                        skipped,
+                        &[],
+                    ));
+                }
+                self.toast(&text);
+            }
+            Err(e) => self.report(tr("Changing launch options", &[]), e.to_string()),
+        }
+        self.reload();
+    }
+
     /// Sets `game`'s launch options to `text`; empty removes them.
     pub fn set_launch(self: &Rc<Self>, launcher: &Launcher, game: &games::Game, text: &str) {
         match launch::set(launcher, &game.id, text) {
