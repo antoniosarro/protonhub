@@ -24,6 +24,7 @@ BuildRequires:  libappstream-glib
 Recommends:     libnotify
 Suggests:       mangohud
 Suggests:       vulkan-tools
+Suggests:       winetricks
 
 %description
 ProtonHub installs and removes compatibility tools such as GE-Proton,

@@ -1,0 +1,170 @@
+# The winetricks verbs a game's page offers, in groups; any other verb can
+# be named too. `id` is the verb as winetricks knows it (`winetricks
+# list-all`); `name` and `description` are what the page shows.
+
+[[group]]
+title = "Visual C++"
+
+[[group.verb]]
+id = "vcrun2022"
+name = "Visual C++ 2015–2022"
+description = "The runtime most games since 2015 need"
+
+[[group.verb]]
+id = "vcrun2013"
+name = "Visual C++ 2013"
+
+[[group.verb]]
+id = "vcrun2012"
+name = "Visual C++ 2012"
+
+[[group.verb]]
+id = "vcrun2010"
+name = "Visual C++ 2010"
+
+[[group.verb]]
+id = "vcrun2008"
+name = "Visual C++ 2008"
+
+[[group.verb]]
+id = "vcrun2005"
+name = "Visual C++ 2005"
+
+[[group.verb]]
+id = "vcrun6"
+name = "Visual C++ 6"
+description = "For games from around 2000"
+
+[[group.verb]]
+id = "mfc140"
+name = "MFC 14"
+description = "Microsoft Foundation Classes, for some launchers and editors"
+
+[[group.verb]]
+id = "vb6run"
+name = "Visual Basic 6"
+
+[[group]]
+title = ".NET"
+
+[[group.verb]]
+id = "dotnet48"
+name = ".NET Framework 4.8"
+description = "Slow to install; for launchers and mod tools that need it"
+
+[[group.verb]]
+id = "dotnet40"
+name = ".NET Framework 4.0"
+
+[[group.verb]]
+id = "dotnet35"
+name = ".NET Framework 3.5"
+
+[[group.verb]]
+id = "dotnetdesktop8"
+name = ".NET Desktop Runtime 8"
+
+[[group.verb]]
+id = "dotnetdesktop6"
+name = ".NET Desktop Runtime 6"
+
+[[group]]
+title = "DirectX"
+
+[[group.verb]]
+id = "d3dx9"
+name = "D3DX9"
+description = "DirectX 9's helper libraries"
+
+[[group.verb]]
+id = "d3dx10_43"
+name = "D3DX10"
+
+[[group.verb]]
+id = "d3dx11_43"
+name = "D3DX11"
+
+[[group.verb]]
+id = "d3dcompiler_47"
+name = "D3D Compiler 47"
+
+[[group.verb]]
+id = "d3dcompiler_43"
+name = "D3D Compiler 43"
+
+[[group.verb]]
+id = "xact"
+name = "XACT"
+description = "DirectX's old audio, 32-bit"
+
+[[group.verb]]
+id = "xact_x64"
+name = "XACT, 64-bit"
+
+[[group.verb]]
+id = "xinput"
+name = "XInput"
+description = "Microsoft's controller library"
+
+[[group.verb]]
+id = "physx"
+name = "PhysX"
+
+[[group]]
+title = "Media"
+
+[[group.verb]]
+id = "mf"
+name = "Media Foundation"
+description = "For cutscenes that play as a black screen"
+
+[[group.verb]]
+id = "quartz"
+name = "DirectShow"
+description = "For older games' videos"
+
+[[group.verb]]
+id = "lavfilters"
+name = "LAV Filters"
+description = "Video codecs for DirectShow"
+
+[[group.verb]]
+id = "faudio"
+name = "FAudio"
+description = "XAudio2, rebuilt"
+
+[[group.verb]]
+id = "openal"
+name = "OpenAL"
+
+[[group]]
+title = "Fonts"
+
+[[group.verb]]
+id = "corefonts"
+name = "Core Fonts"
+description = "Arial, Times New Roman, Verdana and the like"
+
+[[group.verb]]
+id = "tahoma"
+name = "Tahoma"
+
+[[group.verb]]
+id = "cjkfonts"
+name = "Chinese, Japanese and Korean Fonts"
+
+[[group]]
+title = "Windows Version"
+
+[[group.verb]]
+id = "win10"
+name = "Windows 10"
+description = "What the game is told it runs on"
+
+[[group.verb]]
+id = "win7"
+name = "Windows 7"
+
+[[group.verb]]
+id = "winxp"
+name = "Windows XP"

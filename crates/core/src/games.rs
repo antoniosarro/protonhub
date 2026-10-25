@@ -92,6 +92,24 @@ pub enum Error {
     Shortcut,
     #[error("the launch options have an unclosed quote")]
     Unclosed,
+    #[error("{game} has no Wine prefix yet; run it once, then try again")]
+    NoPrefix { game: String },
+    #[error(
+        "can't find the Wine or Proton that runs {game}; run it once with the tool it should use"
+    )]
+    NoWine { game: String },
+    #[error("{program} isn't installed")]
+    Missing { program: &'static str },
+    #[error(
+        "Proton's 32-bit Wine needs /lib/ld-linux.so.2, which this system doesn't have; install steam-run, which provides it"
+    )]
+    NeedsFhs,
+    #[error("{program} failed ({status}):\n{output}")]
+    Failed {
+        program: String,
+        status: String,
+        output: String,
+    },
     #[error(transparent)]
     Install(#[from] install::Error),
 }

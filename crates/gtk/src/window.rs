@@ -5,6 +5,7 @@ use std::cell::{Cell, RefCell};
 use std::path::{Path, PathBuf};
 use std::rc::Rc;
 use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 
 use adw::prelude::*;
 use gtk::glib::prelude::StaticVariantType;
@@ -17,6 +18,7 @@ use protonhub_core::launch;
 use protonhub_core::launcher::{self, Launcher};
 use protonhub_core::manifest::{Arch, LauncherKind, Registry, Tool};
 use protonhub_core::paths;
+use protonhub_core::prefix::{self, Prefix};
 use protonhub_core::releases::{self, Client, Version};
 use protonhub_core::steam;
 use protonhub_core::storage;
@@ -147,6 +149,9 @@ struct JobCard {
     title: gtk::Label,
     step: gtk::Label,
     bar: gtk::ProgressBar,
+    /// Shown for a job that can be stopped.
+    cancel: gtk::Button,
+    stop: RefCell<Option<Rc<dyn Fn()>>>,
 }
 
 impl JobCard {
@@ -163,6 +168,11 @@ impl JobCard {
         step.add_css_class("caption");
         step.add_css_class("dim-label");
         let bar = gtk::ProgressBar::new();
+        let cancel = gtk::Button::builder()
+            .label(tr("Cancel", &[]))
+            .halign(gtk::Align::End)
+            .visible(false)
+            .build();
         let card = gtk::Box::builder()
             .orientation(gtk::Orientation::Vertical)
             .spacing(6)
@@ -175,6 +185,7 @@ impl JobCard {
         card.append(&title);
         card.append(&step);
         card.append(&bar);
+        card.append(&cancel);
         let revealer = gtk::Revealer::builder()
             .transition_type(gtk::RevealerTransitionType::SlideUp)
             .child(&card)
@@ -184,13 +195,18 @@ impl JobCard {
             title,
             step,
             bar,
+            cancel,
+            stop: RefCell::default(),
         }
     }
 
-    fn start(&self, title: &str) {
+    fn start(&self, title: &str, stop: Option<Rc<dyn Fn()>>) {
         self.title.set_label(title);
         self.step.set_label("");
         self.bar.set_fraction(0.0);
+        self.cancel.set_visible(stop.is_some());
+        self.cancel.set_sensitive(true);
+        *self.stop.borrow_mut() = stop;
         self.revealer.set_reveal_child(true);
     }
 
@@ -200,6 +216,7 @@ impl JobCard {
             Step::Download { done, total } => (tr("Downloading", &[]), Some((done, total))),
             Step::Verify => (tr("Verifying the checksum", &[]), None),
             Step::Extract { done, total } => (tr("Extracting", &[]), Some((done, total))),
+            Step::Output(line) => (line, None),
         };
         match fraction {
             Some((done, 0)) => {
@@ -342,6 +359,20 @@ impl Window {
             snapshot: RefCell::default(),
             generation: Cell::new(0),
         });
+        let cancelling = tr("Cancelling…", &[]);
+        // The window lives as long as the app, so its button can hold it.
+        win.job.cancel.connect_clicked(glib::clone!(
+            #[strong]
+            win,
+            move |button| {
+                let Some(stop) = win.job.stop.borrow().clone() else {
+                    return;
+                };
+                button.set_sensitive(false);
+                win.job.step.set_label(&cancelling);
+                stop();
+            }
+        ));
         win.sidebar.connect_row_selected(glib::clone!(
             #[strong]
             win,
@@ -840,6 +871,46 @@ impl Window {
         self.reload();
     }
 
+    /// Installs winetricks `verbs` into `game`'s prefix, as a job that
+    /// shows what winetricks prints and can be cancelled.
+    pub fn tricks(self: &Rc<Self>, game: &games::Game, prefix: Prefix, verbs: Vec<String>) {
+        let names = verbs.join(", ");
+        let title = tr(
+            "Installing {verbs} into {game}",
+            &[("verbs", &names), ("game", &game.name)],
+        );
+        let done = tr(
+            "Installed {verbs} into {game}",
+            &[("verbs", &names), ("game", &game.name)],
+        );
+        let stopped = tr("Stopped installing into {game}", &[("game", &game.name)]);
+        // The run's process group, once started, and whether it was stopped.
+        let pid = Arc::new(AtomicU32::new(0));
+        let cancelled = Arc::new(AtomicBool::new(false));
+        let stop: Rc<dyn Fn()> = Rc::new({
+            let (pid, cancelled, prefix) = (pid.clone(), cancelled.clone(), prefix.clone());
+            move || {
+                cancelled.store(true, Ordering::SeqCst);
+                let (pid, prefix) = (pid.load(Ordering::SeqCst), prefix.clone());
+                // wineserver can take a moment; not on the main thread.
+                if pid != 0 {
+                    std::thread::spawn(move || prefix::cancel(&prefix, pid));
+                }
+            }
+        });
+        self.run_stoppable(title, Some(stop), move |progress| {
+            let cmd = prefix.winetricks(&verbs).map_err(|e| e.to_string())?;
+            let ran = prefix::run(cmd, |id| pid.store(id, Ordering::SeqCst), &mut |line| {
+                progress(Step::Output(line.to_owned()))
+            });
+            match ran {
+                Ok(()) => Ok(done),
+                Err(_) if cancelled.load(Ordering::SeqCst) => Ok(stopped),
+                Err(e) => Err(e.to_string()),
+            }
+        });
+    }
+
     /// Sets the tool `game` runs with; quick enough for the main thread.
     pub fn assign(
         self: &Rc<Self>,
@@ -873,12 +944,22 @@ impl Window {
         title: String,
         work: impl FnOnce(&mut dyn FnMut(Step)) -> Result<String, String> + Send + 'static,
     ) {
+        self.run_stoppable(title, None, work);
+    }
+
+    /// `run`, with a Cancel button that calls `stop` while it runs.
+    fn run_stoppable(
+        self: &Rc<Self>,
+        title: String,
+        stop: Option<Rc<dyn Fn()>>,
+        work: impl FnOnce(&mut dyn FnMut(Step)) -> Result<String, String> + Send + 'static,
+    ) {
         if self.busy() {
             self.toast(&tr("Wait for the current job to finish", &[]));
             return;
         }
         self.busy.set(true);
-        self.job.start(&title);
+        self.job.start(&title, stop);
         // Buttons that would start another job are disabled until it ends.
         self.redraw();
 
@@ -891,6 +972,11 @@ impl Window {
             // Only steps the window can show: a new step or percentage.
             let mut last = None;
             let mut progress = |step: Step| {
+                // Every line, as it comes.
+                if let Step::Output(_) = step {
+                    let _ = tx.send_blocking(Msg::Step(step));
+                    return;
+                }
                 let key = match step {
                     Step::Download { done, total } | Step::Extract { done, total } => {
                         // Percent, or MiB of an unknown total.
@@ -916,6 +1002,7 @@ impl Window {
                         Msg::Step(step) => win.job.show(step),
                         Msg::Done(result) => {
                             win.busy.set(false);
+                            win.job.stop.take();
                             win.job.revealer.set_reveal_child(false);
                             match result {
                                 Ok(done) => win.toast(&done),

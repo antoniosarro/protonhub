@@ -8,6 +8,7 @@
   libadwaita,
   udev,
   vulkan-tools,
+  winetricks,
   version ? "0.0.0-dev",
 }:
 
@@ -42,10 +43,16 @@ rustPlatform.buildRustPackage {
     udev
   ];
 
-  # vkcube, which the MangoHud editor previews over; MangoHud itself comes
-  # from the system, as its Vulkan layer must.
+  # vkcube, which the MangoHud editor previews over (MangoHud itself comes
+  # from the system, as its Vulkan layer must), and winetricks, for the
+  # prefix tools.
   preFixup = ''
-    gappsWrapperArgs+=(--suffix PATH : ${lib.makeBinPath [ vulkan-tools ]})
+    gappsWrapperArgs+=(--suffix PATH : ${
+      lib.makeBinPath [
+        vulkan-tools
+        winetricks
+      ]
+    })
   '';
 
   postInstall = ''

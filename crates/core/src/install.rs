@@ -22,7 +22,7 @@ pub const RECORD: &str = ".protonhub.json";
 const STAGING: &str = ".protonhub-staging";
 
 /// Where the pipeline is, for progress reports.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Step {
     Resolve,
     Download {
@@ -35,6 +35,9 @@ pub enum Step {
         done: u64,
         total: u64,
     },
+    /// A line a program printed, for a job that runs one rather than an
+    /// install.
+    Output(String),
 }
 
 /// What protonhub knows about a version it installed.

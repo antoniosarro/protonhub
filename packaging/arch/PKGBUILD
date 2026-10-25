@@ -14,7 +14,8 @@ depends=('gtk4' 'libadwaita' 'systemd-libs' 'gcc-libs' 'glibc')
 makedepends=('cargo' 'git' 'gettext')
 optdepends=('libnotify: notifications from the update timer'
             'mangohud: the preview in the MangoHud editor'
-            'vulkan-tools: vkcube, which the MangoHud editor previews over')
+            'vulkan-tools: vkcube, which the MangoHud editor previews over'
+            'winetricks: installing components into the prefixes of games')
 provides=("$_pkgname")
 conflicts=("$_pkgname")
 source=("$_pkgname::git+$url.git")

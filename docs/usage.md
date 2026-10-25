@@ -17,6 +17,8 @@ builds and runs it.
 | `protonhub game GAME [--launcher L] [--info]` | One game: its id, source and tool, its prefix and shader cache (Steam), and with `--info` its ProtonDB rating and anti-cheat status. Every launcher is searched; `--launcher` is needed only when several have a game of that name |
 | `protonhub launch GAME [--set TEXT \| --on ID… --off ID…] [--launcher L]` | A Steam or Heroic game's launch options and the presets they have on; `--set` replaces them (`""` removes them), `--on` and `--off` switch presets ([launch options](#launch-options)) |
 | `protonhub presets` | The launch option presets: their id, name, what each sets, and what it's for |
+| `protonhub tricks GAME [VERB… \| --run PROGRAM] [--launcher L]` | A Steam or Heroic game's Wine prefix, the Wine it runs with, and the winetricks verbs in it; VERBs installs them, `--run` runs `winecfg`, `regedit`, `control` or a Windows program (`.exe`, `.msi`) in it ([prefix tools](#prefix-tools)) |
+| `protonhub verbs` | The winetricks verbs offered by group: their id, group, name and what each is for |
 | `protonhub assign GAME TOOL [--launcher L]` | Set the tool a game runs with. GAME is its id or name, TOOL a tool's id or name from `games`, or `default` (Steam) |
 | `protonhub usage [--launcher L]` | Each installed tool's size and what uses it: games, the default, `unused`, or `-` where ProtonHub can't tell |
 | `protonhub cleanup [--launcher L] [--yes]` | List the tools nothing uses and the space they take; `--yes` deletes them |
@@ -127,6 +129,29 @@ protonhub launch "Elden Ring"                      # what it has
 protonhub launch "Elden Ring" --on mangohud --on wayland
 protonhub launch "Elden Ring" --set "PROTON_LOG=1 %command% -windowed"
 ```
+
+## Prefix tools
+
+Verbs are installed by winetricks, run in the game's prefix with the
+game's own Wine or Proton, as protontricks does for Steam:
+
+- A Steam game's prefix is `steamapps/compatdata/<id>/pfx` in whichever
+  library has it, and its Proton is the one that last ran it, named in
+  `compatdata/<id>/config_info`: another version would upgrade the prefix
+  behind Proton's back. A game that never ran has no prefix yet.
+- A Heroic game's prefix and Wine are `winePrefix` and `wineVersion` in its
+  settings file, with the prefix in `pfx/` for a Proton. Like its tool, it
+  needs its settings saved in Heroic once.
+
+`winetricks.log` in the prefix lists what winetricks installed. Installers
+run unattended (`-q`) where they allow it; some still show windows, and
+.NET takes minutes. In the GUI an install is a job with a Cancel button,
+which ends winetricks and every Wine program in the prefix.
+
+Proton's `wine` is a 32-bit program built for a usual Linux system. Where
+there's no `/lib/ld-linux.so.2` for it, as on NixOS, everything runs inside
+`steam-run`, which must be installed. The common verbs are data, in
+[`verbs.toml`](../crates/core/verbs.toml); any other verb can be named.
 
 ## Games and tools
 

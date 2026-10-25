@@ -12,6 +12,7 @@ use protonhub_core::launcher::{self, Launcher};
 use protonhub_core::lock::{self, Lock};
 use protonhub_core::manifest::{Arch, LauncherKind, Registry, Tool};
 use protonhub_core::paths;
+use protonhub_core::prefix;
 use protonhub_core::releases::{self, Client, Version};
 use protonhub_core::storage::{self, Kind};
 use serde::Serialize;
@@ -102,6 +103,23 @@ enum Command {
     },
     /// List the launch option presets and what each sets
     Presets,
+    /// Show GAME's Wine prefix and the winetricks verbs in it, install
+    /// VERBs with winetricks, or run a program in it, all with the game's
+    /// own Wine or Proton (Steam, Heroic)
+    Tricks {
+        game: String,
+        /// Verbs to install: `protonhub verbs` lists common ones, and any
+        /// winetricks verb works
+        verbs: Vec<String>,
+        /// Run winecfg, regedit, control, or a Windows program (.exe, .msi)
+        /// in the prefix instead
+        #[arg(long, conflicts_with = "verbs")]
+        run: Option<String>,
+        #[arg(long)]
+        launcher: Option<String>,
+    },
+    /// List the winetricks verbs ProtonHub offers, by group
+    Verbs,
     /// Set the tool GAME (its id or name) runs with: a tool's id or name,
     /// or "default" for the launcher's default
     Assign {
@@ -634,6 +652,77 @@ fn run(cli: Cli) -> Result<()> {
                 })
                 .collect();
             print(json, text.join("\n"), &presets)
+        }
+        Command::Tricks {
+            game,
+            verbs,
+            run,
+            launcher,
+        } => {
+            let (target, g) = locate(launcher.as_deref(), &game)?;
+            let prefix = prefix::find(&target, &g)?;
+            if let Some(bad) = verbs.iter().find(|v| !prefix::is_verb(v)) {
+                return Err(format!("{bad} isn't a winetricks verb").into());
+            }
+            // Straight to the terminal, where installers can ask and Ctrl+C
+            // reaches them.
+            let cmd = match run.as_deref() {
+                Some(tool @ ("winecfg" | "regedit" | "control")) => Some(prefix.wine_tool(tool)?),
+                Some(path) if std::path::Path::new(path).is_file() => {
+                    Some(prefix.program(&std::path::absolute(path)?)?)
+                }
+                Some(path) => return Err(format!("{path}: no such program").into()),
+                None if verbs.is_empty() => None,
+                None => Some(prefix.winetricks(&verbs)?),
+            };
+            if let Some(mut cmd) = cmd {
+                let status = cmd.status()?;
+                if !status.success() {
+                    return Err(
+                        format!("{} ended with {status}", cmd.get_program().display()).into(),
+                    );
+                }
+            }
+            #[derive(Serialize)]
+            struct Out<'a> {
+                prefix: &'a std::path::Path,
+                wine: &'a std::path::Path,
+                installed: Vec<String>,
+            }
+            let out = Out {
+                prefix: &prefix.dir,
+                wine: &prefix.wine,
+                installed: prefix.installed(),
+            };
+            let text = format!(
+                "prefix\t{}\nwine\t{}\ninstalled\t{}",
+                out.prefix.display(),
+                out.wine.display(),
+                if out.installed.is_empty() {
+                    "-".to_owned()
+                } else {
+                    out.installed.join(" ")
+                }
+            );
+            print(json, text, &out)
+        }
+        Command::Verbs => {
+            let groups = prefix::verbs();
+            let text: Vec<_> = groups
+                .iter()
+                .flat_map(|g| {
+                    g.verb.iter().map(|v| {
+                        format!(
+                            "{}\t{}\t{}\t{}",
+                            v.id,
+                            g.title,
+                            v.name,
+                            v.description.as_deref().unwrap_or("")
+                        )
+                    })
+                })
+                .collect();
+            print(json, text.join("\n"), &groups)
         }
         Command::Assign {
             game,
@@ -1412,6 +1501,8 @@ impl Progress {
             Step::Download { done, total } => ("downloading", Some((done, total))),
             Step::Verify => ("verifying", None),
             Step::Extract { done, total } => ("extracting", Some((done, total))),
+            // Installs print none.
+            Step::Output(_) => return,
         };
         // Of an unknown total (0), only the MiB so far.
         let percent = fraction.map(|(done, total)| match total {

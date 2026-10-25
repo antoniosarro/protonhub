@@ -6,6 +6,7 @@
 mod game;
 mod game_row;
 mod games;
+mod prefix;
 mod storage;
 mod tools;
 

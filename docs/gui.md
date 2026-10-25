@@ -40,8 +40,17 @@ back button at the top left (or Escape, Alt+←, or B on a gamepad): its picture
 ProtonDB rating and anti-cheat status, the tool it runs with (to change,
 as in its row), its launch options (Steam, Heroic), its prefix and shader cache
 on Steam (each with its size, a button to open its folder and one to
-delete it, as in [Storage](#storage)), its ProtonDB, SteamDB and Steam
-store pages, and its app id.
+delete it, as in [Storage](#storage)), its Wine prefix, its ProtonDB,
+SteamDB and Steam store pages, and its app id.
+
+**Wine Prefix** (Steam, Heroic) shows the prefix's folder and the
+components winetricks installed in it. **Install…** picks more: common
+ones by group, those installed already ticked, and any other verb by name
+(Enter installs). The install is a job in the sidebar, with winetricks'
+latest line and a Cancel button. **Wine's Tools** opens winecfg, regedit
+or the control panel in the prefix, and **Run a Windows Program** an
+`.exe` or `.msi` of your choice, all with the game's own Wine or Proton
+([usage.md](usage.md#prefix-tools)).
 
 **Launch Options** shows the game's launch options in a row that unfolds
 to edit them by parts: a row per variable, its name and value side by side

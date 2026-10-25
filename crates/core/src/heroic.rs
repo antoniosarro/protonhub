@@ -389,6 +389,11 @@ fn is_native(platform: &Value) -> bool {
         .is_some_and(|p| p.eq_ignore_ascii_case("linux"))
 }
 
+/// `game`'s settings, from its settings file; none without one.
+pub(crate) fn settings(root: &Path, game: &str) -> Result<Option<Value>, Error> {
+    Ok(read_json(&config_path(root, game))?.map(|mut c| c[game].take()))
+}
+
 fn config_path(root: &Path, game: &str) -> PathBuf {
     root.join("GamesConfig").join(format!("{game}.json"))
 }

@@ -89,6 +89,9 @@ fn build(
     if let Some(group) = launch_group(win, state, game) {
         page.add(&group);
     }
+    if let Some(group) = super::prefix::group(win, state, game) {
+        page.add(&group);
+    }
     if let Ok(Some(storage)) = &state.storage {
         let group = adw::PreferencesGroup::builder()
             .title(tr("Storage", &[]))

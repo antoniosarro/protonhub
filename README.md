@@ -45,6 +45,9 @@ scriptable CLI with JSON output.
   for MangoHud, GameMode, Native Wayland, HDR, NTSync, FSR 4 and DLSS
   upgrades and Proton's log, defined as data in
   [`presets.toml`](crates/core/presets.toml).
+- **Prefix tools**: install winetricks components (Visual C++, .NET,
+  DirectX, fonts…) into a Steam or Heroic game's prefix with the game's own
+  Proton, open winecfg or regedit there, or run a Windows program in it.
 - **MangoHud editor**: its global settings, or a game's own, with a live
   preview of the real MangoHud over vkcube as you change them.
 - **Usage map**: see which games in any launcher use each tool, and
@@ -150,7 +153,10 @@ libadwaita 1.6+, libudev and gettext. [`just`](justfile) lists the recipes:
 - The manifests ship with the app; fetching them from this repository, so
   a fix needs no release, is planned.
 - Inside the Flatpak, ProtonHub can't see whether Steam or Heroic is
-  running, can't install the systemd timer, and can't preview MangoHud.
+  running, can't install the systemd timer, can't preview MangoHud, and
+  can't run winetricks.
+- On NixOS, prefix tools need `steam-run`: Proton's Wine is a 32-bit
+  program for a usual Linux system.
 - Flatpak Steam's MangoHud reads its global settings from Steam's own
   sandbox, not `~/.config/MangoHud`; a game's own settings work there too.
 

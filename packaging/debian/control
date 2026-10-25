@@ -18,7 +18,7 @@ Package: protonhub
 Architecture: amd64 arm64
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Recommends: libnotify-bin
-Suggests: mangohud, vulkan-tools
+Suggests: mangohud, vulkan-tools, winetricks
 Description: install and manage Proton, Wine, DXVK and VKD3D builds
  ProtonHub installs and removes compatibility tools such as GE-Proton,
  Proton-CachyOS, Wine-GE, DXVK and vkd3d-proton for Steam, Heroic, Lutris,
