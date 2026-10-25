@@ -59,7 +59,8 @@ scriptable CLI with JSON output.
 - **Release channels**: keep a tool at its latest release, keep the newest
   N versions, move games onto new releases, all from a daily systemd user
   timer with desktop notifications. No daemon.
-- **Game info**: ProtonDB ratings and Are We Anti-Cheat Yet statuses.
+- **Game info**: ProtonDB ratings, Are We Anti-Cheat Yet statuses and
+  Valve's Steam Deck ratings.
 - **Lockfiles**: export what is installed on one machine and apply it on
   another.
 - **Gamepad and Steam Deck**: the D-pad drives the window, which starts

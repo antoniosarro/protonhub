@@ -21,7 +21,10 @@ of the legend above the list; hovering it shows the tier and the number
 of reports. Under the name, a shield shows its anti-cheat status from Are
 We Anti-Cheat Yet (Supported, Running, Planned, Broken or Denied), when
 the game has anti-cheat. Both are cached for a day; if a source is down,
-the page says so and shows the rest. Pictures come from Steam's library
+the page says so and shows the rest. A Steam game Valve rated for the
+Steam Deck shows the rating (Deck Verified, Playable or Unsupported) and,
+on its page, what Valve rated it with (natively, or a Proton's version),
+from Steam's own app cache. Pictures come from Steam's library
 cache, else Steam's CDN, and from Heroic's library; downloaded ones are
 cached in `~/.cache/protonhub/files`.
 

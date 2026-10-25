@@ -67,6 +67,7 @@ pub fn library(root: &Path, beside: &[Launcher]) -> Result<Library, Error> {
                 tool: own.or_else(|| default.clone()),
                 explicit,
                 epic_namespace: g["namespace"].as_str().map(str::to_owned),
+                deck: None,
                 art: ["art_cover", "art_square"]
                     .iter()
                     .find_map(|k| g[*k].as_str().filter(|s| !s.is_empty()))

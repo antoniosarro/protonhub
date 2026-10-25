@@ -106,6 +106,7 @@ pub fn library(launcher: &Launcher) -> Result<Library, Error> {
             },
             explicit,
             epic_namespace: None,
+            deck: None,
             art: cover
                 .is_file()
                 .then(|| cover.to_string_lossy().into_owned()),

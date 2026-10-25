@@ -8,12 +8,13 @@ use std::rc::Rc;
 use adw::prelude::*;
 use gtk::{gio, glib};
 use protonhub_core::games::{Game, Library};
+use protonhub_core::info::Info;
 use protonhub_core::install::human_size;
 use protonhub_core::launch::{self, Options};
 use protonhub_core::launcher::Launcher;
 use protonhub_core::mangohud;
 
-use super::game_row::{options, source, thumbnail, tier_name};
+use super::game_row::{deck_rating, deck_text, options, source, thumbnail, tier_name};
 use super::storage::{self, kind_name};
 use super::tilde;
 use crate::details::open_button;
@@ -160,11 +161,16 @@ fn build(
         .build()
 }
 
-/// ProtonDB's rating and the anti-cheat status, where either is known.
+/// ProtonDB's rating, the anti-cheat status and Valve's Steam Deck
+/// rating, where any is known.
 fn ratings(state: &LauncherState, game: &Game) -> Option<adw::PreferencesGroup> {
-    let info = state.info.iter().find(|(id, _)| *id == game.id)?;
-    let info = &info.1;
-    if info.protondb.is_none() && info.anticheat.is_none() {
+    let none = Info::default();
+    let info = state
+        .info
+        .iter()
+        .find(|(id, _)| *id == game.id)
+        .map_or(&none, |(_, i)| i);
+    if info.protondb.is_none() && info.anticheat.is_none() && game.deck.is_none() {
         return None;
     }
     let group = adw::PreferencesGroup::builder()
@@ -200,6 +206,16 @@ fn ratings(state: &LauncherState, game: &Game) -> Option<adw::PreferencesGroup> 
             )))
             .build();
         row.add_prefix(&gtk::Image::from_icon_name("security-high-symbolic"));
+        group.add(&row);
+    }
+    if let Some(d) = &game.deck {
+        let row = adw::ActionRow::builder()
+            .title(tr("Steam Deck", &[]))
+            .subtitle(glib::markup_escape_text(&deck_text(d)))
+            .build();
+        let icon = gtk::Image::from_icon_name("input-gaming-symbolic");
+        icon.add_css_class(deck_rating(d.rating).0);
+        row.add_prefix(&icon);
         group.add(&row);
     }
     Some(group)

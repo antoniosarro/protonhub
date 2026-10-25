@@ -10,7 +10,7 @@ use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
 
-use crate::games::{Choice, Error, Game, Library};
+use crate::games::{Choice, Deck, DeckRating, Error, Game, Library};
 use crate::launcher::{Launcher, Packaging};
 use crate::vdf::{self, Obj, Value};
 
@@ -62,12 +62,25 @@ pub fn library(root: &Path) -> Result<Library, Error> {
     };
     let default = mapped("0").map(choice);
 
+    let installed = installed(root, &mut problems)?;
+    let ids: Vec<&str> = installed
+        .iter()
+        .filter(|(_, _, source)| *source == "steam")
+        .map(|(id, _, _)| id.as_str())
+        .collect();
+    // Ratings are extra: an app cache that can't be read leaves them out,
+    // not games, so it's no problem of the library's.
+    let decks = deck_ratings(root, &ids).unwrap_or_default();
     let mut games = Vec::new();
-    for (id, name, source) in installed(root, &mut problems)? {
+    for (id, name, source) in installed {
         let (tool, explicit) = match mapped(&id) {
             Some(name) => (Some(choice(name)), true),
             None => (default.clone(), false),
         };
+        let deck = decks
+            .iter()
+            .find(|(d, _)| *d == id)
+            .map(|(_, deck)| deck.clone());
         games.push(Game {
             art: (source == "steam").then(|| art(root, &id)),
             id,
@@ -76,6 +89,7 @@ pub fn library(root: &Path) -> Result<Library, Error> {
             tool,
             explicit,
             epic_namespace: None,
+            deck,
         });
     }
     games.sort_by_key(|g| g.name.to_lowercase());
@@ -492,15 +506,58 @@ pub(crate) fn app_ids(root: &Path) -> Result<Vec<String>, Error> {
     Ok(ids)
 }
 
-/// The names Steam's app cache (appcache/appinfo.vdf) has for the apps
-/// `ids`, which it keeps for apps no longer installed too. Entries of other
-/// apps are skipped unread. Formats 28 and 29 (2024 on, its keys in a table
-/// at the end); an older one is an error.
+/// The names Steam's app cache has for the apps `ids`, which it keeps for
+/// apps no longer installed too.
 pub(crate) fn app_names(root: &Path, ids: &[&str]) -> Result<Vec<(String, String)>, Error> {
+    let mut names = Vec::new();
+    app_info(root, ids, |id, info| {
+        if let Some(name) = info
+            .path(&["appinfo", "common"])
+            .and_then(|c| c.str("name"))
+        {
+            names.push((id.to_string(), name.to_owned()));
+        }
+    })?;
+    Ok(names)
+}
+
+/// Valve's Steam Deck ratings of the apps `ids` it rated, from Steam's app
+/// cache.
+fn deck_ratings(root: &Path, ids: &[&str]) -> Result<Vec<(String, Deck)>, Error> {
+    let mut decks = Vec::new();
+    app_info(root, ids, |id, info| {
+        let Some(compat) = info.path(&["appinfo", "common", "steam_deck_compatibility"]) else {
+            return;
+        };
+        let category = match compat.get("category") {
+            Some(Value::Int(n)) => *n,
+            Some(Value::Str(s)) => s.parse().unwrap_or(0),
+            _ => 0,
+        };
+        let rating = match category {
+            1 => DeckRating::Unsupported,
+            2 => DeckRating::Playable,
+            3 => DeckRating::Verified,
+            _ => return,
+        };
+        let runtime = compat
+            .obj("configuration")
+            .and_then(|c| c.str("recommended_runtime"))
+            .filter(|r| !r.is_empty())
+            .map(str::to_owned);
+        decks.push((id.to_string(), Deck { rating, runtime }));
+    })?;
+    Ok(decks)
+}
+
+/// Each of the apps `ids` in Steam's app cache (appcache/appinfo.vdf),
+/// with its info. Entries of other apps are skipped unread. Formats 28 and
+/// 29 (2024 on, its keys in a table at the end); an older one is an error.
+fn app_info(root: &Path, ids: &[&str], mut each: impl FnMut(u64, &Obj)) -> Result<(), Error> {
     let path = root.join("appcache/appinfo.vdf");
     let bytes = match fs::read(&path) {
         Ok(b) => b,
-        Err(e) if e.kind() == io::ErrorKind::NotFound => return Ok(Vec::new()),
+        Err(e) if e.kind() == io::ErrorKind::NotFound => return Ok(()),
         Err(source) => return Err(Error::Io { path, source }),
     };
     let bad = |message: String| Error::Vdf {
@@ -531,7 +588,6 @@ pub(crate) fn app_names(root: &Path, ids: &[&str]) -> Result<Vec<(String, String
         other => return Err(bad(format!("unknown format {other:#010x}"))),
     };
     let wanted: Vec<u64> = ids.iter().filter_map(|id| id.parse().ok()).collect();
-    let mut names = Vec::new();
     loop {
         let id = int(pos, 4)?;
         if id == 0 {
@@ -550,13 +606,11 @@ pub(crate) fn app_names(root: &Path, ids: &[&str]) -> Result<Vec<(String, String
                 None => vdf::parse_binary(kv),
             }
             .map_err(|e| bad(format!("app {id}: {}", e.message)))?;
-            if let Some(name) = obj.path(&["appinfo", "common"]).and_then(|c| c.str("name")) {
-                names.push((id.to_string(), name.to_owned()));
-            }
+            each(id, &obj);
         }
         pos = end;
     }
-    Ok(names)
+    Ok(())
 }
 
 /// The app manifests (`appmanifest_<id>.acf`) of a library; none on a

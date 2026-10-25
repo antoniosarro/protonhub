@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: protonhub\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-25 15:32+0100\n"
+"POT-Creation-Date: 2026-10-25 15:38+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -165,7 +165,7 @@ msgstr[1] ""
 msgid "Reading {file}"
 msgstr ""
 
-#: crates/gtk/src/mangohud.rs:47 crates/gtk/src/page/game.rs:303
+#: crates/gtk/src/mangohud.rs:47 crates/gtk/src/page/game.rs:319
 msgid "Save"
 msgstr ""
 
@@ -185,7 +185,7 @@ msgstr ""
 msgid "Saved the MangoHud settings"
 msgstr ""
 
-#: crates/gtk/src/mangohud.rs:116 crates/gtk/src/page/game.rs:706
+#: crates/gtk/src/mangohud.rs:116 crates/gtk/src/page/game.rs:722
 #, rust-format
 msgid "Writing {file}"
 msgstr ""
@@ -194,151 +194,155 @@ msgstr ""
 msgid "Starting the preview"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:97 crates/gtk/src/page/mod.rs:115
+#: crates/gtk/src/page/game.rs:98 crates/gtk/src/page/mod.rs:115
 msgid "Storage"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:102 crates/gtk/src/page/storage.rs:137
+#: crates/gtk/src/page/game.rs:103 crates/gtk/src/page/storage.rs:137
 msgid "No prefixes or shader caches"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:103 crates/gtk/src/page/storage.rs:138
+#: crates/gtk/src/page/game.rs:104 crates/gtk/src/page/storage.rs:138
 msgid "Steam makes them when a game first runs"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:143
+#: crates/gtk/src/page/game.rs:144
 msgid "Steam App ID"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:144
+#: crates/gtk/src/page/game.rs:145
 msgid "Faugus Game ID"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:145
+#: crates/gtk/src/page/game.rs:146
 msgid "Heroic App Name"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:171
+#: crates/gtk/src/page/game.rs:177
 msgid "On Linux"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:175
+#: crates/gtk/src/page/game.rs:181
 msgid "ProtonDB"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:177
+#: crates/gtk/src/page/game.rs:183
 #, rust-format
 msgid "{tier}, from {n} report"
 msgid_plural "{tier}, from {n} reports"
 msgstr[0] ""
 msgstr[1] ""
 
-#: crates/gtk/src/page/game.rs:195
+#: crates/gtk/src/page/game.rs:201
 msgid "Anti-cheat"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:216
+#: crates/gtk/src/page/game.rs:213
+msgid "Steam Deck"
+msgstr ""
+
+#: crates/gtk/src/page/game.rs:232
 msgid "Compatibility Tool"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:220
+#: crates/gtk/src/page/game.rs:236
 msgid "Runs With"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:231
+#: crates/gtk/src/page/game.rs:247
 #, rust-format
 msgid "Quit {launcher} to change it"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:259
+#: crates/gtk/src/page/game.rs:275
 msgid "Launch Options"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:265
+#: crates/gtk/src/page/game.rs:281
 msgid "Can't read the launch options"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:272
+#: crates/gtk/src/page/game.rs:288
 msgid "Set a non-Steam game's launch options in its properties in Steam"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:281
+#: crates/gtk/src/page/game.rs:297
 msgid ""
 "The switches edit the text; save it to change the game. Not every Proton "
 "build reads every option."
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:291
+#: crates/gtk/src/page/game.rs:307
 msgid "As text"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:296
+#: crates/gtk/src/page/game.rs:312
 msgid "Launch options"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:339
+#: crates/gtk/src/page/game.rs:355
 msgid "Add Variable"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:359
+#: crates/gtk/src/page/game.rs:375
 msgid "Programs it runs in"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:361
+#: crates/gtk/src/page/game.rs:377
 msgid "Arguments"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:425
+#: crates/gtk/src/page/game.rs:441
 msgid "Name"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:425
+#: crates/gtk/src/page/game.rs:441
 msgid "Remove"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:425
+#: crates/gtk/src/page/game.rs:441
 msgid "Value"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:505
+#: crates/gtk/src/page/game.rs:521
 msgid "None"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:567
+#: crates/gtk/src/page/game.rs:583
 msgid "Own MangoHud Settings"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:569
+#: crates/gtk/src/page/game.rs:585
 msgid "This game's MangoHud settings instead of the global ones"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:599 crates/gtk/src/page/gamescope.rs:30
+#: crates/gtk/src/page/game.rs:615 crates/gtk/src/page/gamescope.rs:30
 #, rust-format
 msgid "{program} isn't installed: the game won't start with it"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:698
+#: crates/gtk/src/page/game.rs:714
 msgid "Edit"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:705
+#: crates/gtk/src/page/game.rs:721
 #, rust-format
 msgid "MangoHud for {game}"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:755
+#: crates/gtk/src/page/game.rs:771
 msgid "On the Web"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:759
+#: crates/gtk/src/page/game.rs:775
 msgid "ProtonDB Reports"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:763
+#: crates/gtk/src/page/game.rs:779
 msgid "SteamDB"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:767
+#: crates/gtk/src/page/game.rs:783
 msgid "Steam Store"
 msgstr ""
 
@@ -371,36 +375,73 @@ msgstr ""
 msgid "Anti-cheat: {names}"
 msgstr ""
 
-#: crates/gtk/src/page/game_row.rs:84
+#: crates/gtk/src/page/game_row.rs:72
+#, rust-format
+msgid "Deck {rating}"
+msgstr ""
+
+#: crates/gtk/src/page/game_row.rs:76
+#, rust-format
+msgid "Steam Deck: {rating}"
+msgstr ""
+
+#: crates/gtk/src/page/game_row.rs:99
 #, rust-format
 msgid "ProtonDB: {tier}, from {n} report"
 msgid_plural "ProtonDB: {tier}, from {n} reports"
 msgstr[0] ""
 msgstr[1] ""
 
-#: crates/gtk/src/page/game_row.rs:116
+#: crates/gtk/src/page/game_row.rs:131
 msgid "The tool it runs with"
 msgstr ""
 
-#: crates/gtk/src/page/game_row.rs:123 crates/gtk/src/page/tools.rs:157
+#: crates/gtk/src/page/game_row.rs:138 crates/gtk/src/page/tools.rs:157
 #: crates/gtk/src/window.rs:636
 msgid "Details"
 msgstr ""
 
-#: crates/gtk/src/page/game_row.rs:223
+#: crates/gtk/src/page/game_row.rs:238
 #, rust-format
 msgid "Default ({tool})"
 msgstr ""
 
-#: crates/gtk/src/page/game_row.rs:224
+#: crates/gtk/src/page/game_row.rs:239
 msgid "Default (none)"
 msgstr ""
 
-#: crates/gtk/src/page/game_row.rs:258 crates/gtk/src/page/storage.rs:294
+#: crates/gtk/src/page/game_row.rs:273
+msgid "Verified"
+msgstr ""
+
+#: crates/gtk/src/page/game_row.rs:274
+msgid "Playable"
+msgstr ""
+
+#: crates/gtk/src/page/game_row.rs:275
+msgid "Unsupported"
+msgstr ""
+
+#: crates/gtk/src/page/game_row.rs:283
+#, rust-format
+msgid "{rating}, natively"
+msgstr ""
+
+#: crates/gtk/src/page/game_row.rs:285
+#, rust-format
+msgid "{rating}, with Steam's default Proton"
+msgstr ""
+
+#: crates/gtk/src/page/game_row.rs:289
+#, rust-format
+msgid "{rating}, with Proton {version}"
+msgstr ""
+
+#: crates/gtk/src/page/game_row.rs:305 crates/gtk/src/page/storage.rs:294
 msgid "Non-Steam game"
 msgstr ""
 
-#: crates/gtk/src/page/game_row.rs:262
+#: crates/gtk/src/page/game_row.rs:309
 msgid "Sideloaded"
 msgstr ""
 

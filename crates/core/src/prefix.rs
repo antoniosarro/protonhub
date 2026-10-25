@@ -439,6 +439,7 @@ mod tests {
             }),
             explicit: false,
             epic_namespace: None,
+            deck: None,
             art: None,
         }
     }

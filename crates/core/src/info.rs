@@ -126,6 +126,7 @@ mod tests {
             tool: None,
             explicit: false,
             epic_namespace: ns.map(str::to_owned),
+            deck: None,
             art: None,
         }
     }

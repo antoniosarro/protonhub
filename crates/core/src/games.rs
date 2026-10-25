@@ -40,6 +40,27 @@ pub struct Game {
     /// A picture of the game: a local file's path, or a URL.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub art: Option<String>,
+    /// Valve's Steam Deck rating, for a Steam game it rated.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub deck: Option<Deck>,
+}
+
+/// Valve's Steam Deck rating of a game, from Steam's app cache.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct Deck {
+    pub rating: DeckRating,
+    /// What Valve rated it with: "native", "proton-stable" (Steam's
+    /// default Proton), or a Proton's version, as "proton-8.0-2".
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub runtime: Option<String>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "lowercase")]
+pub enum DeckRating {
+    Unsupported,
+    Playable,
+    Verified,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -613,6 +634,69 @@ pub(crate) mod tests {
         steam::uninstall(ten).unwrap();
         assert!(!ten.manifest.exists() && !ten.dir.exists());
         assert_eq!(steam::officials(&l.root).unwrap().len(), 1);
+    }
+
+    #[test]
+    fn steam_deck_ratings_come_from_the_app_cache() {
+        let home = TempDir::new("steam-deck");
+        let l = steam(&home);
+        // Format 29: games 10 (verified, native) and 20 (playable, with
+        // the default runtime), with their keys in a table at the end.
+        let mut b = Vec::new();
+        b.extend(0x0756_4429u32.to_le_bytes());
+        b.extend(1u32.to_le_bytes());
+        b.extend(0u64.to_le_bytes());
+        let app = |b: &mut Vec<u8>, id: u32, category: i32, runtime: Option<&str>| {
+            let mut kv = vec![0x00];
+            kv.extend(0u32.to_le_bytes()); // appinfo
+            kv.push(0x00);
+            kv.extend(1u32.to_le_bytes()); // common
+            kv.push(0x00);
+            kv.extend(2u32.to_le_bytes()); // steam_deck_compatibility
+            kv.push(0x02);
+            kv.extend(3u32.to_le_bytes()); // category
+            kv.extend(category.to_le_bytes());
+            if let Some(runtime) = runtime {
+                kv.push(0x00);
+                kv.extend(4u32.to_le_bytes()); // configuration
+                kv.push(0x01);
+                kv.extend(5u32.to_le_bytes()); // recommended_runtime
+                kv.extend(runtime.as_bytes());
+                kv.extend([0x00, 0x08]);
+            }
+            kv.extend([0x08, 0x08, 0x08, 0x08]);
+            b.extend(id.to_le_bytes());
+            b.extend((60 + kv.len() as u32).to_le_bytes());
+            b.extend([0; 60]);
+            b.extend(kv);
+        };
+        app(&mut b, 10, 3, Some("native"));
+        app(&mut b, 20, 2, None);
+        b.extend(0u32.to_le_bytes());
+        let table = b.len() as u64;
+        b[8..16].copy_from_slice(&table.to_le_bytes());
+        b.extend(6u32.to_le_bytes());
+        b.extend(b"appinfo\0common\0steam_deck_compatibility\0category\0configuration\0recommended_runtime\0");
+        fs::create_dir_all(l.root.join("appcache")).unwrap();
+        fs::write(l.root.join("appcache/appinfo.vdf"), b).unwrap();
+
+        let lib = library(&l).unwrap().unwrap();
+        assert!(lib.problems.is_empty(), "{:?}", lib.problems);
+        let deck = |id: &str| lib.games.iter().find(|g| g.id == id).unwrap().deck.clone();
+        assert_eq!(
+            deck("10"),
+            Some(Deck {
+                rating: DeckRating::Verified,
+                runtime: Some("native".into())
+            })
+        );
+        assert_eq!(
+            deck("20"),
+            Some(Deck {
+                rating: DeckRating::Playable,
+                runtime: None
+            })
+        );
     }
 
     #[test]

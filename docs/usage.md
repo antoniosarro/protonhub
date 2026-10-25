@@ -13,7 +13,7 @@ builds and runs it.
 | `protonhub install TOOL[@VERSION] [--launcher L]` | Install a release; the version is a tag, or `latest` (the default) |
 | `protonhub list` | What is in each launcher's tool directories, and which of it protonhub installed |
 | `protonhub remove TOOL@VERSION [--launcher L]` | Remove a version protonhub installed |
-| `protonhub games [--launcher L] [--info]` | Steam's, Heroic's and Faugus Launcher's installed games and the tool each runs with ("(default)" when it's the launcher's default); `--info` adds ProtonDB's rating and the anti-cheat status (network, cached for a day) |
+| `protonhub games [--launcher L] [--info]` | Steam's, Heroic's and Faugus Launcher's installed games and the tool each runs with ("(default)" when it's the launcher's default); `--info` adds ProtonDB's rating, the anti-cheat status (network, cached for a day) and Valve's Steam Deck rating (from Steam's app cache) |
 | `protonhub game GAME [--launcher L] [--info]` | One game: its id, source and tool, its prefix and shader cache (Steam), and with `--info` its ProtonDB rating and anti-cheat status. Every launcher is searched; `--launcher` is needed only when several have a game of that name |
 | `protonhub launch GAME [--set TEXT \| --on ID… --off ID…] [--launcher L]` | A Steam or Heroic game's launch options and the presets they have on; `--set` replaces them (`""` removes them), `--on` and `--off` switch presets ([launch options](#launch-options)) |
 | `protonhub presets` | The launch option presets: their id, name, what each sets, and what it's for |

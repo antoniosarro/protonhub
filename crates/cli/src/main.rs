@@ -476,7 +476,16 @@ fn run(cli: Cli) -> Result<()> {
                         let ac = i.anticheat.as_ref().map_or("-".into(), |a| {
                             format!("anti-cheat {}: {}", a.status, a.anticheats.join(", "))
                         });
-                        line.push_str(&format!("\t{rating}\t{ac}"));
+                        let deck = g.deck.as_ref().map_or("-".into(), |d| {
+                            let rating = serde_json::to_value(d.rating).expect("ratings serialize");
+                            match &d.runtime {
+                                Some(r) => {
+                                    format!("Deck {} ({r})", rating.as_str().unwrap_or_default())
+                                }
+                                None => format!("Deck {}", rating.as_str().unwrap_or_default()),
+                            }
+                        });
+                        line.push_str(&format!("\t{rating}\t{ac}\t{deck}"));
                     }
                     text.push(line);
                 }

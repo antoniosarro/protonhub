@@ -5,7 +5,7 @@ use std::rc::Rc;
 
 use adw::prelude::*;
 use gtk::glib;
-use protonhub_core::games::{Choice, Game, Library};
+use protonhub_core::games::{Choice, Deck, DeckRating, Game, Library};
 use protonhub_core::info::Info;
 use protonhub_core::launcher::Launcher;
 use protonhub_core::manifest::LauncherKind;
@@ -60,6 +60,21 @@ pub(super) fn game_row(
         status.set_tooltip_text(Some(&tr(
             "Anti-cheat: {names}",
             &[("names", &a.anticheats.join(", "))],
+        )));
+        under.append(&status);
+    }
+    if let Some(d) = &game.deck {
+        let (class, rating) = deck_rating(d.rating);
+        let status = gtk::Box::new(gtk::Orientation::Horizontal, 4);
+        status.add_css_class(class);
+        status.append(&gtk::Image::from_icon_name("input-gaming-symbolic"));
+        status.append(&gtk::Label::new(Some(&tr(
+            "Deck {rating}",
+            &[("rating", &rating)],
+        ))));
+        status.set_tooltip_text(Some(&tr(
+            "Steam Deck: {rating}",
+            &[("rating", &deck_text(d))],
         )));
         under.append(&status);
     }
@@ -252,6 +267,38 @@ pub(super) fn options(
     (options, labels, selected)
 }
 
+/// A Deck rating's style class and name.
+pub(super) fn deck_rating(rating: DeckRating) -> (&'static str, String) {
+    match rating {
+        DeckRating::Verified => ("success", tr("Verified", &[])),
+        DeckRating::Playable => ("warning", tr("Playable", &[])),
+        DeckRating::Unsupported => ("error", tr("Unsupported", &[])),
+    }
+}
+
+/// A Deck rating in words, with what Valve rated it with.
+pub(super) fn deck_text(deck: &Deck) -> String {
+    let (_, rating) = deck_rating(deck.rating);
+    match deck.runtime.as_deref() {
+        Some("native") => tr("{rating}, natively", &[("rating", &rating)]),
+        Some("proton-stable") => tr(
+            "{rating}, with Steam's default Proton",
+            &[("rating", &rating)],
+        ),
+        Some(runtime) => tr(
+            "{rating}, with Proton {version}",
+            &[
+                ("rating", &rating),
+                (
+                    "version",
+                    runtime.strip_prefix("proton-").unwrap_or(runtime),
+                ),
+            ],
+        ),
+        None => rating,
+    }
+}
+
 pub(super) fn source(source: &str) -> String {
     match source {
         "steam" => "Steam".into(),
@@ -285,6 +332,7 @@ mod tests {
             tool: tool.map(choice),
             explicit,
             epic_namespace: None,
+            deck: None,
             art: None,
         }
     }
