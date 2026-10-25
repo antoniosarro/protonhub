@@ -90,6 +90,8 @@ pub enum Error {
         "ProtonHub can't change a non-Steam game's launch options yet; set them in its properties in Steam"
     )]
     Shortcut,
+    #[error("the launch options have an unclosed quote")]
+    Unclosed,
     #[error(transparent)]
     Install(#[from] install::Error),
 }
@@ -701,7 +703,7 @@ pub(crate) mod tests {
 
     /// A Heroic with an Epic game set to GE-Proton10-34, a sideloaded one on
     /// the default Wine-GE, a native Linux game, and GE-Proton9-1 unused.
-    fn heroic(home: &Path) -> Launcher {
+    pub(crate) fn heroic(home: &Path) -> Launcher {
         let root = home.join("heroic");
         for bin in [
             "tools/proton/GE-Proton10-34/proton",

@@ -1,4 +1,4 @@
-//! Heroic's games and per-game Wine or Proton.
+//! Heroic's games, their Wine or Proton and their launch options.
 //!
 //! Installed games come from Heroic's library caches (Epic, GOG, Amazon,
 //! and sideloaded apps). A game's settings, its `wineVersion` among them,
@@ -9,9 +9,10 @@ use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
 
-use serde_json::{Value, json};
+use serde_json::{Map, Value, json};
 
 use crate::games::{Choice, Error, Game, Library};
+use crate::launch::{self, Options};
 use crate::launcher::Launcher;
 use protonhub_manifest::LauncherKind;
 
@@ -83,8 +84,7 @@ pub fn library(root: &Path, beside: &[Launcher]) -> Result<Library, Error> {
 }
 
 /// Sets `game`'s Wine or Proton to the choice whose id (its binary) is
-/// `tool`. The game must have a settings file: ProtonHub doesn't invent
-/// one, since Heroic fills in the rest of the settings when it writes it.
+/// `tool`.
 pub fn assign(
     root: &Path,
     beside: &[Launcher],
@@ -98,6 +98,161 @@ pub fn assign(
         .ok_or_else(|| Error::UnknownTool {
             id: tool.to_owned(),
         })?;
+    let kind = if choice.id.ends_with("/proton") {
+        "proton"
+    } else {
+        "wine"
+    };
+    edit_settings(root, game, |settings| {
+        settings.insert(
+            "wineVersion".into(),
+            json!({ "bin": choice.id, "name": choice.name, "type": kind }),
+        );
+    })
+}
+
+/// Heroic's own switches for programs the presets run: each runs its
+/// program itself, so the text shows it as one, and a preset sets it.
+const SWITCHES: [(&str, &str); 2] = [("showMangohud", "mangohud"), ("useGameMode", "gamemoderun")];
+
+/// The launch options of each game with a settings file, by id, as text in
+/// Steam's form: its variables, the programs Heroic runs it in (its own
+/// MangoHud and GameMode switches among them), %command% and its
+/// arguments. Games without any are left out.
+pub fn launch_options(root: &Path) -> Result<Vec<(String, String)>, Error> {
+    let dir = root.join("GamesConfig");
+    let entries = match fs::read_dir(&dir) {
+        Ok(e) => e,
+        Err(e) if e.kind() == io::ErrorKind::NotFound => return Ok(Vec::new()),
+        Err(source) => return Err(Error::Io { path: dir, source }),
+    };
+    let mut all = Vec::new();
+    for path in entries.flatten().map(|e| e.path()) {
+        let Some(id) = path
+            .file_stem()
+            .filter(|_| path.extension().is_some_and(|e| e == "json"))
+            .map(|s| s.to_string_lossy().into_owned())
+        else {
+            continue;
+        };
+        let Some(config) = read_json(&path)? else {
+            continue;
+        };
+        let text = options(&config[&id]).to_string();
+        if !text.is_empty() {
+            all.push((id, text));
+        }
+    }
+    all.sort();
+    Ok(all)
+}
+
+/// Sets `game`'s variables, programs and arguments from `text`, launch
+/// options in Steam's form. Heroic keeps each program with its arguments:
+/// a word starts a program when it's the first, one the settings had, or a
+/// preset's, and is the one before's argument otherwise.
+pub fn set_launch_options(root: &Path, game: &str, text: &str) -> Result<(), Error> {
+    let options = Options::parse(text).ok_or(Error::Unclosed)?;
+    let presets = launch::presets();
+    edit_settings(root, game, |settings| {
+        let had = wrapper_programs(settings.get("wrapperOptions"));
+        let mut programs: Vec<Vec<String>> = Vec::new();
+        for word in options.wrappers {
+            let starts = had.iter().any(|w| w.first() == Some(&word))
+                || presets.iter().any(|p| p.wrapper.as_ref() == Some(&word));
+            match programs.last_mut() {
+                Some(program) if !starts => program.push(word),
+                _ => programs.push(vec![word]),
+            }
+        }
+        for (key, program) in SWITCHES {
+            let at = programs.iter().position(|p| *p == [program]);
+            settings.insert(key.into(), json!(at.is_some()));
+            if let Some(i) = at {
+                programs.remove(i);
+            }
+        }
+        let wrappers: Vec<Value> = programs
+            .iter()
+            .map(|p| json!({ "exe": p[0], "args": join(&p[1..]) }))
+            .collect();
+        let env: Vec<Value> = options
+            .env
+            .iter()
+            .map(|(key, value)| json!({ "key": key, "value": value }))
+            .collect();
+        // Sic: Heroic's spelling.
+        settings.insert("enviromentOptions".into(), json!(env));
+        settings.insert("wrapperOptions".into(), json!(wrappers));
+        settings.insert("launcherArgs".into(), json!(join(&options.args)));
+    })
+}
+
+/// A game's settings as launch options.
+fn options(settings: &Value) -> Options {
+    let env: Vec<(String, String)> = settings["enviromentOptions"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter_map(|e| {
+            let key = e["key"].as_str().filter(|k| !k.is_empty())?;
+            Some((
+                key.to_owned(),
+                e["value"].as_str().unwrap_or_default().to_owned(),
+            ))
+        })
+        .collect();
+    let mut wrappers: Vec<String> = SWITCHES
+        .iter()
+        .filter(|(key, _)| settings[key] == json!(true))
+        .map(|(_, program)| (*program).to_owned())
+        .collect();
+    wrappers.extend(
+        wrapper_programs(settings.get("wrapperOptions"))
+            .into_iter()
+            .flatten(),
+    );
+    Options {
+        command: !env.is_empty() || !wrappers.is_empty(),
+        env,
+        wrappers,
+        args: split(settings["launcherArgs"].as_str().unwrap_or_default()),
+    }
+}
+
+/// Each of `wrapperOptions`' programs, followed by its arguments.
+fn wrapper_programs(wrappers: Option<&Value>) -> Vec<Vec<String>> {
+    wrappers
+        .and_then(Value::as_array)
+        .into_iter()
+        .flatten()
+        .filter_map(|w| {
+            let exe = w["exe"].as_str().filter(|e| !e.is_empty())?;
+            let mut words = vec![exe.to_owned()];
+            words.extend(split(w["args"].as_str().unwrap_or_default()));
+            Some(words)
+        })
+        .collect()
+}
+
+/// Words as Heroic splits them, shell-like; by spaces where that fails.
+fn split(text: &str) -> Vec<String> {
+    shlex::split(text).unwrap_or_else(|| text.split_whitespace().map(str::to_owned).collect())
+}
+
+fn join(words: &[String]) -> String {
+    // Quoting fails only on a NUL byte, which no split word has.
+    shlex::try_join(words.iter().map(String::as_str)).unwrap_or_else(|_| words.join(" "))
+}
+
+/// Changes `game`'s settings with `change`. The game must have a settings
+/// file: ProtonHub doesn't invent one, since Heroic fills in the rest of
+/// the settings when it writes it.
+fn edit_settings(
+    root: &Path,
+    game: &str,
+    change: impl FnOnce(&mut Map<String, Value>),
+) -> Result<(), Error> {
     let path = config_path(root, game);
     let mut config = read_json(&path)?.ok_or_else(|| Error::NotConfigured {
         game: game.to_owned(),
@@ -109,15 +264,7 @@ pub fn assign(
             path: path.clone(),
             message: format!("no settings object for {game}"),
         })?;
-    let kind = if choice.id.ends_with("/proton") {
-        "proton"
-    } else {
-        "wine"
-    };
-    settings.insert(
-        "wineVersion".into(),
-        json!({ "bin": choice.id, "name": choice.name, "type": kind }),
-    );
+    change(settings);
     let text = serde_json::to_string_pretty(&config).expect("JSON values serialize");
     crate::games::write_with_backup(&path, text.as_bytes())
 }

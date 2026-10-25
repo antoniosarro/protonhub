@@ -15,7 +15,7 @@ builds and runs it.
 | `protonhub remove TOOL@VERSION [--launcher L]` | Remove a version protonhub installed |
 | `protonhub games [--launcher L] [--info]` | Steam's and Heroic's installed games and the tool each runs with ("(default)" when it's the launcher's default); `--info` adds ProtonDB's rating and the anti-cheat status (network, cached for a day) |
 | `protonhub game GAME [--launcher L] [--info]` | One game: its id, source and tool, its prefix and shader cache (Steam), and with `--info` its ProtonDB rating and anti-cheat status. Every launcher is searched; `--launcher` is needed only when several have a game of that name |
-| `protonhub launch GAME [--set TEXT \| --on ID… --off ID…] [--launcher L]` | A Steam game's launch options and the presets they have on; `--set` replaces them (`""` removes them), `--on` and `--off` switch presets ([launch options](#launch-options)) |
+| `protonhub launch GAME [--set TEXT \| --on ID… --off ID…] [--launcher L]` | A Steam or Heroic game's launch options and the presets they have on; `--set` replaces them (`""` removes them), `--on` and `--off` switch presets ([launch options](#launch-options)) |
 | `protonhub presets` | The launch option presets: their id, name, what each sets, and what it's for |
 | `protonhub assign GAME TOOL [--launcher L]` | Set the tool a game runs with. GAME is its id or name, TOOL a tool's id or name from `games`, or `default` (Steam) |
 | `protonhub usage [--launcher L]` | Each installed tool's size and what uses it: games, the default, `unused`, or `-` where ProtonHub can't tell |
@@ -108,8 +108,19 @@ program (MangoHud's `mangohud`, GameMode's `gamemoderun`), or both;
 switching it off takes them out again and leaves everything else as it
 was. Presets are data, in [`presets.toml`](../crates/core/presets.toml).
 
-Like `assign`, changing them is refused while Steam runs, and the previous
-`localconfig.vdf` is kept as `localconfig.vdf.protonhub-backup`.
+Heroic has no such text: a game's settings file
+(`GamesConfig/<app>.json`) keeps its variables, the programs it runs in
+with their arguments, and its arguments apart, and switches for MangoHud
+and GameMode of its own. ProtonHub shows them in the same form, with
+Heroic's switches as `mangohud` and `gamemoderun`, and writes them back
+apart, setting Heroic's switches for those two programs. A program's
+arguments are the words after it up to the next program: one the
+settings already had, or a preset's. Like the game's tool, they can be
+changed once the game's settings were saved in Heroic.
+
+Like `assign`, changing them is refused while the launcher runs, and the
+previous file is kept beside it with `.protonhub-backup` added to its
+name.
 
 ```sh
 protonhub launch "Elden Ring"                      # what it has

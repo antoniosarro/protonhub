@@ -38,7 +38,7 @@ change keeps the previous settings file as `<name>.protonhub-backup`.
 A game's row, or its info button, opens its page over the list, with a
 back button at the top left (or Escape, Alt+←, or B on a gamepad): its picture, its
 ProtonDB rating and anti-cheat status, the tool it runs with (to change,
-as in its row), its launch options (Steam), its prefix and shader cache
+as in its row), its launch options (Steam, Heroic), its prefix and shader cache
 on Steam (each with its size, a button to open its folder and one to
 delete it, as in [Storage](#storage)), its ProtonDB, SteamDB and Steam
 store pages, and its app id.
@@ -47,7 +47,7 @@ store pages, and its app id.
 for each preset ([usage.md](usage.md#launch-options)): MangoHud, GameMode,
 Native Wayland, HDR, NTSync, FSR 4 and DLSS upgrades, and Proton's log.
 The switches show what the text has on and edit it; **Save** (or Enter)
-writes it to Steam. A switch for a program that isn't installed says so,
+writes it to the launcher. A switch for a program that isn't installed says so,
 since the game wouldn't start with it. Non-Steam shortcuts keep theirs in
 Steam.
 

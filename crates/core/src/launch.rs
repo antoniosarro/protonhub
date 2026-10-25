@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::games::{self, Error};
 use crate::launcher::Launcher;
-use crate::steam;
+use crate::{heroic, steam};
 
 /// What Steam replaces with the game's own command line.
 const COMMAND: &str = "%command%";
@@ -150,6 +150,7 @@ pub fn presets() -> Vec<Preset> {
 pub fn all(launcher: &Launcher) -> Result<Option<Vec<(String, String)>>, Error> {
     match launcher.kind {
         LauncherKind::Steam => steam::launch_options(&launcher.root).map(Some),
+        LauncherKind::Heroic => heroic::launch_options(&launcher.root).map(Some),
         _ => Ok(None),
     }
 }
@@ -164,6 +165,7 @@ pub fn set(launcher: &Launcher, game: &str, text: &str) -> Result<(), Error> {
     }
     match launcher.kind {
         LauncherKind::Steam => steam::set_launch_options(&launcher.root, game, text),
+        LauncherKind::Heroic => heroic::set_launch_options(&launcher.root, game, text),
         kind => Err(Error::Unsupported {
             launcher: kind.title(),
         }),
@@ -176,7 +178,7 @@ mod tests {
     use std::path::Path;
 
     use super::*;
-    use crate::games::tests::{steam, write};
+    use crate::games::tests::{heroic, steam, write};
     use crate::testutil::TempDir;
 
     fn preset(id: &str) -> Preset {
@@ -350,5 +352,71 @@ mod tests {
         fs::remove_file(l.root.join("config/loginusers.vdf")).unwrap();
         fs::remove_dir_all(l.root.join("userdata/2")).unwrap();
         assert_eq!(all(&l).unwrap().unwrap()[0].1, "one", "the only one");
+    }
+
+    #[test]
+    fn reads_and_writes_heroics_launch_options() {
+        let home = TempDir::new("launch-heroic");
+        let l = heroic(&home);
+        let path = l.root.join("GamesConfig/side1.json");
+        write(
+            &path,
+            &serde_json::json!({ "side1": {
+                "language": "kept",
+                "showMangohud": false,
+                "useGameMode": true,
+                "enviromentOptions": [{ "key": "DXVK_HUD", "value": "fps,gpu" }],
+                "wrapperOptions": [{ "exe": "gamescope", "args": "-W 1920 --" }, { "exe": "protonhax", "args": "init" }],
+                "launcherArgs": "-novid 'a b'",
+            } })
+            .to_string(),
+        );
+        let text = "DXVK_HUD='fps,gpu' gamemoderun gamescope -W 1920 -- protonhax init %command% -novid 'a b'";
+        assert_eq!(
+            all(&l).unwrap().unwrap(),
+            [("side1".to_owned(), text.to_owned())],
+            "epic1 has none"
+        );
+
+        // MangoHud on, GameMode off: Heroic's own switches. A new word
+        // after a program is that program's.
+        let mut o = Options::parse(text).unwrap();
+        o.set(&preset("mangohud"), true);
+        o.set(&preset("gamemode"), false);
+        o.set(&preset("wayland"), true);
+        o.wrappers.push("--fullscreen".into());
+        set(&l, "side1", &o.to_string()).unwrap();
+        let after: serde_json::Value =
+            serde_json::from_str(&fs::read_to_string(&path).unwrap()).unwrap();
+        let s = &after["side1"];
+        assert_eq!(s["language"], "kept");
+        assert_eq!(
+            (&s["showMangohud"], &s["useGameMode"]),
+            (&true.into(), &false.into())
+        );
+        assert_eq!(
+            s["enviromentOptions"],
+            serde_json::json!([
+                { "key": "DXVK_HUD", "value": "fps,gpu" },
+                { "key": "PROTON_ENABLE_WAYLAND", "value": "1" },
+            ])
+        );
+        assert_eq!(
+            s["wrapperOptions"],
+            serde_json::json!([
+                { "exe": "gamescope", "args": "-W 1920 --" },
+                { "exe": "protonhax", "args": "init --fullscreen" },
+            ])
+        );
+        assert_eq!(s["launcherArgs"], "-novid 'a b'");
+        assert!(path.with_file_name("side1.json.protonhub-backup").is_file());
+
+        set(&l, "side1", "").unwrap();
+        assert!(all(&l).unwrap().unwrap().is_empty(), "all removed");
+        assert!(matches!(
+            set(&l, "epic3", "x"),
+            Err(Error::NotConfigured { .. })
+        ));
+        assert!(matches!(set(&l, "side1", "'x"), Err(Error::Unclosed)));
     }
 }

@@ -789,7 +789,6 @@ impl Window {
         self.reload();
     }
 
-    /// Sets the tool `game` runs with; quick enough for the main thread.
     /// Sets `game`'s launch options to `text`; empty removes them.
     pub fn set_launch(self: &Rc<Self>, launcher: &Launcher, game: &games::Game, text: &str) {
         match launch::set(launcher, &game.id, text) {
@@ -815,6 +814,7 @@ impl Window {
         self.reload();
     }
 
+    /// Sets the tool `game` runs with; quick enough for the main thread.
     pub fn assign(
         self: &Rc<Self>,
         launcher: &Launcher,
