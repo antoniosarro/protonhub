@@ -611,7 +611,13 @@ fn launch_group(
                 }
                 if let Some(mut options) = Options::parse(&text.text()) {
                     options.set(&preset, row.is_active());
-                    text.set_text(&options.to_string());
+                    // Setting the text empties it first, which switches
+                    // this off and on again in the sync and notifies once
+                    // more: unchanged, it stops there.
+                    let new = options.to_string();
+                    if new != text.text() {
+                        text.set_text(&new);
+                    }
                 }
             }
         ));
