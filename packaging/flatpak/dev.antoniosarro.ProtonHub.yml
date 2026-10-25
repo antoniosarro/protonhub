@@ -32,6 +32,8 @@ finish-args:
   - --filesystem=~/.var/app/com.usebottles.bottles/data/bottles
   - --filesystem=~/.local/share/winezgui
   - --filesystem=~/.var/app/io.github.fastrizwaan.WineZGUI/data/winezgui
+  # MangoHud's settings, global and per game.
+  - --filesystem=xdg-config/MangoHud:create
 build-options:
   append-path: /usr/lib/sdk/rust-stable/bin
   env:

@@ -12,7 +12,9 @@ url='https://github.com/antoniosarro/protonhub'
 license=('MIT')
 depends=('gtk4' 'libadwaita' 'systemd-libs' 'gcc-libs' 'glibc')
 makedepends=('cargo' 'git' 'gettext')
-optdepends=('libnotify: notifications from the update timer')
+optdepends=('libnotify: notifications from the update timer'
+            'mangohud: the preview in the MangoHud editor'
+            'vulkan-tools: vkcube, which the MangoHud editor previews over')
 provides=("$_pkgname")
 conflicts=("$_pkgname")
 source=("$_pkgname::git+$url.git")

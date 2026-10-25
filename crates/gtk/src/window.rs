@@ -260,9 +260,14 @@ impl Window {
             .visible(false)
             .build();
         errors_button.add_css_class("error");
+        let mangohud_button = gtk::Button::builder()
+            .icon_name("video-display-symbolic")
+            .tooltip_text(tr("MangoHud Settings (Ctrl+M)", &[]))
+            .build();
         let sidebar_header = adw::HeaderBar::new();
         sidebar_header.pack_start(&refresh);
         sidebar_header.pack_end(&errors_button);
+        sidebar_header.pack_end(&mangohud_button);
 
         let sidebar = gtk::ListBox::new();
         sidebar.add_css_class("navigation-sidebar");
@@ -368,6 +373,25 @@ impl Window {
                 move |_: &adw::ApplicationWindow, _, _| errors::show(&win)
             ))
             .build();
+        // Outside the macro below, where xgettext doesn't look.
+        let (mangohud_title, mangohud_opening) = (
+            tr("MangoHud", &[]),
+            tr("Opening the MangoHud settings", &[]),
+        );
+        let mangohud_action = gio::ActionEntry::builder("mangohud")
+            .activate(glib::clone!(
+                #[strong]
+                win,
+                move |_: &adw::ApplicationWindow, _, _| match protonhub_core::mangohud::global_path(
+                ) {
+                    Some(path) => crate::mangohud::show(&win, &mangohud_title, path, None),
+                    None => win.report(
+                        mangohud_opening.clone(),
+                        "no home directory: HOME isn't set".into(),
+                    ),
+                }
+            ))
+            .build();
         // Alt+1…9 shows the nth launcher.
         let tab_action = gio::ActionEntry::builder("tab")
             .parameter_type(Some(&i32::static_variant_type()))
@@ -383,14 +407,16 @@ impl Window {
             ))
             .build();
         win.window
-            .add_action_entries([refresh_action, errors_action, tab_action]);
+            .add_action_entries([refresh_action, errors_action, mangohud_action, tab_action]);
         for n in 0..9 {
             app.set_accels_for_action(&format!("win.tab({n})"), &[&format!("<Alt>{}", n + 1)]);
         }
         refresh.set_action_name(Some("win.refresh"));
+        mangohud_button.set_action_name(Some("win.mangohud"));
         errors_button.set_action_name(Some("win.errors"));
         app.set_accels_for_action("win.refresh", &["<Control>r", "F5"]);
         app.set_accels_for_action("win.errors", &["<Control>e"]);
+        app.set_accels_for_action("win.mangohud", &["<Control>m"]);
         app.set_accels_for_action("window.close", &["<Control>q", "<Control>w"]);
         win.reload();
         win

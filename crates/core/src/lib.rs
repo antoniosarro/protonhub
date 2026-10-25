@@ -9,6 +9,7 @@ pub mod install;
 pub mod launch;
 pub mod launcher;
 pub mod lock;
+pub mod mangohud;
 pub mod paths;
 pub mod releases;
 pub mod steam;

@@ -7,6 +7,7 @@
   gtk4,
   libadwaita,
   udev,
+  vulkan-tools,
   version ? "0.0.0-dev",
 }:
 
@@ -40,6 +41,12 @@ rustPlatform.buildRustPackage {
     libadwaita
     udev
   ];
+
+  # vkcube, which the MangoHud editor previews over; MangoHud itself comes
+  # from the system, as its Vulkan layer must.
+  preFixup = ''
+    gappsWrapperArgs+=(--suffix PATH : ${lib.makeBinPath [ vulkan-tools ]})
+  '';
 
   postInstall = ''
     sh packaging/install-data.sh $out

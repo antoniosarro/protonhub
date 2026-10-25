@@ -1,0 +1,379 @@
+# The MangoHud settings its editor offers, in groups. `default` is what
+# MangoHud does without the line (MangoHud 0.8, src/overlay_params.cpp); a
+# setting at its default is left out of the file. Kinds: `switch` (written
+# as `key` or `key=0`), `number` (with `min`, `max` and `step`), `choice`
+# (one of `choices`), `color` (RRGGBB) and `text`. A group of `elements`
+# is things the HUD shows: with `legacy_layout=0`, MangoHud shows only those
+# listed, in their order, whatever their default.
+
+[[group]]
+title = "Metrics"
+elements = true
+
+[[group.setting]]
+key = "fps"
+name = "Frame Rate"
+kind = "switch"
+default = "1"
+
+[[group.setting]]
+key = "frametime"
+name = "Frame Time"
+description = "Milliseconds per frame, beside the frame rate"
+kind = "switch"
+default = "1"
+
+[[group.setting]]
+key = "frame_timing"
+name = "Frame Time Graph"
+kind = "switch"
+default = "1"
+
+[[group.setting]]
+key = "histogram"
+name = "Graph as Bars"
+description = "The frame time graph as a histogram"
+kind = "switch"
+default = "0"
+
+[[group.setting]]
+key = "show_fps_limit"
+name = "Current Frame Rate Limit"
+kind = "switch"
+default = "0"
+
+[[group.setting]]
+key = "gpu_stats"
+name = "GPU Load"
+kind = "switch"
+default = "1"
+
+[[group.setting]]
+key = "gpu_temp"
+name = "GPU Temperature"
+kind = "switch"
+default = "0"
+
+[[group.setting]]
+key = "gpu_power"
+name = "GPU Power"
+kind = "switch"
+default = "0"
+
+[[group.setting]]
+key = "gpu_core_clock"
+name = "GPU Clock"
+kind = "switch"
+default = "0"
+
+[[group.setting]]
+key = "gpu_mem_clock"
+name = "GPU Memory Clock"
+kind = "switch"
+default = "0"
+
+[[group.setting]]
+key = "gpu_name"
+name = "GPU Name"
+kind = "switch"
+default = "0"
+
+[[group.setting]]
+key = "vram"
+name = "Video Memory"
+kind = "switch"
+default = "0"
+
+[[group.setting]]
+key = "cpu_stats"
+name = "CPU Load"
+kind = "switch"
+default = "1"
+
+[[group.setting]]
+key = "core_load"
+name = "Load per Core"
+kind = "switch"
+default = "0"
+
+[[group.setting]]
+key = "cpu_temp"
+name = "CPU Temperature"
+kind = "switch"
+default = "0"
+
+[[group.setting]]
+key = "cpu_power"
+name = "CPU Power"
+kind = "switch"
+default = "0"
+
+[[group.setting]]
+key = "cpu_mhz"
+name = "CPU Clock"
+kind = "switch"
+default = "0"
+
+[[group.setting]]
+key = "ram"
+name = "Memory"
+kind = "switch"
+default = "0"
+
+[[group.setting]]
+key = "swap"
+name = "Swap"
+kind = "switch"
+default = "0"
+
+[[group.setting]]
+key = "procmem"
+name = "The Game's Memory"
+kind = "switch"
+default = "0"
+
+[[group.setting]]
+key = "battery"
+name = "Battery"
+kind = "switch"
+default = "0"
+
+[[group.setting]]
+key = "fan"
+name = "Fan Speed"
+description = "On the Steam Deck"
+kind = "switch"
+default = "0"
+
+[[group.setting]]
+key = "time"
+name = "Clock"
+kind = "switch"
+default = "0"
+
+[[group]]
+title = "Game"
+elements = true
+
+[[group.setting]]
+key = "engine_version"
+name = "Graphics API Version"
+description = "DXVK's, VKD3D's or OpenGL's"
+kind = "switch"
+default = "0"
+
+[[group.setting]]
+key = "vulkan_driver"
+name = "Vulkan Driver"
+kind = "switch"
+default = "0"
+
+[[group.setting]]
+key = "wine"
+name = "Wine or Proton Version"
+kind = "switch"
+default = "0"
+
+[[group.setting]]
+key = "winesync"
+name = "Wine Synchronization"
+description = "NTSync, fsync, esync or none"
+kind = "switch"
+default = "0"
+
+[[group.setting]]
+key = "resolution"
+name = "Resolution"
+kind = "switch"
+default = "0"
+
+[[group.setting]]
+key = "gamemode"
+name = "GameMode Status"
+kind = "switch"
+default = "0"
+
+[[group.setting]]
+key = "fsr"
+name = "FSR Status"
+description = "In gamescope"
+kind = "switch"
+default = "0"
+
+[[group.setting]]
+key = "hdr"
+name = "HDR Status"
+description = "In gamescope"
+kind = "switch"
+default = "0"
+
+[[group]]
+title = "Layout"
+
+[[group.setting]]
+key = "position"
+name = "Position"
+kind = "choice"
+choices = ["top-left", "top-center", "top-right", "middle-left", "middle-right", "bottom-left", "bottom-center", "bottom-right"]
+default = "top-left"
+
+[[group.setting]]
+key = "horizontal"
+name = "In One Line"
+kind = "switch"
+default = "0"
+
+[[group.setting]]
+key = "hud_compact"
+name = "Compact"
+kind = "switch"
+default = "0"
+
+[[group.setting]]
+key = "table_columns"
+name = "Columns"
+kind = "number"
+min = 1
+max = 10
+step = 1
+default = "3"
+
+[[group.setting]]
+key = "font_size"
+name = "Font Size"
+kind = "number"
+min = 8
+max = 96
+step = 1
+default = "24"
+
+[[group.setting]]
+key = "offset_x"
+name = "Horizontal Offset"
+kind = "number"
+min = 0
+max = 4000
+step = 1
+default = "0"
+
+[[group.setting]]
+key = "offset_y"
+name = "Vertical Offset"
+kind = "number"
+min = 0
+max = 4000
+step = 1
+default = "0"
+
+[[group.setting]]
+key = "round_corners"
+name = "Rounded Corners"
+kind = "number"
+min = 0
+max = 20
+step = 1
+default = "0"
+
+[[group]]
+title = "Colors"
+
+[[group.setting]]
+key = "background_alpha"
+name = "Background Opacity"
+kind = "number"
+min = 0
+max = 1
+step = 0.05
+default = "0.5"
+
+[[group.setting]]
+key = "alpha"
+name = "Text Opacity"
+kind = "number"
+min = 0
+max = 1
+step = 0.05
+default = "1"
+
+[[group.setting]]
+key = "text_outline"
+name = "Outlined Text"
+kind = "switch"
+default = "1"
+
+[[group.setting]]
+key = "background_color"
+name = "Background"
+kind = "color"
+default = "020202"
+
+[[group.setting]]
+key = "text_color"
+name = "Text"
+kind = "color"
+default = "FFFFFF"
+
+[[group.setting]]
+key = "gpu_color"
+name = "GPU"
+kind = "color"
+default = "2E9762"
+
+[[group.setting]]
+key = "cpu_color"
+name = "CPU"
+kind = "color"
+default = "2E97CB"
+
+[[group.setting]]
+key = "vram_color"
+name = "Video Memory"
+kind = "color"
+default = "AD64C1"
+
+[[group.setting]]
+key = "ram_color"
+name = "Memory"
+kind = "color"
+default = "C26693"
+
+[[group.setting]]
+key = "engine_color"
+name = "Graphics API"
+kind = "color"
+default = "EB5B5B"
+
+[[group.setting]]
+key = "frametime_color"
+name = "Frame Time Graph"
+kind = "color"
+default = "00FF00"
+
+[[group]]
+title = "Controls"
+
+[[group.setting]]
+key = "fps_limit"
+name = "Frame Rate Limit"
+description = "Frames per second, 0 for none; several, comma-separated, to switch between"
+kind = "text"
+default = "0"
+
+[[group.setting]]
+key = "toggle_hud"
+name = "Show or Hide Key"
+kind = "text"
+default = "Shift_R+F12"
+
+[[group.setting]]
+key = "toggle_fps_limit"
+name = "Frame Rate Limit Key"
+kind = "text"
+default = "Shift_L+F1"
+
+[[group.setting]]
+key = "no_display"
+name = "Hidden at Start"
+description = "Shown with the show or hide key"
+kind = "switch"
+default = "0"

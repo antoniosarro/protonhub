@@ -22,6 +22,8 @@ BuildRequires:  gettext
 BuildRequires:  desktop-file-utils
 BuildRequires:  libappstream-glib
 Recommends:     libnotify
+Suggests:       mangohud
+Suggests:       vulkan-tools
 
 %description
 ProtonHub installs and removes compatibility tools such as GE-Proton,

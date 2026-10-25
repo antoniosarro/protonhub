@@ -45,6 +45,8 @@ scriptable CLI with JSON output.
   for MangoHud, GameMode, Native Wayland, HDR, NTSync, FSR 4 and DLSS
   upgrades and Proton's log, defined as data in
   [`presets.toml`](crates/core/presets.toml).
+- **MangoHud editor**: its global settings, or a game's own, with a live
+  preview of the real MangoHud over vkcube as you change them.
 - **Usage map**: see which games in any launcher use each tool, and
   delete the ones nothing uses in one step.
 - **Storage**: each Steam game's Wine prefix and shader cache by size,
@@ -148,7 +150,9 @@ libadwaita 1.6+, libudev and gettext. [`just`](justfile) lists the recipes:
 - The manifests ship with the app; fetching them from this repository, so
   a fix needs no release, is planned.
 - Inside the Flatpak, ProtonHub can't see whether Steam or Heroic is
-  running, and can't install the systemd timer.
+  running, can't install the systemd timer, and can't preview MangoHud.
+- Flatpak Steam's MangoHud reads its global settings from Steam's own
+  sandbox, not `~/.config/MangoHud`; a game's own settings work there too.
 
 ## License
 

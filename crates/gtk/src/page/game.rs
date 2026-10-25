@@ -11,6 +11,7 @@ use protonhub_core::games::{Game, Library};
 use protonhub_core::install::human_size;
 use protonhub_core::launch::{self, Options};
 use protonhub_core::launcher::Launcher;
+use protonhub_core::mangohud;
 
 use super::game_row::{options, source, thumbnail, tier_name};
 use super::storage::{self, kind_name};
@@ -556,8 +557,31 @@ fn launch_group(
     });
     group.add(&expander);
 
+    // The game's own MangoHud settings are a switch too, after MangoHud's.
+    let own = mangohud::game_path(&state.launcher, &game.id).map(|path| launch::Preset {
+        id: "mangohud-config".into(),
+        name: tr("Own MangoHud Settings", &[]),
+        description: tr(
+            "This game's MangoHud settings instead of the global ones",
+            &[],
+        ),
+        env: [(
+            mangohud::CONFIG_VAR.into(),
+            path.to_string_lossy().into_owned(),
+        )]
+        .into(),
+        wrapper: None,
+    });
+    let mut presets = launch::presets();
+    if let Some(own) = &own {
+        let at = presets
+            .iter()
+            .position(|p| p.id == "mangohud")
+            .map_or(0, |i| i + 1);
+        presets.insert(at, own.clone());
+    }
     let mut switches = Vec::new();
-    for preset in launch::presets() {
+    for preset in presets {
         // Inside a Flatpak, the host's programs aren't on PATH to look for.
         let missing = preset.wrapper.as_deref().filter(|w| {
             protonhub_core::games::sees_launchers() && !protonhub_core::install::on_path(w)
@@ -575,6 +599,13 @@ fn launch_group(
             .build();
         group.add(&row);
         switches.push((preset, row));
+    }
+    if let Some((path, row)) = own.as_ref().and_then(|own| {
+        let path = mangohud::game_path(&state.launcher, &game.id)?;
+        let (_, row) = switches.iter().find(|(p, _)| p.id == own.id)?;
+        Some((path, row.clone()))
+    }) {
+        own_settings(win, game, path, &row);
     }
     // The switches show what the text sets, and change it; while they're
     // set to match it, changing them changes nothing.
@@ -623,6 +654,47 @@ fn launch_group(
         ));
     }
     Some(group)
+}
+
+/// An Edit button on the switch for the game's own MangoHud settings, in
+/// `path`; switching them on starts them as a copy of the global ones.
+fn own_settings(win: &Rc<Window>, game: &Game, path: std::path::PathBuf, row: &adw::SwitchRow) {
+    let edit = gtk::Button::builder()
+        .icon_name("document-edit-symbolic")
+        .tooltip_text(tr("Edit", &[]))
+        .valign(gtk::Align::Center)
+        .build();
+    edit.add_css_class("flat");
+    row.add_suffix(&edit);
+    let global = mangohud::global_path();
+    // Outside the macros below, where xgettext doesn't look.
+    let title = tr("MangoHud for {game}", &[("game", &game.name)]);
+    let writing = tr("Writing {file}", &[("file", &path.display().to_string())]);
+    edit.connect_clicked(glib::clone!(
+        #[strong]
+        win,
+        #[strong]
+        path,
+        #[strong]
+        global,
+        move |_| crate::mangohud::show(&win, &title, path.clone(), global.clone())
+    ));
+    row.connect_active_notify(glib::clone!(
+        #[strong]
+        win,
+        move |row| {
+            if !row.is_active() || path.exists() {
+                return;
+            }
+            let copy = global
+                .as_deref()
+                .map_or(Ok(Default::default()), mangohud::read)
+                .and_then(|c| mangohud::write(&path, &c));
+            if let Err(e) = copy {
+                win.report(writing.clone(), e.to_string());
+            }
+        }
+    ));
 }
 
 /// Marks `widget` as holding text that can't be used.

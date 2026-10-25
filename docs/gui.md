@@ -50,9 +50,11 @@ Variable**; the programs it runs in; its arguments; and the whole as text.
 Below it is a switch for each preset ([usage.md](usage.md#launch-options)):
 MangoHud, GameMode, Native Wayland, HDR, NTSync, FSR 4 and DLSS upgrades,
 and Proton's log. The parts and switches show what the text has on and
-edit it; **Save** (or Enter in any field) writes it to the launcher. A switch for a program that isn't installed says so,
-since the game wouldn't start with it. Non-Steam shortcuts keep theirs in
-Steam.
+edit it; **Save** (or Enter in any field) writes it to the launcher. A
+switch for a program that isn't installed says so, since the game wouldn't
+start with it. **Own MangoHud Settings** points the game at a MangoHud
+file of its own ([MangoHud](#mangohud)), made as a copy of the global one;
+its edit button opens it. Non-Steam shortcuts keep theirs in Steam.
 
 While Steam or Heroic runs, its games can't be changed (it would overwrite
 the change when it exits), and a banner says so. A Heroic game needs its
@@ -120,6 +122,25 @@ the MiB done; buttons that would start another job are disabled until it
 ends. A toast reports the result. After installing into Steam, restart
 Steam to see the new tool.
 
+## MangoHud
+
+The display button in the sidebar's header bar (Ctrl+M) edits MangoHud's
+global settings, `~/.config/MangoHud/MangoHud.conf`; a game's own, from
+its page, are in `~/.config/MangoHud/protonhub/`, and its launch options
+name them in `MANGOHUD_CONFIGFILE`. The editor has a tab each for the
+metrics, what it shows about the game, the layout, the colors and the
+controls; the settings are data, in
+[`mangohud.toml`](../crates/core/mangohud.toml). A setting at MangoHud's
+default is left out of the file, and lines the editor doesn't show stay as
+they were. With `legacy_layout=0` in the file, MangoHud shows only the
+metrics listed, in their order, and the switches say so.
+
+**Preview** runs the real MangoHud over vkcube, beside the window, with the
+settings as they are in the editor: MangoHud draws nothing over GTK
+windows, so it can't be inside one. Each change shows in it at once, saved
+or not. It needs `mangohud` and `vkcube` (from vulkan-tools) installed, and
+isn't available inside the Flatpak.
+
 ## Errors
 
 A failure shows a toast with **Details**, and a warning button appears in
@@ -156,6 +177,7 @@ when it exits.
 | Ctrl+R, F5 | Look for launchers and tools again |
 | Alt+1 … Alt+9 | Show the first … ninth launcher |
 | Ctrl+E | The error log |
+| Ctrl+M | MangoHud's global settings |
 | Ctrl+Q, Ctrl+W | Close the window |
 
 ## Screenshots

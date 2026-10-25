@@ -8,6 +8,7 @@ mod details;
 mod errors;
 mod gamepad;
 mod i18n;
+mod mangohud;
 mod page;
 mod tool;
 mod window;
