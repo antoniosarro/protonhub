@@ -15,6 +15,7 @@ builds and runs it.
 | `protonhub remove TOOL@VERSION [--launcher L]` | Remove a version protonhub installed |
 | `protonhub games [--launcher L] [--info]` | Steam's, Heroic's and Faugus Launcher's installed games and the tool each runs with ("(default)" when it's the launcher's default); `--info` adds ProtonDB's rating, the anti-cheat status (network, cached for a day) and Valve's Steam Deck rating (from Steam's app cache) |
 | `protonhub game GAME [--launcher L] [--info]` | One game: its id, source and tool, its prefix and shader cache (Steam), and with `--info` its ProtonDB rating and anti-cheat status. Every launcher is searched; `--launcher` is needed only when several have a game of that name |
+| `protonhub steam-user [USER\|last] [--launcher L]` | Steam's users with settings here, and the one launch options go to; USER (an account id or name) chooses one, `last` goes back to the one signed in last |
 | `protonhub shortcut GAME [--name N] [--target T] [--start-in D] [--launcher L]` | A non-Steam shortcut's name, target, start folder and launch options; the options change it (Steam not running). Its launch options are `launch`'s |
 | `protonhub launch GAME [--set TEXT \| --on ID… --off ID…] [--launcher L]` | A Steam game's, non-Steam shortcut's or Heroic game's launch options and the presets they have on; `--set` replaces them (`""` removes them), `--on` and `--off` switch presets ([launch options](#launch-options)) |
 | `protonhub presets` | The launch option presets: their id, name, what each sets, and what it's for |
@@ -106,7 +107,9 @@ protonhub apply protonhub.lock         # laptop
 
 Steam keeps a game's launch options per user, in
 `userdata/<account>/config/localconfig.vdf`; ProtonHub changes those of
-the user signed in last. A non-Steam shortcut's are in its entry in
+the user signed in last, or of the one chosen with `protonhub steam-user`
+or in the GUI's preferences (kept in `$XDG_CONFIG_HOME/protonhub/steam-user`)
+when that user has settings here. A non-Steam shortcut's are in its entry in
 `userdata/<account>/config/shortcuts.vdf`, a binary file ProtonHub
 rewrites only when it can write it back exactly as it read it. They read `VAR=value… program… %command%
 arguments…`: variables, the programs the game runs in, and after

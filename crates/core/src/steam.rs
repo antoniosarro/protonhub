@@ -559,7 +559,18 @@ pub fn set_launch_options(root: &Path, game: &str, text: &str) -> Result<(), Err
 /// loginusers.vdf, keyed by SteamID64, whose low 32 bits are the account id
 /// that names their userdata directory), else of the only user.
 fn local_config(root: &Path) -> Result<PathBuf, Error> {
+    local_config_of(root, crate::paths::steam_user().as_deref())
+}
+
+/// The localconfig.vdf of `chosen`, an account id, where it has one; else
+/// as `local_config` picks.
+fn local_config_of(root: &Path, chosen: Option<&str>) -> Result<PathBuf, Error> {
     let file = |account: &str| root.join(format!("userdata/{account}/config/localconfig.vdf"));
+    if let Some(chosen) = chosen
+        && file(chosen).is_file()
+    {
+        return Ok(file(chosen));
+    }
     let logins = root.join("config/loginusers.vdf");
     let users = read_text(&logins)?;
     let recent = users
@@ -589,6 +600,54 @@ fn local_config(root: &Path) -> Result<PathBuf, Error> {
             ),
         }),
     }
+}
+
+/// One of Steam's users with settings on this machine.
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
+pub struct User {
+    /// The account id, which names its userdata directory.
+    pub account: String,
+    /// Its name in Steam, where loginusers.vdf has it.
+    pub name: Option<String>,
+    /// Whether its settings are the ones launch options go to.
+    pub current: bool,
+}
+
+/// Steam's users with settings here, and which one launch options go to.
+pub fn users(root: &Path) -> Result<Vec<User>, Error> {
+    let logins = read_text(&root.join("config/loginusers.vdf"))?;
+    let names: Vec<(u64, &str)> = logins
+        .as_ref()
+        .and_then(|u| u.obj("users"))
+        .map(|u| u.0.as_slice())
+        .unwrap_or_default()
+        .iter()
+        .filter_map(|(id, u)| {
+            Some((
+                id.parse::<u64>().ok()? & 0xffff_ffff,
+                u.as_obj()?.str("PersonaName")?,
+            ))
+        })
+        .collect();
+    let current = local_config(root).ok();
+    let mut users: Vec<User> = subdirs(&root.join("userdata"))?
+        .into_iter()
+        .filter(|d| d.join("config/localconfig.vdf").is_file())
+        .filter_map(|d| {
+            let account = d.file_name()?.to_string_lossy().into_owned();
+            let id: u64 = account.parse().ok().filter(|&id| id != 0)?;
+            Some(User {
+                name: names
+                    .iter()
+                    .find(|(n, _)| *n == id)
+                    .map(|(_, name)| (*name).to_owned()),
+                current: current.as_deref() == Some(&*d.join("config/localconfig.vdf")),
+                account,
+            })
+        })
+        .collect();
+    users.sort_by(|a, b| a.account.cmp(&b.account));
+    Ok(users)
 }
 
 /// A binary KeyValues file, or none where there isn't one.
@@ -796,6 +855,41 @@ pub(crate) fn same_dir(a: &Path, b: &Path) -> bool {
 mod tests {
     use super::*;
     use crate::testutil::TempDir;
+
+    #[test]
+    fn a_chosen_user_gets_the_launch_options_where_they_have_settings() {
+        let home = TempDir::new("steam-users");
+        let root = home.join("Steam");
+        for account in ["1", "2"] {
+            let path = root.join(format!("userdata/{account}/config/localconfig.vdf"));
+            fs::create_dir_all(path.parent().unwrap()).unwrap();
+            fs::write(path, "\"UserLocalConfigStore\"\n{\n}\n").unwrap();
+        }
+        fs::create_dir_all(root.join("config")).unwrap();
+        fs::write(
+            root.join("config/loginusers.vdf"),
+            "\"users\"\n{\n\t\"76561197960265729\"\n\t{\n\t\t\"PersonaName\"\t\t\"Ann\"\n\t\t\"MostRecent\"\t\t\"1\"\n\t}\n}\n",
+        )
+        .unwrap();
+        let of = |chosen| local_config_of(&root, chosen).unwrap();
+        assert!(
+            of(None).ends_with("userdata/1/config/localconfig.vdf"),
+            "signed in last"
+        );
+        assert!(of(Some("2")).ends_with("userdata/2/config/localconfig.vdf"));
+        assert!(
+            of(Some("9")).ends_with("userdata/1/config/localconfig.vdf"),
+            "no settings: the last"
+        );
+        let users = users(&root).unwrap();
+        assert_eq!(
+            users
+                .iter()
+                .map(|u| (u.account.as_str(), u.name.as_deref()))
+                .collect::<Vec<_>>(),
+            [("1", Some("Ann")), ("2", None)]
+        );
+    }
 
     #[test]
     fn a_shortcut_is_edited_or_its_file_left_alone() {

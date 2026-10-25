@@ -53,6 +53,34 @@ pub fn save_token(token: Option<&str>) -> std::io::Result<()> {
     }
 }
 
+/// The Steam account chosen for launch options, `steam-user` in
+/// ProtonHub's settings; none for the one signed in last.
+pub fn steam_user() -> Option<String> {
+    // Tests mustn't depend on the choice made on the machine.
+    if cfg!(test) {
+        return None;
+    }
+    let text = std::fs::read_to_string(config_dir()?.join("steam-user")).ok()?;
+    Some(text.trim().to_owned()).filter(|a| !a.is_empty())
+}
+
+/// Saves the Steam account chosen, or with none goes back to the one
+/// signed in last.
+pub fn save_steam_user(account: Option<&str>) -> std::io::Result<()> {
+    let dir = config_dir().ok_or_else(|| std::io::Error::other("HOME isn't set"))?;
+    let path = dir.join("steam-user");
+    match account {
+        None => match std::fs::remove_file(&path) {
+            Err(e) if e.kind() != std::io::ErrorKind::NotFound => Err(e),
+            _ => Ok(()),
+        },
+        Some(account) => {
+            std::fs::create_dir_all(&dir)?;
+            std::fs::write(&path, format!("{account}\n"))
+        }
+    }
+}
+
 /// `$XDG_CONFIG_HOME`, else `~/.config`.
 pub fn config_home() -> Option<PathBuf> {
     xdg("XDG_CONFIG_HOME", ".config")

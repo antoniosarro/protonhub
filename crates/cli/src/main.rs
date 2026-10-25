@@ -152,6 +152,13 @@ enum Command {
         #[arg(long)]
         launcher: Option<String>,
     },
+    /// Show Steam's users and the one launch options go to, or choose one:
+    /// an account id or name, or "last" for the one signed in last
+    SteamUser {
+        user: Option<String>,
+        #[arg(long)]
+        launcher: Option<String>,
+    },
     /// Show each installed tool's size and the games that use it
     Usage {
         #[arg(long)]
@@ -812,6 +819,32 @@ fn run(cli: Cli) -> Result<()> {
                 s.name, s.target, s.start_dir, s.launch_options
             );
             print(json, text, &s)
+        }
+        Command::SteamUser { user, launcher } => {
+            let target = pick_one(launcher.as_deref(), is_steam, "has users (steam)")?;
+            if let Some(user) = user {
+                let users = steam::users(&target.root)?;
+                let account = match user.as_str() {
+                    "last" => None,
+                    _ => Some(
+                        users
+                            .iter()
+                            .find(|u| u.account == user || u.name.as_deref() == Some(&user))
+                            .map(|u| u.account.as_str())
+                            .ok_or_else(|| format!("no Steam user {user} with settings here"))?,
+                    ),
+                };
+                paths::save_steam_user(account)?;
+            }
+            let users = steam::users(&target.root)?;
+            let text: Vec<_> = users
+                .iter()
+                .map(|u| {
+                    let mark = if u.current { "\t(launch options)" } else { "" };
+                    format!("{}\t{}{mark}", u.account, u.name.as_deref().unwrap_or("-"))
+                })
+                .collect();
+            print(json, text.join("\n"), &users)
         }
         Command::Default { tool, launcher } => {
             let target = pick_one(

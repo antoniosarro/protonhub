@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: protonhub\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-25 15:54+0100\n"
+"POT-Creation-Date: 2026-10-25 15:57+0100\n"
 "PO-Revision-Date: 2026-10-10 22:25+0200\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: Italian\n"
@@ -944,33 +944,54 @@ msgstr ""
 "\n"
 "{tools}"
 
-#: crates/gtk/src/preferences.rs:16
+#: crates/gtk/src/preferences.rs:18
 msgid "GitHub"
 msgstr "GitHub"
 
-#: crates/gtk/src/preferences.rs:18
+#: crates/gtk/src/preferences.rs:20
 msgid "GITHUB_TOKEN is set, and used instead of a token saved here"
-msgstr "GITHUB_TOKEN è impostata, e viene usata al posto di un token salvato qui"
+msgstr ""
+"GITHUB_TOKEN è impostata, e viene usata al posto di un token salvato qui"
 
-#: crates/gtk/src/preferences.rs:21
-msgid "A token raises GitHub's limit from 60 to 5000 requests an hour. It needs no scopes, and goes to GitHub alone."
-msgstr "Un token alza il limite di GitHub da 60 a 5000 richieste all'ora. Non servono permessi, e viene inviato solo a GitHub."
+#: crates/gtk/src/preferences.rs:23
+msgid ""
+"A token raises GitHub's limit from 60 to 5000 requests an hour. It needs no "
+"scopes, and goes to GitHub alone."
+msgstr ""
+"Un token alza il limite di GitHub da 60 a 5000 richieste all'ora. Non "
+"servono permessi, e viene inviato solo a GitHub."
 
-#: crates/gtk/src/preferences.rs:27
+#: crates/gtk/src/preferences.rs:29
 msgid "Access Token"
 msgstr "Token di accesso"
 
-#: crates/gtk/src/preferences.rs:33
+#: crates/gtk/src/preferences.rs:35
 msgid "Token saved"
 msgstr "Token salvato"
 
-#: crates/gtk/src/preferences.rs:34
+#: crates/gtk/src/preferences.rs:36
 msgid "Token removed"
 msgstr "Token rimosso"
 
-#: crates/gtk/src/preferences.rs:35
+#: crates/gtk/src/preferences.rs:37
 msgid "Saving the GitHub token"
 msgstr "Salvataggio del token di GitHub"
+
+#: crates/gtk/src/preferences.rs:83
+msgid "Steam Profile"
+msgstr "Profilo di Steam"
+
+#: crates/gtk/src/preferences.rs:85
+msgid "The user whose launch options ProtonHub shows and changes"
+msgstr "L'utente di cui ProtonHub mostra e modifica le opzioni di avvio"
+
+#: crates/gtk/src/preferences.rs:91
+msgid "The one signed in last"
+msgstr "L'ultimo che ha effettuato l'accesso"
+
+#: crates/gtk/src/preferences.rs:92
+msgid "Choosing the Steam profile"
+msgstr "Scelta del profilo di Steam"
 
 #: crates/gtk/src/tool.rs:48
 #, rust-format
