@@ -937,6 +937,25 @@ impl Window {
         self.reload();
     }
 
+    /// Sets Steam's default tool, or with none turns Steam Play off for
+    /// games without one of their own.
+    pub fn set_default(self: &Rc<Self>, launcher: &Launcher, tool: Option<&games::Choice>) {
+        match games::set_default(launcher, tool.map(|c| c.id.as_str())) {
+            Ok(()) => self.toast(&match tool {
+                Some(c) => tr(
+                    "Games without a tool of their own now run with {tool}",
+                    &[("tool", &c.name)],
+                ),
+                None => tr(
+                    "Steam Play is off for games without a tool of their own",
+                    &[],
+                ),
+            }),
+            Err(e) => self.report(tr("Setting the default tool", &[]), e.to_string()),
+        }
+        self.reload();
+    }
+
     /// Runs `work` on a worker thread with its progress in the sidebar,
     /// then toasts its result or logs its error, and reloads the launchers.
     fn run(

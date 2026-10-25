@@ -21,6 +21,10 @@ const MAPPING: [&str; 5] = [
     "CompatToolMapping",
 ];
 
+/// The key in `CompatToolMapping` of the default, what every game without
+/// a tool of its own runs with.
+pub const DEFAULT: &str = "0";
+
 /// Where in a user's localconfig.vdf each app's settings are, its launch
 /// options among them.
 const APPS: [&str; 5] = ["UserLocalConfigStore", "Software", "Valve", "Steam", "apps"];
@@ -83,12 +87,13 @@ pub fn library(root: &Path) -> Result<Library, Error> {
 }
 
 /// Sets each game's tool, or with `None` leaves it to the default, in one
-/// rewrite of config.vdf. Nothing is written unless every game and tool is
-/// known.
+/// rewrite of config.vdf; for [`DEFAULT`], the default's, or with `None`
+/// none, which is Steam Play off for games without one. Nothing is written
+/// unless every game and tool is known.
 pub fn assign(root: &Path, moves: &[(&str, Option<&str>)]) -> Result<(), Error> {
     let lib = library(root)?;
     for &(game, tool) in moves {
-        if !lib.games.iter().any(|g| g.id == game) {
+        if game != DEFAULT && !lib.games.iter().any(|g| g.id == game) {
             return Err(Error::UnknownGame {
                 id: game.to_owned(),
             });
@@ -108,11 +113,12 @@ pub fn assign(root: &Path, moves: &[(&str, Option<&str>)]) -> Result<(), Error> 
         match tool {
             Some(tool) => {
                 // What Steam itself writes for a choice made in a game's
-                // properties.
+                // properties, or in its settings for the default.
+                let priority = if game == DEFAULT { "75" } else { "250" };
                 let mut entry = Obj::default();
                 entry.set("name", Value::Str(tool.to_owned()));
                 entry.set("config", Value::Str(String::new()));
-                entry.set("priority", Value::Str("250".into()));
+                entry.set("priority", Value::Str(priority.into()));
                 mapping.set(game, Value::Obj(entry));
             }
             None => {

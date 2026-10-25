@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: protonhub\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-25 14:03+0100\n"
+"POT-Creation-Date: 2026-10-25 14:12+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -153,7 +153,7 @@ msgid "{game} now runs with {tool}"
 msgstr ""
 
 #: crates/gtk/src/i18n.rs:69 crates/gtk/src/i18n.rs:70
-#: crates/gtk/src/page/tools.rs:322 crates/gtk/src/window.rs:1038
+#: crates/gtk/src/page/tools.rs:322 crates/gtk/src/window.rs:1057
 #, rust-format
 msgid "{n} game"
 msgid_plural "{n} games"
@@ -400,67 +400,79 @@ msgstr ""
 msgid "Sideloaded"
 msgstr ""
 
-#: crates/gtk/src/page/games.rs:29
+#: crates/gtk/src/page/games.rs:30
 msgid "No games installed"
 msgstr ""
 
-#: crates/gtk/src/page/games.rs:31
+#: crates/gtk/src/page/games.rs:32
 #, rust-format
 msgid "Games installed with {launcher} show up here"
 msgstr ""
 
-#: crates/gtk/src/page/games.rs:40
+#: crates/gtk/src/page/games.rs:41
 msgid "Search games"
 msgstr ""
 
-#: crates/gtk/src/page/games.rs:47
+#: crates/gtk/src/page/games.rs:48
 msgid "Move Games…"
 msgstr ""
 
-#: crates/gtk/src/page/games.rs:51
+#: crates/gtk/src/page/games.rs:52
 msgid "Move every game set to one tool to another"
 msgstr ""
 
-#: crates/gtk/src/page/games.rs:74
+#: crates/gtk/src/page/games.rs:78
 msgid "Some ratings or anti-cheat statuses are missing"
 msgstr ""
 
-#: crates/gtk/src/page/games.rs:86
+#: crates/gtk/src/page/games.rs:90
 msgid "Left out: a file couldn't be read"
 msgstr ""
 
-#: crates/gtk/src/page/games.rs:96
+#: crates/gtk/src/page/games.rs:100
 msgid "No games match"
 msgstr ""
 
-#: crates/gtk/src/page/games.rs:147
+#: crates/gtk/src/page/games.rs:158
+msgid "None: Steam Play off"
+msgstr ""
+
+#: crates/gtk/src/page/games.rs:166
+msgid "Default Tool"
+msgstr ""
+
+#: crates/gtk/src/page/games.rs:167
+msgid "What games without a tool of their own run with"
+msgstr ""
+
+#: crates/gtk/src/page/games.rs:196
 msgid "ProtonDB rating:"
 msgstr ""
 
-#: crates/gtk/src/page/games.rs:185
+#: crates/gtk/src/page/games.rs:234
 #, rust-format
 msgid "{tool} ({n} game)"
 msgid_plural "{tool} ({n} games)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: crates/gtk/src/page/games.rs:193
+#: crates/gtk/src/page/games.rs:242
 msgid "From"
 msgstr ""
 
-#: crates/gtk/src/page/games.rs:200
+#: crates/gtk/src/page/games.rs:249
 msgid "To"
 msgstr ""
 
-#: crates/gtk/src/page/games.rs:204
+#: crates/gtk/src/page/games.rs:253
 msgid "Games on the launcher's default stay on it"
 msgstr ""
 
-#: crates/gtk/src/page/games.rs:211
+#: crates/gtk/src/page/games.rs:260
 msgid "Move"
 msgstr ""
 
-#: crates/gtk/src/page/games.rs:219
+#: crates/gtk/src/page/games.rs:268
 msgid "Move Games"
 msgstr ""
 
@@ -1128,17 +1140,30 @@ msgstr ""
 msgid "Setting the tool of {game}"
 msgstr ""
 
-#: crates/gtk/src/window.rs:958
+#: crates/gtk/src/window.rs:946
+#, rust-format
+msgid "Games without a tool of their own now run with {tool}"
+msgstr ""
+
+#: crates/gtk/src/window.rs:950
+msgid "Steam Play is off for games without a tool of their own"
+msgstr ""
+
+#: crates/gtk/src/window.rs:954
+msgid "Setting the default tool"
+msgstr ""
+
+#: crates/gtk/src/window.rs:977
 msgid "Wait for the current job to finish"
 msgstr ""
 
-#: crates/gtk/src/window.rs:1040
+#: crates/gtk/src/window.rs:1059
 #, rust-format
 msgid "{n} tool"
 msgid_plural "{n} tools"
 msgstr[0] ""
 msgstr[1] ""
 
-#: crates/gtk/src/window.rs:1066
+#: crates/gtk/src/window.rs:1085
 msgid "Running"
 msgstr ""

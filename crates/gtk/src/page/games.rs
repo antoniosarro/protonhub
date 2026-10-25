@@ -6,6 +6,7 @@ use adw::prelude::*;
 use gtk::glib;
 use protonhub_core::games::{Choice, Library};
 use protonhub_core::launcher::Launcher;
+use protonhub_core::manifest::LauncherKind;
 
 use super::game_row::{game_row, tier_name};
 use super::{boxed, scrolled};
@@ -64,6 +65,9 @@ pub(super) fn view(
     bar.append(&search);
     bar.append(&move_games);
     content.append(&bar);
+    if launcher.kind == LauncherKind::Steam {
+        content.append(&boxed(&default_row(win, launcher, lib, running)));
+    }
     if state.info.iter().any(|(_, i)| i.protondb.is_some()) {
         content.append(&legend());
     }
@@ -135,6 +139,51 @@ pub(super) fn view(
     ));
     content.append(&list);
     scrolled(&content)
+}
+
+/// Steam's default tool, chosen from its tools or none; choosing sets it.
+fn default_row(
+    win: &Rc<Window>,
+    launcher: &Launcher,
+    lib: &Library,
+    running: bool,
+) -> adw::ComboRow {
+    // A default that isn't installed any more is shown too, as it is.
+    let mut choices = lib.choices.clone();
+    if let Some(d) = &lib.default
+        && !choices.iter().any(|c| c.id == d.id)
+    {
+        choices.push(d.clone());
+    }
+    let mut labels = vec![tr("None: Steam Play off", &[])];
+    labels.extend(choices.iter().map(|c| c.name.clone()));
+    let current = lib
+        .default
+        .as_ref()
+        .and_then(|d| choices.iter().position(|c| c.id == d.id))
+        .map_or(0, |i| i + 1);
+    let row = adw::ComboRow::builder()
+        .title(tr("Default Tool", &[]))
+        .subtitle(tr("What games without a tool of their own run with", &[]))
+        .model(&gtk::StringList::new(
+            &labels.iter().map(String::as_str).collect::<Vec<_>>(),
+        ))
+        .selected(current as u32)
+        .sensitive(!running)
+        .build();
+    row.connect_selected_notify(glib::clone!(
+        #[strong]
+        win,
+        #[strong]
+        launcher,
+        move |row| {
+            let at = row.selected() as usize;
+            if at != current {
+                win.set_default(&launcher, at.checked_sub(1).and_then(|i| choices.get(i)));
+            }
+        }
+    ));
+    row
 }
 
 /// What the colors of the bands at the start of the game rows mean.

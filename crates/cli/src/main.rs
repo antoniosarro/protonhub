@@ -128,6 +128,14 @@ enum Command {
         #[arg(long)]
         launcher: Option<String>,
     },
+    /// Show Steam's default tool, what games without one of their own run
+    /// with, or set it: a tool's id or name, or "none" to turn Steam Play
+    /// off for them
+    Default {
+        tool: Option<String>,
+        #[arg(long)]
+        launcher: Option<String>,
+    },
     /// Show each installed tool's size and the games that use it
     Usage {
         #[arg(long)]
@@ -750,6 +758,34 @@ fn run(cli: Cli) -> Result<()> {
             games::assign(&target, &g.id, choice.map(|c| c.id.as_str()))?;
             let to = choice.map_or("the default".into(), |c| c.name.clone());
             print(json, format!("{} now runs with {to}", g.name), &choice)
+        }
+        Command::Default { tool, launcher } => {
+            let target = pick_one(launcher.as_deref(), is_steam, "has a default tool (steam)")?;
+            let library = games::library(&target)?.expect("steam has games");
+            let Some(tool) = tool else {
+                let text = library
+                    .default
+                    .as_ref()
+                    .map_or("none".into(), |c| c.name.clone());
+                return print(json, text, &library.default);
+            };
+            let choice = if tool == "none" {
+                None
+            } else {
+                Some(find_choice(&library, &tool)?)
+            };
+            if !games::sees_launchers() {
+                eprintln!(
+                    "protonhub: warning: inside the Flatpak, ProtonHub can't tell whether {target} is running; \
+                     if it is, it overwrites this change when it exits"
+                );
+            }
+            games::set_default(&target, choice.map(|c| c.id.as_str()))?;
+            let text = match choice {
+                Some(c) => format!("Games without a tool of their own now run with {}", c.name),
+                None => "Steam Play is off for games without a tool of their own".into(),
+            };
+            print(json, text, &choice)
         }
         Command::Usage { launcher } => {
             let registry = Registry::load_dir(&registry_dir)?;

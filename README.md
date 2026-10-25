@@ -39,8 +39,8 @@ scriptable CLI with JSON output.
   resumable downloads, atomic installs that never leave a half-extracted
   tool behind.
 - **Per-game tools**: set the tool each Steam and Heroic game runs with,
-  one at a time or in bulk, with the previous settings file kept as a
-  backup.
+  one at a time or in bulk, and Steam's default, with the previous
+  settings file kept as a backup.
 - **Launch options**: edit a Steam or Heroic game's launch options, with
   35 switches (MangoHud, GameMode, Native Wayland, HDR, FSR 4, DLSS
   and XeSS upgrades, WoW64, NVAPI, Anti-Lag and more) defined as data in

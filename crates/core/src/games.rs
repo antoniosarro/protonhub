@@ -159,6 +159,18 @@ pub fn assign_many(launcher: &Launcher, moves: &[(&str, Option<&str>)]) -> Resul
     }
 }
 
+/// Sets the tool Steam's games without one of their own run with, or with
+/// `None` turns Steam Play off for them. Refused while Steam runs, as
+/// `assign` is.
+pub fn set_default(launcher: &Launcher, tool: Option<&str>) -> Result<(), Error> {
+    if launcher.kind != LauncherKind::Steam {
+        return Err(Error::Unsupported {
+            launcher: launcher.kind.title(),
+        });
+    }
+    assign_many(launcher, &[(steam::DEFAULT, tool)])
+}
+
 /// Moves every game set to a tool matching `from` (its id or name) to the
 /// tool `to`, and returns their names. Games on the launcher's default
 /// stay on it.
@@ -649,6 +661,36 @@ pub(crate) mod tests {
         assert!(matches!(unknown, Error::UnknownTool { .. }), "{unknown}");
         let game = steam::assign(&l.root, &[("99", None)]).unwrap_err();
         assert!(matches!(game, Error::UnknownGame { .. }), "{game}");
+    }
+
+    #[test]
+    fn steam_default_is_set_and_turned_off() {
+        let home = TempDir::new("steam-default");
+        let l = steam(&home);
+        let config = l.root.join("config/config.vdf");
+        let default = |l: &Launcher| library(l).unwrap().unwrap().default.map(|c| c.id);
+
+        steam::assign(&l.root, &[(steam::DEFAULT, Some("GE-Proton10-1"))]).unwrap();
+        assert_eq!(default(&l).as_deref(), Some("GE-Proton10-1"));
+        let lib = library(&l).unwrap().unwrap();
+        let game = lib.games.iter().find(|g| g.id == "20").unwrap();
+        assert_eq!(
+            (game.tool.as_ref().unwrap().id.as_str(), game.explicit),
+            ("GE-Proton10-1", false),
+            "a game without its own follows"
+        );
+        assert!(
+            fs::read_to_string(&config)
+                .unwrap()
+                .contains("\t\t\t\t\t\t\"priority\"\t\t\"75\"\n")
+        );
+
+        steam::assign(&l.root, &[(steam::DEFAULT, None)]).unwrap();
+        assert_eq!(default(&l), None);
+        let unknown = steam::assign(&l.root, &[(steam::DEFAULT, Some("nope"))]).unwrap_err();
+        assert!(matches!(unknown, Error::UnknownTool { .. }), "{unknown}");
+        let heroic = set_default(&heroic(&home), Some("x")).unwrap_err();
+        assert!(matches!(heroic, Error::Unsupported { .. }), "{heroic}");
     }
 
     #[test]

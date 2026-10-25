@@ -32,8 +32,11 @@ Protons in compatibilitytools.d (Valve's Protons too, when Heroic's "show
 Valve Proton" setting is on) and Lutris's Wine builds, marked "(Steam)"
 or "(Lutris)" where Heroic has the same version. **Search games** filters
 the list.
-**Move Games…** moves every game set to one tool to another at once. Each
-change keeps the previous settings file as `<name>.protonhub-backup`.
+**Move Games…** moves every game set to one tool to another at once. On
+Steam, **Default Tool** above the list sets Steam's default, what games
+without a tool of their own run with, or none to turn Steam Play off for
+them. Each change keeps the previous settings file as
+`<name>.protonhub-backup`.
 
 A game's row, or its info button, opens its page over the list, with a
 back button at the top left (or Escape, Alt+←, or B on a gamepad): its picture, its

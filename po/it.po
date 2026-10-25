@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: protonhub\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-25 14:03+0100\n"
+"POT-Creation-Date: 2026-10-25 14:12+0100\n"
 "PO-Revision-Date: 2026-10-10 22:25+0200\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: Italian\n"
@@ -157,7 +157,7 @@ msgid "{game} now runs with {tool}"
 msgstr "{game} ora usa {tool}"
 
 #: crates/gtk/src/i18n.rs:69 crates/gtk/src/i18n.rs:70
-#: crates/gtk/src/page/tools.rs:322 crates/gtk/src/window.rs:1038
+#: crates/gtk/src/page/tools.rs:322 crates/gtk/src/window.rs:1057
 #, rust-format
 msgid "{n} game"
 msgid_plural "{n} games"
@@ -408,67 +408,79 @@ msgstr "Gioco non di Steam"
 msgid "Sideloaded"
 msgstr "Aggiunto manualmente"
 
-#: crates/gtk/src/page/games.rs:29
+#: crates/gtk/src/page/games.rs:30
 msgid "No games installed"
 msgstr "Nessun gioco installato"
 
-#: crates/gtk/src/page/games.rs:31
+#: crates/gtk/src/page/games.rs:32
 #, rust-format
 msgid "Games installed with {launcher} show up here"
 msgstr "I giochi installati con {launcher} compaiono qui"
 
-#: crates/gtk/src/page/games.rs:40
+#: crates/gtk/src/page/games.rs:41
 msgid "Search games"
 msgstr "Cerca giochi"
 
-#: crates/gtk/src/page/games.rs:47
+#: crates/gtk/src/page/games.rs:48
 msgid "Move Games…"
 msgstr "Sposta giochi…"
 
-#: crates/gtk/src/page/games.rs:51
+#: crates/gtk/src/page/games.rs:52
 msgid "Move every game set to one tool to another"
 msgstr "Sposta su un altro strumento tutti i giochi impostati su uno"
 
-#: crates/gtk/src/page/games.rs:74
+#: crates/gtk/src/page/games.rs:78
 msgid "Some ratings or anti-cheat statuses are missing"
 msgstr "Mancano alcune valutazioni o stati dell'anti-cheat"
 
-#: crates/gtk/src/page/games.rs:86
+#: crates/gtk/src/page/games.rs:90
 msgid "Left out: a file couldn't be read"
 msgstr "Escluso: impossibile leggere un file"
 
-#: crates/gtk/src/page/games.rs:96
+#: crates/gtk/src/page/games.rs:100
 msgid "No games match"
 msgstr "Nessun gioco corrisponde"
 
-#: crates/gtk/src/page/games.rs:147
+#: crates/gtk/src/page/games.rs:158
+msgid "None: Steam Play off"
+msgstr "Nessuno: Steam Play disattivato"
+
+#: crates/gtk/src/page/games.rs:166
+msgid "Default Tool"
+msgstr "Strumento predefinito"
+
+#: crates/gtk/src/page/games.rs:167
+msgid "What games without a tool of their own run with"
+msgstr "Con cosa girano i giochi senza uno strumento proprio"
+
+#: crates/gtk/src/page/games.rs:196
 msgid "ProtonDB rating:"
 msgstr "Valutazione ProtonDB:"
 
-#: crates/gtk/src/page/games.rs:185
+#: crates/gtk/src/page/games.rs:234
 #, rust-format
 msgid "{tool} ({n} game)"
 msgid_plural "{tool} ({n} games)"
 msgstr[0] "{tool} ({n} gioco)"
 msgstr[1] "{tool} ({n} giochi)"
 
-#: crates/gtk/src/page/games.rs:193
+#: crates/gtk/src/page/games.rs:242
 msgid "From"
 msgstr "Da"
 
-#: crates/gtk/src/page/games.rs:200
+#: crates/gtk/src/page/games.rs:249
 msgid "To"
 msgstr "A"
 
-#: crates/gtk/src/page/games.rs:204
+#: crates/gtk/src/page/games.rs:253
 msgid "Games on the launcher's default stay on it"
 msgstr "I giochi sullo strumento predefinito del launcher restano su quello"
 
-#: crates/gtk/src/page/games.rs:211
+#: crates/gtk/src/page/games.rs:260
 msgid "Move"
 msgstr "Sposta"
 
-#: crates/gtk/src/page/games.rs:219
+#: crates/gtk/src/page/games.rs:268
 msgid "Move Games"
 msgstr "Sposta giochi"
 
@@ -538,7 +550,8 @@ msgstr "MangoHud"
 
 #: crates/gtk/src/page/gamescope.rs:84
 msgid "Drawn by gamescope, as it recommends over the MangoHud switch"
-msgstr "Disegnato da gamescope, come consiglia al posto dell'interruttore MangoHud"
+msgstr ""
+"Disegnato da gamescope, come consiglia al posto dell'interruttore MangoHud"
 
 #: crates/gtk/src/page/mod.rs:33
 #, rust-format
@@ -1156,18 +1169,31 @@ msgstr "{game} ora usa lo strumento predefinito"
 msgid "Setting the tool of {game}"
 msgstr "Impostazione dello strumento di {game}"
 
-#: crates/gtk/src/window.rs:958
+#: crates/gtk/src/window.rs:946
+#, rust-format
+msgid "Games without a tool of their own now run with {tool}"
+msgstr "I giochi senza uno strumento proprio ora girano con {tool}"
+
+#: crates/gtk/src/window.rs:950
+msgid "Steam Play is off for games without a tool of their own"
+msgstr "Steam Play è disattivato per i giochi senza uno strumento proprio"
+
+#: crates/gtk/src/window.rs:954
+msgid "Setting the default tool"
+msgstr "Impostazione dello strumento predefinito"
+
+#: crates/gtk/src/window.rs:977
 msgid "Wait for the current job to finish"
 msgstr "Attendi che l'operazione in corso finisca"
 
-#: crates/gtk/src/window.rs:1040
+#: crates/gtk/src/window.rs:1059
 #, rust-format
 msgid "{n} tool"
 msgid_plural "{n} tools"
 msgstr[0] "{n} strumento"
 msgstr[1] "{n} strumenti"
 
-#: crates/gtk/src/window.rs:1066
+#: crates/gtk/src/window.rs:1085
 msgid "Running"
 msgstr "In esecuzione"
 

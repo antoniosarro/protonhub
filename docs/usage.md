@@ -20,6 +20,7 @@ builds and runs it.
 | `protonhub tricks GAME [VERB… \| --run PROGRAM] [--launcher L]` | A Steam or Heroic game's Wine prefix, the Wine it runs with, and the winetricks verbs in it; VERBs installs them, `--run` runs `winecfg`, `regedit`, `control` or a Windows program (`.exe`, `.msi`) in it ([prefix tools](#prefix-tools)) |
 | `protonhub verbs` | The winetricks verbs offered by group: their id, group, name and what each is for |
 | `protonhub assign GAME TOOL [--launcher L]` | Set the tool a game runs with. GAME is its id or name, TOOL a tool's id or name from `games`, or `default` (Steam) |
+| `protonhub default [TOOL] [--launcher L]` | Steam's default tool, what games without one of their own run with; with TOOL (a tool's id or name from `games`, or `none` for Steam Play off) sets it |
 | `protonhub usage [--launcher L]` | Each installed tool's size and what uses it: games, the default, `unused`, or `-` where ProtonHub can't tell |
 | `protonhub cleanup [--launcher L] [--yes]` | List the tools nothing uses and the space they take; `--yes` deletes them |
 | `protonhub storage list [--launcher L]` | Each Wine prefix and shader cache in Steam's libraries, largest first, with its app's name, and `(uninstalled)` or `(removed from Steam)` for a leftover |
