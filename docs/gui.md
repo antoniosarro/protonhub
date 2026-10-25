@@ -204,6 +204,7 @@ when it exits.
 | Alt+1 … Alt+9 | Show the first … ninth launcher |
 | Ctrl+E | The error log |
 | Ctrl+M | MangoHud's global settings |
+| Ctrl+, | Preferences: a GitHub token |
 | Ctrl+Q, Ctrl+W | Close the window |
 
 ## Screenshots

@@ -3,14 +3,15 @@
 //!
 //! GitHub allows 60 unauthenticated API calls an hour, so every response
 //! is cached with its ETag and revalidated: a 304 doesn't count against the
-//! limit. A token (`GITHUB_TOKEN`) raises it to 5000, and is only ever sent
+//! limit. A token (`GITHUB_TOKEN`, or one saved: [`paths::github_token`])
+//! raises it to 5000, and is only ever sent
 //! to GitHub.
 
 use std::fs::{self, File, OpenOptions};
 use std::io::{self, Read, Write};
 use std::path::{Path, PathBuf};
-use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
 use protonhub_manifest::{ReleaseAsset, Source, Tool};
@@ -141,7 +142,7 @@ pub enum Error {
         message: String,
     },
     #[error(
-        "the GitHub API rate limit is used up until {reset} (unix time); set GITHUB_TOKEN to raise it from 60 to 5000 requests an hour"
+        "the GitHub API rate limit is used up until {reset} (unix time); set a GitHub token (GITHUB_TOKEN, or ProtonHub's preferences) to raise it from 60 to 5000 requests an hour"
     )]
     RateLimited { reset: u64 },
     #[error("{url}: unexpected response: {source}")]
@@ -197,7 +198,8 @@ fn decode<T: serde::de::DeserializeOwned>(body: &str) -> Result<T, serde_json::E
 pub struct Client {
     agent: ureq::Agent,
     api: String,
-    token: Option<String>,
+    /// Shared by its clones, so a token set applies to all.
+    token: Arc<Mutex<Option<String>>>,
     cache: PathBuf,
     /// Set to stop a download, as a Cancel button does.
     cancel: Option<Arc<AtomicBool>>,
@@ -216,10 +218,15 @@ impl Client {
         Self {
             agent,
             api: api.into(),
-            token: token.filter(|t| !t.is_empty()),
+            token: Arc::new(Mutex::new(token.filter(|t| !t.is_empty()))),
             cache,
             cancel: None,
         }
+    }
+
+    /// Sends `token` to GitHub from now on, or none.
+    pub fn set_token(&self, token: Option<String>) {
+        *self.token.lock().expect("never poisoned") = token.filter(|t| !t.is_empty());
     }
 
     /// This client, with its downloads stopped once `cancel` is set; what
@@ -358,7 +365,7 @@ impl Client {
             req = req
                 .header("Accept", "application/vnd.github+json")
                 .header("X-GitHub-Api-Version", "2022-11-28");
-            if let Some(token) = &self.token {
+            if let Some(token) = self.token.lock().expect("never poisoned").as_ref() {
                 req = req.header("Authorization", format!("Bearer {token}"));
             }
         }

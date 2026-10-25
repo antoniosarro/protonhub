@@ -1465,7 +1465,7 @@ fn client() -> Result<Client> {
     Ok(Client::new(
         releases::API,
         cache_dir()?,
-        std::env::var("GITHUB_TOKEN").ok(),
+        paths::github_token(),
     ))
 }
 

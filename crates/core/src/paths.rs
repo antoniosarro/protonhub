@@ -18,6 +18,41 @@ pub fn config_dir() -> Option<PathBuf> {
     config_home().map(|d| d.join("protonhub"))
 }
 
+/// The GitHub token to send: `$GITHUB_TOKEN`, else the one saved.
+pub fn github_token() -> Option<String> {
+    std::env::var("GITHUB_TOKEN").ok().or_else(saved_token)
+}
+
+/// The token saved in ProtonHub's settings, `github-token` there.
+pub fn saved_token() -> Option<String> {
+    let text = std::fs::read_to_string(config_dir()?.join("github-token")).ok()?;
+    Some(text.trim().to_owned()).filter(|t| !t.is_empty())
+}
+
+/// Saves `token`, readable by the user alone, or with none removes it.
+pub fn save_token(token: Option<&str>) -> std::io::Result<()> {
+    use std::io::Write;
+    use std::os::unix::fs::OpenOptionsExt;
+    let dir = config_dir().ok_or_else(|| std::io::Error::other("HOME isn't set"))?;
+    let path = dir.join("github-token");
+    match token.map(str::trim).filter(|t| !t.is_empty()) {
+        None => match std::fs::remove_file(&path) {
+            Err(e) if e.kind() != std::io::ErrorKind::NotFound => Err(e),
+            _ => Ok(()),
+        },
+        Some(token) => {
+            std::fs::create_dir_all(&dir)?;
+            let mut file = std::fs::OpenOptions::new()
+                .write(true)
+                .create(true)
+                .truncate(true)
+                .mode(0o600)
+                .open(&path)?;
+            writeln!(file, "{token}")
+        }
+    }
+}
+
 /// `$XDG_CONFIG_HOME`, else `~/.config`.
 pub fn config_home() -> Option<PathBuf> {
     xdg("XDG_CONFIG_HOME", ".config")

@@ -43,7 +43,7 @@ impl Env {
         let home = paths::home().ok_or("HOME is not set")?;
         let cache = paths::cache_dir().ok_or("neither XDG_CACHE_HOME nor HOME is set")?;
         let arch = Arch::host().ok_or("this CPU architecture has no builds")?;
-        let token = std::env::var("GITHUB_TOKEN").ok();
+        let token = paths::github_token();
         Ok(Self {
             registry: Arc::new(registry),
             client: Arc::new(Client::new(releases::API, cache.clone(), token)),
@@ -295,8 +295,13 @@ impl Window {
             .icon_name("video-display-symbolic")
             .tooltip_text(tr("MangoHud Settings (Ctrl+M)", &[]))
             .build();
+        let preferences = gtk::Button::builder()
+            .icon_name("emblem-system-symbolic")
+            .tooltip_text(tr("Preferences (Ctrl+,)", &[]))
+            .build();
         let sidebar_header = adw::HeaderBar::new();
         sidebar_header.pack_start(&refresh);
+        sidebar_header.pack_start(&preferences);
         sidebar_header.pack_end(&errors_button);
         sidebar_header.pack_end(&mangohud_button);
 
@@ -438,6 +443,13 @@ impl Window {
                 }
             ))
             .build();
+        let preferences_action = gio::ActionEntry::builder("preferences")
+            .activate(glib::clone!(
+                #[strong]
+                win,
+                move |_: &adw::ApplicationWindow, _, _| crate::preferences::show(&win)
+            ))
+            .build();
         // Alt+1…9 shows the nth launcher.
         let tab_action = gio::ActionEntry::builder("tab")
             .parameter_type(Some(&i32::static_variant_type()))
@@ -452,17 +464,24 @@ impl Window {
                 }
             ))
             .build();
-        win.window
-            .add_action_entries([refresh_action, errors_action, mangohud_action, tab_action]);
+        win.window.add_action_entries([
+            refresh_action,
+            errors_action,
+            mangohud_action,
+            preferences_action,
+            tab_action,
+        ]);
         for n in 0..9 {
             app.set_accels_for_action(&format!("win.tab({n})"), &[&format!("<Alt>{}", n + 1)]);
         }
         refresh.set_action_name(Some("win.refresh"));
         mangohud_button.set_action_name(Some("win.mangohud"));
+        preferences.set_action_name(Some("win.preferences"));
         errors_button.set_action_name(Some("win.errors"));
         app.set_accels_for_action("win.refresh", &["<Control>r", "F5"]);
         app.set_accels_for_action("win.errors", &["<Control>e"]);
         app.set_accels_for_action("win.mangohud", &["<Control>m"]);
+        app.set_accels_for_action("win.preferences", &["<Control>comma"]);
         app.set_accels_for_action("window.close", &["<Control>q", "<Control>w"]);
         win.reload();
         // The repository's tool manifests, for the next start; offline or

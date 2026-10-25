@@ -124,8 +124,9 @@ the launcher's sight before deleting it.
 
 API responses are cached under `$XDG_CACHE_HOME/protonhub/api` with their
 ETags and revalidated, since a 304 doesn't count against GitHub's
-unauthenticated limit of 60 requests an hour. `GITHUB_TOKEN` raises it to
-5000, and is sent only to GitHub. A used-up limit is its own error, with
+unauthenticated limit of 60 requests an hour. `GITHUB_TOKEN`, or a token
+saved in the preferences (`paths::github_token`), raises it to 5000, and is
+sent only to GitHub. A used-up limit is its own error, with
 the reset time.
 
 ### Tests

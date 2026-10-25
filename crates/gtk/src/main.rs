@@ -10,6 +10,7 @@ mod gamepad;
 mod i18n;
 mod mangohud;
 mod page;
+mod preferences;
 mod tool;
 mod window;
 

@@ -237,7 +237,9 @@ status is 1.
 Without a token, GitHub allows 60 API requests an hour. protonhub caches
 responses and revalidates them, which doesn't count, so this rarely
 matters; when it does, set `GITHUB_TOKEN` (any token, no scopes needed) to
-raise the limit to 5000.
+raise the limit to 5000, or save a token in the GUI's preferences, kept in
+`$XDG_CONFIG_HOME/protonhub/github-token` (readable by you alone) and
+used by the CLI too; `GITHUB_TOKEN` wins over it.
 
 ## Files
 
