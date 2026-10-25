@@ -74,6 +74,8 @@ pub enum Error {
         "{launcher} is running, and a game or its shader processing may be using this; quit it first"
     )]
     InUse { launcher: &'static str },
+    #[error("{launcher} didn't quit within a minute")]
+    StillRunning { launcher: &'static str },
     #[error("no installed game {id}")]
     UnknownGame { id: String },
     #[error("no compatibility tool {id}")]

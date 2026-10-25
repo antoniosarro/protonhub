@@ -260,6 +260,8 @@ pub struct Window {
     /// redraws.
     pub game: RefCell<Option<(Launcher, String)>>,
     pub errors: RefCell<Vec<errors::Entry>>,
+    /// The Steams ProtonHub quit, to offer starting again.
+    pub quit: RefCell<Vec<Launcher>>,
     pub env: Result<Env, String>,
     snapshot: RefCell<Option<Rc<Snapshot>>>,
     /// Counts reloads, so an older one finishing late is dropped.
@@ -355,6 +357,7 @@ impl Window {
             view: RefCell::default(),
             game: RefCell::default(),
             errors: RefCell::default(),
+            quit: RefCell::default(),
             env: Env::load(),
             snapshot: RefCell::default(),
             generation: Cell::new(0),
@@ -673,6 +676,27 @@ impl Window {
                 tr("Installed {version}", &[("version", &version)])
             })
         });
+    }
+
+    /// Quits `launcher`, a Steam, so its games can be changed; its page
+    /// then offers to start it again.
+    pub fn quit_steam(self: &Rc<Self>, launcher: &Launcher) {
+        self.quit.borrow_mut().push(launcher.clone());
+        let launcher = launcher.clone();
+        self.run(tr("Quitting Steam", &[]), move |_| {
+            steam::quit(&launcher).map_err(|e| e.to_string())?;
+            Ok(tr("Steam quit: change its games, then start it again", &[]))
+        });
+    }
+
+    /// Starts `launcher`, a Steam ProtonHub quit.
+    pub fn start_steam(self: &Rc<Self>, launcher: &Launcher) {
+        self.quit.borrow_mut().retain(|l| l != launcher);
+        match steam::start(launcher) {
+            Ok(()) => self.toast(&tr("Starting Steam", &[])),
+            Err(e) => self.report(tr("Starting Steam", &[]), e.to_string()),
+        }
+        self.reload();
     }
 
     /// Deletes the tool in `dir`, whoever installed it and whatever uses it.

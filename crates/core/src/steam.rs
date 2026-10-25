@@ -11,6 +11,7 @@ use std::io;
 use std::path::{Path, PathBuf};
 
 use crate::games::{Choice, Error, Game, Library};
+use crate::launcher::{Launcher, Packaging};
 use crate::vdf::{self, Obj, Value};
 
 const MAPPING: [&str; 5] = [
@@ -84,6 +85,38 @@ pub fn library(root: &Path) -> Result<Library, Error> {
         choices,
         problems,
     })
+}
+
+/// The command that runs `launcher`, a Steam, as its packaging does.
+fn command(launcher: &Launcher) -> std::process::Command {
+    let (program, args): (&str, &[&str]) = match launcher.packaging {
+        Packaging::Native => ("steam", &[]),
+        Packaging::Flatpak => ("flatpak", &["run", "com.valvesoftware.Steam"]),
+        Packaging::Snap => ("snap", &["run", "steam"]),
+    };
+    let mut cmd = std::process::Command::new(program);
+    cmd.args(args);
+    cmd
+}
+
+/// Asks Steam to quit, as its own Exit does, and waits up to a minute for
+/// it to.
+pub fn quit(launcher: &Launcher) -> Result<(), Error> {
+    let mut cmd = command(launcher);
+    cmd.arg("-shutdown");
+    crate::prefix::launch(cmd)?;
+    for _ in 0..120 {
+        if !crate::games::is_running(launcher) {
+            return Ok(());
+        }
+        std::thread::sleep(std::time::Duration::from_millis(500));
+    }
+    Err(Error::StillRunning { launcher: "Steam" })
+}
+
+/// Starts Steam, and leaves it running.
+pub fn start(launcher: &Launcher) -> Result<(), Error> {
+    crate::prefix::launch(command(launcher))
 }
 
 /// Sets each game's tool, or with `None` leaves it to the default, in one

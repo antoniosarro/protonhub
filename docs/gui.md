@@ -71,8 +71,11 @@ start with it. **Own MangoHud Settings** points the game at a MangoHud
 file of its own ([MangoHud](#mangohud)), made as a copy of the global one;
 its edit button opens it. Non-Steam shortcuts keep theirs in Steam.
 
-While Steam or Heroic runs, its games can't be changed (it would overwrite
-the change when it exits), and a banner says so. A Heroic game needs its
+While Steam, Heroic or Faugus Launcher runs, its games can't be changed
+(it would overwrite the change when it exits), and a banner says so. On
+Steam's, **Quit Steam** asks Steam to quit, as its own Exit does, and
+waits for it; the banner then offers **Start Steam** for when you're done.
+A Heroic game needs its
 settings saved in Heroic once before ProtonHub can change it.
 
 ## Tools

@@ -17,6 +17,8 @@ use std::rc::Rc;
 use adw::prelude::*;
 use gtk::glib;
 
+use protonhub_core::manifest::LauncherKind;
+
 use crate::i18n::tr;
 use crate::window::{Env, LauncherState, Window};
 
@@ -27,12 +29,39 @@ pub fn build(win: &Rc<Window>, env: &Env, state: &LauncherState) -> gtk::Widget 
     view.add_top_bar(&header);
 
     let library = state.library.as_ref().map(Option::as_ref);
+    let steam = launcher.kind == LauncherKind::Steam;
     if library.is_ok_and(|l| l.is_some()) {
         if state.running {
-            view.add_top_bar(&banner(&tr(
+            let banner = banner(&tr(
                 "{launcher} is running: quit it to change a game's tool, or it will undo the change",
                 &[("launcher", &launcher.title())],
-            )));
+            ));
+            // Steam can be asked to quit; Heroic and Faugus can't.
+            if steam {
+                banner.set_button_label(Some(&tr("Quit Steam", &[])));
+                banner.connect_button_clicked(glib::clone!(
+                    #[strong]
+                    win,
+                    #[strong]
+                    launcher,
+                    move |_| win.quit_steam(&launcher)
+                ));
+            }
+            view.add_top_bar(&banner);
+        } else if steam && win.quit.borrow().contains(launcher) {
+            let banner = banner(&tr(
+                "ProtonHub quit Steam: start it again when you're done",
+                &[],
+            ));
+            banner.set_button_label(Some(&tr("Start Steam", &[])));
+            banner.connect_button_clicked(glib::clone!(
+                #[strong]
+                win,
+                #[strong]
+                launcher,
+                move |_| win.start_steam(&launcher)
+            ));
+            view.add_top_bar(&banner);
         } else if !protonhub_core::games::sees_launchers() {
             view.add_top_bar(&banner(&tr(
                 "Quit {launcher} before changing a game's tool: from inside a Flatpak, ProtonHub can't tell whether it's running",

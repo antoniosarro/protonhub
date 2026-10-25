@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: protonhub\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-25 14:46+0100\n"
+"POT-Creation-Date: 2026-10-25 15:29+0100\n"
 "PO-Revision-Date: 2026-10-10 22:25+0200\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: Italian\n"
@@ -151,13 +151,13 @@ msgstr "Nessun errore"
 msgid "Errors"
 msgstr "Errori"
 
-#: crates/gtk/src/i18n.rs:64 crates/gtk/src/window.rs:925
+#: crates/gtk/src/i18n.rs:64 crates/gtk/src/window.rs:949
 #, rust-format
 msgid "{game} now runs with {tool}"
 msgstr "{game} ora usa {tool}"
 
 #: crates/gtk/src/i18n.rs:69 crates/gtk/src/i18n.rs:70
-#: crates/gtk/src/page/tools.rs:322 crates/gtk/src/window.rs:1058
+#: crates/gtk/src/page/tools.rs:322 crates/gtk/src/window.rs:1082
 #, rust-format
 msgid "{n} game"
 msgid_plural "{n} games"
@@ -198,7 +198,7 @@ msgstr "Scrittura di {file}"
 msgid "Starting the preview"
 msgstr "Avvio dell'anteprima"
 
-#: crates/gtk/src/page/game.rs:97 crates/gtk/src/page/mod.rs:86
+#: crates/gtk/src/page/game.rs:97 crates/gtk/src/page/mod.rs:115
 msgid "Storage"
 msgstr "Archiviazione"
 
@@ -391,7 +391,7 @@ msgid "The tool it runs with"
 msgstr "Lo strumento con cui viene eseguito"
 
 #: crates/gtk/src/page/game_row.rs:123 crates/gtk/src/page/tools.rs:157
-#: crates/gtk/src/window.rs:622
+#: crates/gtk/src/window.rs:625
 msgid "Details"
 msgstr "Dettagli"
 
@@ -548,7 +548,7 @@ msgstr "Schermo intero"
 msgid "HDR"
 msgstr "HDR"
 
-#: crates/gtk/src/page/gamescope.rs:82 crates/gtk/src/window.rs:409
+#: crates/gtk/src/page/gamescope.rs:82 crates/gtk/src/window.rs:412
 msgid "MangoHud"
 msgstr "MangoHud"
 
@@ -557,7 +557,7 @@ msgid "Drawn by gamescope, as it recommends over the MangoHud switch"
 msgstr ""
 "Disegnato da gamescope, come consiglia al posto dell'interruttore MangoHud"
 
-#: crates/gtk/src/page/mod.rs:33
+#: crates/gtk/src/page/mod.rs:36
 #, rust-format
 msgid ""
 "{launcher} is running: quit it to change a game's tool, or it will undo the "
@@ -566,7 +566,19 @@ msgstr ""
 "{launcher} è in esecuzione: chiudilo per cambiare lo strumento di un gioco, "
 "o annullerà la modifica"
 
-#: crates/gtk/src/page/mod.rs:38
+#: crates/gtk/src/page/mod.rs:41
+msgid "Quit Steam"
+msgstr "Chiudi Steam"
+
+#: crates/gtk/src/page/mod.rs:53
+msgid "ProtonHub quit Steam: start it again when you're done"
+msgstr "ProtonHub ha chiuso Steam: riavvialo quando hai finito"
+
+#: crates/gtk/src/page/mod.rs:56
+msgid "Start Steam"
+msgstr "Avvia Steam"
+
+#: crates/gtk/src/page/mod.rs:67
 #, rust-format
 msgid ""
 "Quit {launcher} before changing a game's tool: from inside a Flatpak, "
@@ -575,24 +587,24 @@ msgstr ""
 "Chiudi {launcher} prima di cambiare lo strumento di un gioco: dentro un "
 "Flatpak, ProtonHub non può sapere se è in esecuzione"
 
-#: crates/gtk/src/page/mod.rs:50 crates/gtk/src/page/mod.rs:59
+#: crates/gtk/src/page/mod.rs:79 crates/gtk/src/page/mod.rs:88
 #: crates/gtk/src/page/storage.rs:125
 msgid "Games"
 msgstr "Giochi"
 
-#: crates/gtk/src/page/mod.rs:57
+#: crates/gtk/src/page/mod.rs:86
 msgid "Can't read the games"
 msgstr "Impossibile leggere i giochi"
 
-#: crates/gtk/src/page/mod.rs:66
+#: crates/gtk/src/page/mod.rs:95
 msgid "Can't read the tool directories"
 msgstr "Impossibile leggere le cartelle degli strumenti"
 
-#: crates/gtk/src/page/mod.rs:71
+#: crates/gtk/src/page/mod.rs:100
 msgid "Tools"
 msgstr "Strumenti"
 
-#: crates/gtk/src/page/mod.rs:78
+#: crates/gtk/src/page/mod.rs:107
 msgid "Can't read the prefixes and shader caches"
 msgstr "Impossibile leggere i prefissi e le cache degli shader"
 
@@ -982,31 +994,31 @@ msgstr "Estrazione"
 msgid "{step} · {done} of {total}"
 msgstr "{step} · {done} di {total}"
 
-#: crates/gtk/src/window.rs:273
+#: crates/gtk/src/window.rs:275
 msgid "Look for launchers and tools again (Ctrl+R)"
 msgstr "Cerca di nuovo launcher e strumenti (Ctrl+R)"
 
-#: crates/gtk/src/window.rs:282
+#: crates/gtk/src/window.rs:284
 msgid "MangoHud Settings (Ctrl+M)"
 msgstr "Impostazioni di MangoHud (Ctrl+M)"
 
-#: crates/gtk/src/window.rs:362
+#: crates/gtk/src/window.rs:365
 msgid "Cancelling…"
 msgstr "Annullamento…"
 
-#: crates/gtk/src/window.rs:410
+#: crates/gtk/src/window.rs:413
 msgid "Opening the MangoHud settings"
 msgstr "Apertura delle impostazioni di MangoHud"
 
-#: crates/gtk/src/window.rs:539
+#: crates/gtk/src/window.rs:542
 msgid "ProtonHub can't start"
 msgstr "ProtonHub non può avviarsi"
 
-#: crates/gtk/src/window.rs:561
+#: crates/gtk/src/window.rs:564
 msgid "No launchers found"
 msgstr "Nessun launcher trovato"
 
-#: crates/gtk/src/window.rs:563
+#: crates/gtk/src/window.rs:566
 msgid ""
 "ProtonHub looks for Steam, Heroic, Lutris, Bottles and WineZGUI, native, "
 "Flatpak or Snap."
@@ -1014,190 +1026,202 @@ msgstr ""
 "ProtonHub cerca Steam, Heroic, Lutris, Bottles e WineZGUI, nativi, Flatpak o "
 "Snap."
 
-#: crates/gtk/src/window.rs:619
+#: crates/gtk/src/window.rs:622
 #, rust-format
 msgid "{n} error"
 msgid_plural "{n} errors"
 msgstr[0] "{n} errore"
 msgstr[1] "{n} errori"
 
-#: crates/gtk/src/window.rs:621
+#: crates/gtk/src/window.rs:624
 #, rust-format
 msgid "{operation} failed"
 msgstr "{operation}: errore"
 
-#: crates/gtk/src/window.rs:645
+#: crates/gtk/src/window.rs:648
 #, rust-format
 msgid "Installing the latest {tool}"
 msgstr "Installazione dell'ultima versione di {tool}"
 
-#: crates/gtk/src/window.rs:647
+#: crates/gtk/src/window.rs:650
 #, rust-format
 msgid "Installing {version}"
 msgstr "Installazione di {version}"
 
-#: crates/gtk/src/window.rs:664
+#: crates/gtk/src/window.rs:667
 #, rust-format
 msgid "Installed {version}; it needs {programs}, which isn't installed"
 msgstr "{version} installato; richiede {programs}, che non è installato"
 
-#: crates/gtk/src/window.rs:669
+#: crates/gtk/src/window.rs:672
 #, rust-format
 msgid "Installed {version}; restart Steam to use it"
 msgstr "{version} installato; riavvia Steam per usarlo"
 
-#: crates/gtk/src/window.rs:673
+#: crates/gtk/src/window.rs:676
 #, rust-format
 msgid "Installed {version}"
 msgstr "{version} installato"
 
-#: crates/gtk/src/window.rs:680 crates/gtk/src/window.rs:695
+#: crates/gtk/src/window.rs:686
+msgid "Quitting Steam"
+msgstr "Chiusura di Steam"
+
+#: crates/gtk/src/window.rs:688
+msgid "Steam quit: change its games, then start it again"
+msgstr "Steam è chiuso: modifica i suoi giochi, poi riavvialo"
+
+#: crates/gtk/src/window.rs:696 crates/gtk/src/window.rs:697
+msgid "Starting Steam"
+msgstr "Avvio di Steam"
+
+#: crates/gtk/src/window.rs:704 crates/gtk/src/window.rs:719
 #, rust-format
 msgid "Deleting {tool}"
 msgstr "Eliminazione di {tool}"
 
-#: crates/gtk/src/window.rs:683 crates/gtk/src/window.rs:702
+#: crates/gtk/src/window.rs:707 crates/gtk/src/window.rs:726
 #, rust-format
 msgid "Deleted {tool}"
 msgstr "{tool} eliminato"
 
-#: crates/gtk/src/window.rs:699
+#: crates/gtk/src/window.rs:723
 msgid "Steam is running: quit it first"
 msgstr "Steam è in esecuzione: chiudilo prima"
 
-#: crates/gtk/src/window.rs:709
+#: crates/gtk/src/window.rs:733
 #, rust-format
 msgid "Deleting {n} unused tool"
 msgid_plural "Deleting {n} unused tools"
 msgstr[0] "Eliminazione di {n} strumento inutilizzato"
 msgstr[1] "Eliminazione di {n} strumenti inutilizzati"
 
-#: crates/gtk/src/window.rs:718 crates/gtk/src/window.rs:735
+#: crates/gtk/src/window.rs:742 crates/gtk/src/window.rs:759
 #, rust-format
 msgid "Freed {size}"
 msgstr "Liberati {size}"
 
-#: crates/gtk/src/window.rs:726
+#: crates/gtk/src/window.rs:750
 #, rust-format
 msgid "Deleting {n} folder"
 msgid_plural "Deleting {n} folders"
 msgstr[0] "Eliminazione di {n} cartella"
 msgstr[1] "Eliminazione di {n} cartelle"
 
-#: crates/gtk/src/window.rs:742
+#: crates/gtk/src/window.rs:766
 #, rust-format
 msgid "Updating {tool}"
 msgstr "Aggiornamento di {tool}"
 
-#: crates/gtk/src/window.rs:764
+#: crates/gtk/src/window.rs:788
 #, rust-format
 msgid "installed {version}"
 msgstr "{version} installato"
 
-#: crates/gtk/src/window.rs:768
+#: crates/gtk/src/window.rs:792
 #, rust-format
 msgid "moved {n} game onto it"
 msgid_plural "moved {n} games onto it"
 msgstr[0] "{n} gioco spostato sulla nuova versione"
 msgstr[1] "{n} giochi spostati sulla nuova versione"
 
-#: crates/gtk/src/window.rs:776
+#: crates/gtk/src/window.rs:800
 #, rust-format
 msgid "deleted {n} old version"
 msgid_plural "deleted {n} old versions"
 msgstr[0] "{n} versione vecchia eliminata"
 msgstr[1] "{n} versioni vecchie eliminate"
 
-#: crates/gtk/src/window.rs:784
+#: crates/gtk/src/window.rs:808
 #, rust-format
 msgid "{version} is up to date"
 msgstr "{version} è aggiornato"
 
-#: crates/gtk/src/window.rs:804
+#: crates/gtk/src/window.rs:828
 msgid "Reading the channels"
 msgstr "Lettura dei canali"
 
-#: crates/gtk/src/window.rs:813 crates/gtk/src/window.rs:821
+#: crates/gtk/src/window.rs:837 crates/gtk/src/window.rs:845
 msgid "Saving the channels"
 msgstr "Salvataggio dei canali"
 
-#: crates/gtk/src/window.rs:836
+#: crates/gtk/src/window.rs:860
 #, rust-format
 msgid "Moved {n} game to {tool}"
 msgid_plural "Moved {n} games to {tool}"
 msgstr[0] "{n} gioco spostato su {tool}"
 msgstr[1] "{n} giochi spostati su {tool}"
 
-#: crates/gtk/src/window.rs:842
+#: crates/gtk/src/window.rs:866
 #, rust-format
 msgid "Moving games to {tool}"
 msgstr "Spostamento dei giochi su {tool}"
 
-#: crates/gtk/src/window.rs:854
+#: crates/gtk/src/window.rs:878
 #, rust-format
 msgid "{game} now launches without options"
 msgstr "{game} ora si avvia senza opzioni"
 
-#: crates/gtk/src/window.rs:859
+#: crates/gtk/src/window.rs:883
 #, rust-format
 msgid "Saved the launch options of {game}"
 msgstr "Opzioni di avvio di {game} salvate"
 
-#: crates/gtk/src/window.rs:865
+#: crates/gtk/src/window.rs:889
 #, rust-format
 msgid "Setting the launch options of {game}"
 msgstr "Impostazione delle opzioni di avvio di {game}"
 
-#: crates/gtk/src/window.rs:879
+#: crates/gtk/src/window.rs:903
 #, rust-format
 msgid "Installing {verbs} into {game}"
 msgstr "Installazione di {verbs} in {game}"
 
-#: crates/gtk/src/window.rs:883
+#: crates/gtk/src/window.rs:907
 #, rust-format
 msgid "Installed {verbs} into {game}"
 msgstr "{verbs} installato in {game}"
 
-#: crates/gtk/src/window.rs:886
+#: crates/gtk/src/window.rs:910
 #, rust-format
 msgid "Stopped installing into {game}"
 msgstr "Installazione in {game} interrotta"
 
-#: crates/gtk/src/window.rs:928
+#: crates/gtk/src/window.rs:952
 #, rust-format
 msgid "{game} now runs with the default"
 msgstr "{game} ora usa lo strumento predefinito"
 
-#: crates/gtk/src/window.rs:932
+#: crates/gtk/src/window.rs:956
 #, rust-format
 msgid "Setting the tool of {game}"
 msgstr "Impostazione dello strumento di {game}"
 
-#: crates/gtk/src/window.rs:946
+#: crates/gtk/src/window.rs:970
 #, rust-format
 msgid "Games without a tool of their own now run with {tool}"
 msgstr "I giochi senza uno strumento proprio ora girano con {tool}"
 
-#: crates/gtk/src/window.rs:950
+#: crates/gtk/src/window.rs:974
 msgid "Steam Play is off for games without a tool of their own"
 msgstr "Steam Play è disattivato per i giochi senza uno strumento proprio"
 
-#: crates/gtk/src/window.rs:954
+#: crates/gtk/src/window.rs:978
 msgid "Setting the default tool"
 msgstr "Impostazione dello strumento predefinito"
 
-#: crates/gtk/src/window.rs:977
+#: crates/gtk/src/window.rs:1001
 msgid "Wait for the current job to finish"
 msgstr "Attendi che l'operazione in corso finisca"
 
-#: crates/gtk/src/window.rs:1060
+#: crates/gtk/src/window.rs:1084
 #, rust-format
 msgid "{n} tool"
 msgid_plural "{n} tools"
 msgstr[0] "{n} strumento"
 msgstr[1] "{n} strumenti"
 
-#: crates/gtk/src/window.rs:1086
+#: crates/gtk/src/window.rs:1110
 msgid "Running"
 msgstr "In esecuzione"
 
