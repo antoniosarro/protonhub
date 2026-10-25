@@ -9,6 +9,8 @@
 use std::fs::{self, File, OpenOptions};
 use std::io::{self, Read, Write};
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
 
 use protonhub_manifest::{ReleaseAsset, Source, Tool};
@@ -128,6 +130,8 @@ impl From<RawRelease> for Release {
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
+    #[error("cancelled")]
+    Cancelled,
     #[error("{url}: {source}")]
     Http { url: String, source: ureq::Error },
     #[error("{url}: HTTP {status}{}", if message.is_empty() { String::new() } else { format!(": {message}") })]
@@ -189,11 +193,14 @@ fn decode<T: serde::de::DeserializeOwned>(body: &str) -> Result<T, serde_json::E
     })
 }
 
+#[derive(Clone)]
 pub struct Client {
     agent: ureq::Agent,
     api: String,
     token: Option<String>,
     cache: PathBuf,
+    /// Set to stop a download, as a Cancel button does.
+    cancel: Option<Arc<AtomicBool>>,
 }
 
 impl Client {
@@ -211,6 +218,16 @@ impl Client {
             api: api.into(),
             token: token.filter(|t| !t.is_empty()),
             cache,
+            cancel: None,
+        }
+    }
+
+    /// This client, with its downloads stopped once `cancel` is set; what
+    /// was downloaded stays to resume.
+    pub fn cancellable(&self, cancel: Arc<AtomicBool>) -> Self {
+        Self {
+            cancel: Some(cancel),
+            ..self.clone()
         }
     }
 
@@ -466,6 +483,13 @@ impl Client {
             let mut body = resp.into_body().into_reader();
             let mut buf = vec![0; 1 << 16];
             loop {
+                if self
+                    .cancel
+                    .as_ref()
+                    .is_some_and(|c| c.load(Ordering::SeqCst))
+                {
+                    return Err(Error::Cancelled);
+                }
                 let n = match body.read(&mut buf) {
                     Ok(0) => break,
                     Ok(n) => n,
@@ -745,6 +769,27 @@ mod tests {
             std::fs::metadata(dir.join("a.tar.gz.part")).unwrap().len(),
             10
         );
+    }
+
+    #[test]
+    fn a_cancelled_download_stops_and_is_kept_to_resume() {
+        let server = serve(|_| Response::ok(vec![1; 1 << 20]));
+        let dir = TempDir::new("gh-cancel");
+        let cancel = Arc::new(AtomicBool::new(false));
+        let client = Client::new(&server.url, dir.join("cache"), None).cancellable(cancel.clone());
+        let asset = ReleaseAsset {
+            name: "a.tar.gz".into(),
+            url: format!("{}/a.tar.gz", server.url),
+            size: 1 << 20,
+        };
+        let err = client
+            .download(&asset, &dir, &mut |_, _| {
+                cancel.store(true, Ordering::SeqCst)
+            })
+            .unwrap_err();
+        assert!(matches!(err, Error::Cancelled), "{err}");
+        let kept = std::fs::metadata(dir.join("a.tar.gz.part")).unwrap().len();
+        assert!(kept > 0 && kept < 1 << 20, "{kept}");
     }
 
     fn tool_from(source: &str) -> Tool {

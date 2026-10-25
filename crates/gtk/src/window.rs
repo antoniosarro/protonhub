@@ -141,6 +141,17 @@ impl Snapshot {
     }
 }
 
+/// A flag for a download job's Cancel button to set, and the button's
+/// action.
+fn cancel_button() -> (Arc<AtomicBool>, Rc<dyn Fn()>) {
+    let cancel = Arc::new(AtomicBool::new(false));
+    let stop: Rc<dyn Fn()> = Rc::new({
+        let cancel = cancel.clone();
+        move || cancel.store(true, Ordering::SeqCst)
+    });
+    (cancel, stop)
+}
+
 /// The running job's card at the bottom of the sidebar. One job at a
 /// time: two installs into the same directory would race for its staging
 /// area.
@@ -651,14 +662,20 @@ impl Window {
                 &[("version", &named(&tool.name, t))],
             ),
         };
-        let (client, downloads, arch) = (env.client.clone(), env.downloads.clone(), env.arch);
+        let (cancel, stop) = cancel_button();
+        let client = env.client.cancellable(cancel.clone());
+        let (downloads, arch) = (env.downloads.clone(), env.arch);
         let (owned, target) = (tool.clone(), launcher.clone());
         let restart = launcher.kind == LauncherKind::Steam;
-        self.run(title, move |progress| {
-            let entry = install::install(
+        let stopped = tr("Stopped installing {tool}", &[("tool", &tool.name)]);
+        self.run_stoppable(title, Some(stop), move |progress| {
+            let entry = match install::install(
                 &client, &owned, &version, &target, arch, &downloads, progress,
-            )
-            .map_err(|e| e.to_string())?;
+            ) {
+                Ok(entry) => entry,
+                Err(_) if cancel.load(Ordering::SeqCst) => return Ok(stopped),
+                Err(e) => return Err(e.to_string()),
+            };
             let version = entry.record.map(|r| r.version).unwrap_or_default();
             let version = named(&owned.name, &version);
             let missing = install::missing(&owned);
@@ -764,15 +781,17 @@ impl Window {
     pub fn update_channel(self: &Rc<Self>, tool: &Tool, channel: Channel) {
         let Ok(env) = &self.env else { return };
         let title = tr("Updating {tool}", &[("tool", &tool.name)]);
+        let (cancel, stop) = cancel_button();
+        let stopped = tr("Stopped updating {tool}", &[("tool", &tool.name)]);
         let (client, registry, home, downloads, arch) = (
-            env.client.clone(),
+            env.client.cancellable(cancel.clone()),
             env.registry.clone(),
             env.home.clone(),
             env.downloads.clone(),
             env.arch,
         );
         let name = tool.name.clone();
-        self.run(title, move |progress| {
+        self.run_stoppable(title, Some(stop), move |progress| {
             let launchers = launcher::detect(&home);
             let cx = channels::Context {
                 client: &client,
@@ -781,7 +800,11 @@ impl Window {
                 arch,
                 downloads: &downloads,
             };
-            let u = channels::update(&cx, &channel, progress).map_err(|e| e.to_string())?;
+            let u = match channels::update(&cx, &channel, progress) {
+                Ok(u) => u,
+                Err(_) if cancel.load(Ordering::SeqCst) => return Ok(stopped),
+                Err(e) => return Err(e.to_string()),
+            };
             let mut did = Vec::new();
             let latest = named(&name, &u.latest);
             if u.installed.is_some() {

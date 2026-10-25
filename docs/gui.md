@@ -137,7 +137,9 @@ An install, removal or cleanup runs in the background, one at a time. A
 card at the bottom of the sidebar shows the step (finding the release,
 downloading, verifying the checksum, extracting) with a progress bar and
 the MiB done; buttons that would start another job are disabled until it
-ends. A toast reports the result. After installing into Steam, restart
+ends. An install or update has a Cancel button, which stops its download;
+what was downloaded stays, and the next try resumes from it. A toast
+reports the result. After installing into Steam, restart
 Steam to see the new tool.
 
 ## MangoHud
