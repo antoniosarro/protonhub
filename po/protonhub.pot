@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: protonhub\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-25 00:46+0200\n"
+"POT-Creation-Date: 2026-10-25 09:26+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -230,32 +230,64 @@ msgid ""
 "build reads every option."
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:285
+#: crates/gtk/src/page/game.rs:286
+msgid "As text"
+msgstr ""
+
+#: crates/gtk/src/page/game.rs:291
 msgid "Launch options"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:293
+#: crates/gtk/src/page/game.rs:298
 msgid "Save"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:340
+#: crates/gtk/src/page/game.rs:334
+msgid "Add Variable"
+msgstr ""
+
+#: crates/gtk/src/page/game.rs:354
+msgid "Programs it runs in"
+msgstr ""
+
+#: crates/gtk/src/page/game.rs:356
+msgid "Arguments"
+msgstr ""
+
+#: crates/gtk/src/page/game.rs:420
+msgid "Name"
+msgstr ""
+
+#: crates/gtk/src/page/game.rs:420
+msgid "Remove"
+msgstr ""
+
+#: crates/gtk/src/page/game.rs:420
+msgid "Value"
+msgstr ""
+
+#: crates/gtk/src/page/game.rs:500
+msgid "None"
+msgstr ""
+
+#: crates/gtk/src/page/game.rs:567
 #, rust-format
 msgid "{program} isn't installed: the game won't start with it"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:403
+#: crates/gtk/src/page/game.rs:639
 msgid "On the Web"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:407
+#: crates/gtk/src/page/game.rs:643
 msgid "ProtonDB Reports"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:411
+#: crates/gtk/src/page/game.rs:647
 msgid "SteamDB"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:415
+#: crates/gtk/src/page/game.rs:651
 msgid "Steam Store"
 msgstr ""
 
@@ -867,17 +899,17 @@ msgstr[1] ""
 msgid "Moving games to {tool}"
 msgstr ""
 
-#: crates/gtk/src/window.rs:798
+#: crates/gtk/src/window.rs:797
 #, rust-format
 msgid "{game} now launches without options"
 msgstr ""
 
-#: crates/gtk/src/window.rs:803
+#: crates/gtk/src/window.rs:802
 #, rust-format
 msgid "Saved the launch options of {game}"
 msgstr ""
 
-#: crates/gtk/src/window.rs:809
+#: crates/gtk/src/window.rs:808
 #, rust-format
 msgid "Setting the launch options of {game}"
 msgstr ""

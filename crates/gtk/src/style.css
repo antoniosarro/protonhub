@@ -41,3 +41,8 @@ window.narrow .thumbnail { min-width: 45px; }
   border-radius: 12px;
   background-color: alpha(currentColor, 0.06);
 }
+
+/* A game's launch options: the summary in the row that unfolds them,
+   and the text in its fields. */
+.launch-options row.header .subtitle,
+.launch-options text { font-family: monospace; }

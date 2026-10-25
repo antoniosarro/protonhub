@@ -43,11 +43,14 @@ on Steam (each with its size, a button to open its folder and one to
 delete it, as in [Storage](#storage)), its ProtonDB, SteamDB and Steam
 store pages, and its app id.
 
-**Launch Options** shows the game's launch options as text, and a switch
-for each preset ([usage.md](usage.md#launch-options)): MangoHud, GameMode,
-Native Wayland, HDR, NTSync, FSR 4 and DLSS upgrades, and Proton's log.
-The switches show what the text has on and edit it; **Save** (or Enter)
-writes it to the launcher. A switch for a program that isn't installed says so,
+**Launch Options** shows the game's launch options in a row that unfolds
+to edit them by parts: a row per variable, its name and value side by side
+(a name no shell would set is marked, and left out), with **Add
+Variable**; the programs it runs in; its arguments; and the whole as text.
+Below it is a switch for each preset ([usage.md](usage.md#launch-options)):
+MangoHud, GameMode, Native Wayland, HDR, NTSync, FSR 4 and DLSS upgrades,
+and Proton's log. The parts and switches show what the text has on and
+edit it; **Save** (or Enter in any field) writes it to the launcher. A switch for a program that isn't installed says so,
 since the game wouldn't start with it. Non-Steam shortcuts keep theirs in
 Steam.
 

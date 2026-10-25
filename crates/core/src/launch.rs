@@ -95,8 +95,6 @@ impl Options {
 /// left as it is for Steam to find.
 impl std::fmt::Display for Options {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        // Quoting fails only on a NUL byte, which shlex never splits out.
-        let quote = |w: &str| shlex::try_quote(w).map_or_else(|_| w.to_owned(), |q| q.into_owned());
         let mut words: Vec<String> = self
             .env
             .iter()
@@ -111,14 +109,36 @@ impl std::fmt::Display for Options {
     }
 }
 
+/// Words as a shell splits them; none for text it couldn't, like an
+/// unclosed quote.
+pub fn split(text: &str) -> Option<Vec<String>> {
+    shlex::split(text)
+}
+
+/// Words quoted where needed, as a shell splits them back.
+pub fn join(words: &[String]) -> String {
+    words.iter().map(|w| quote(w)).collect::<Vec<_>>().join(" ")
+}
+
+fn quote(word: &str) -> String {
+    // Quoting fails only on a NUL byte, which shlex never splits out.
+    shlex::try_quote(word).map_or_else(|_| word.to_owned(), |q| q.into_owned())
+}
+
+/// Whether `key` can be a variable's name: a shell reads `key=value` as
+/// setting it.
+pub fn is_name(key: &str) -> bool {
+    let mut chars = key.chars();
+    chars
+        .next()
+        .is_some_and(|c| c.is_ascii_alphabetic() || c == '_')
+        && chars.all(|c| c.is_ascii_alphanumeric() || c == '_')
+}
+
 /// `NAME=value` as a shell reads an assignment.
 fn assignment(word: &str) -> Option<(String, String)> {
     let (key, value) = word.split_once('=')?;
-    let mut chars = key.chars();
-    let first = chars.next()?;
-    let valid = (first.is_ascii_alphabetic() || first == '_')
-        && chars.all(|c| c.is_ascii_alphanumeric() || c == '_');
-    valid.then(|| (key.to_owned(), value.to_owned()))
+    is_name(key).then(|| (key.to_owned(), value.to_owned()))
 }
 
 /// A switch on a game's page: variables to set, a program to run it in, or

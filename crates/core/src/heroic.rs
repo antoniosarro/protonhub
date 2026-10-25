@@ -174,7 +174,7 @@ pub fn set_launch_options(root: &Path, game: &str, text: &str) -> Result<(), Err
         }
         let wrappers: Vec<Value> = programs
             .iter()
-            .map(|p| json!({ "exe": p[0], "args": join(&p[1..]) }))
+            .map(|p| json!({ "exe": p[0], "args": launch::join(&p[1..]) }))
             .collect();
         let env: Vec<Value> = options
             .env
@@ -184,7 +184,7 @@ pub fn set_launch_options(root: &Path, game: &str, text: &str) -> Result<(), Err
         // Sic: Heroic's spelling.
         settings.insert("enviromentOptions".into(), json!(env));
         settings.insert("wrapperOptions".into(), json!(wrappers));
-        settings.insert("launcherArgs".into(), json!(join(&options.args)));
+        settings.insert("launcherArgs".into(), json!(launch::join(&options.args)));
     })
 }
 
@@ -237,12 +237,7 @@ fn wrapper_programs(wrappers: Option<&Value>) -> Vec<Vec<String>> {
 
 /// Words as Heroic splits them, shell-like; by spaces where that fails.
 fn split(text: &str) -> Vec<String> {
-    shlex::split(text).unwrap_or_else(|| text.split_whitespace().map(str::to_owned).collect())
-}
-
-fn join(words: &[String]) -> String {
-    // Quoting fails only on a NUL byte, which no split word has.
-    shlex::try_join(words.iter().map(String::as_str)).unwrap_or_else(|_| words.join(" "))
+    launch::split(text).unwrap_or_else(|| text.split_whitespace().map(str::to_owned).collect())
 }
 
 /// Changes `game`'s settings with `change`. The game must have a settings
