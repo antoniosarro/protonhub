@@ -937,8 +937,8 @@ impl Window {
         self.reload();
     }
 
-    /// Sets Steam's default tool, or with none turns Steam Play off for
-    /// games without one of their own.
+    /// Sets the launcher's default tool, or with none turns Steam Play off
+    /// for games without one of their own.
     pub fn set_default(self: &Rc<Self>, launcher: &Launcher, tool: Option<&games::Choice>) {
         match games::set_default(launcher, tool.map(|c| c.id.as_str())) {
             Ok(()) => self.toast(&match tool {
@@ -1045,6 +1045,7 @@ fn sidebar_row(state: &LauncherState) -> gtk::ListBoxRow {
         LauncherKind::Lutris => "applications-system-symbolic",
         LauncherKind::Bottles => "package-x-generic-symbolic",
         LauncherKind::Winezgui => "application-x-executable-symbolic",
+        LauncherKind::Faugus => "input-gaming-symbolic",
     });
     let name = gtk::Label::builder()
         .label(l.title())

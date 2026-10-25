@@ -23,7 +23,7 @@ launchers = { steam = "compatibilitytools.d", heroic = "tools/proton" }
 | `dir` | Optional. The directory name to install into, `{tag}` being the release's tag: for archives without exactly one top-level directory (DXVK-NVAPI), or to rename the one they have (Steam-Play-None's `Steam-Play-None-main`) |
 | `subdir` | Optional, with `dir`. The directory inside the archive's top-level one that is the tool, for archives that hold more: DXVK-Sarek's hold its source, with the DLLs in `build` |
 | `requires` | Optional. Programs the tool needs on the host and doesn't bring (Roberta needs `scummvm`). Installing works without them, with a warning |
-| `launchers` | For each launcher (`steam`, `heroic`, `lutris`, `bottles`, `winezgui`), the directory under its data directory that versions are extracted into. Relative, without `..` |
+| `launchers` | For each launcher (`steam`, `heroic`, `lutris`, `bottles`, `winezgui`, `faugus`), the directory under its data directory that versions are extracted into; for `faugus`, under the Steam data directory whose compatibilitytools.d it uses. Relative, without `..` |
 
 Unknown fields, architectures and launchers are errors, so a typo is caught
 when the manifest loads rather than ignored.
@@ -94,7 +94,7 @@ fix reaches users without an app release.
 
 | Tool | Source | Launchers |
 |---|---|---|
-| GE-Proton, Proton-CachyOS, Proton-Wineland, DW-Proton, Proton-RTSP, Proton-EM | GitHub | Steam, Heroic, Lutris, Bottles |
+| GE-Proton, Proton-CachyOS, Proton-Wineland, DW-Proton, Proton-RTSP, Proton-EM | GitHub | Steam, Heroic, Lutris, Bottles, Faugus Launcher |
 | Luxtorpeda | Codeberg | Steam |
 | Boxtron, Roberta | GitHub | Steam |
 | Steam-Play-None | the main branch's archive | Steam |

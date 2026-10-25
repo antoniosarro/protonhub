@@ -141,6 +141,7 @@ fn build(
         &adw::ActionRow::builder()
             .title(match game.source {
                 "steam" | "shortcut" => tr("Steam App ID", &[]),
+                "faugus" => tr("Faugus Game ID", &[]),
                 _ => tr("Heroic App Name", &[]),
             })
             .subtitle(glib::markup_escape_text(&game.id))

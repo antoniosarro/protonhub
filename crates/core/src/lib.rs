@@ -2,6 +2,7 @@
 //! download, verify, and install its releases into them.
 
 pub mod channels;
+pub mod faugus;
 pub mod games;
 pub mod heroic;
 pub mod info;

@@ -47,8 +47,13 @@ impl Launcher {
     }
 
     /// Where `tool`'s versions go in this launcher, if the tool supports it.
+    /// Faugus Launcher's go in a Steam's data directory, not its own.
     pub fn tool_dir(&self, tool: &Tool) -> Option<PathBuf> {
-        tool.launchers.get(&self.kind).map(|d| self.root.join(d))
+        let base = match self.kind {
+            LauncherKind::Faugus => crate::faugus::steam_dir(&self.home()?),
+            _ => self.root.clone(),
+        };
+        tool.launchers.get(&self.kind).map(|d| base.join(d))
     }
 
     /// Whether `spec` names this launcher: a kind (`steam`) or a kind and
@@ -148,6 +153,12 @@ const LOCATIONS: &[(LauncherKind, Packaging, &str)] = {
             Winezgui,
             Flatpak,
             ".var/app/io.github.fastrizwaan.WineZGUI/data/winezgui",
+        ),
+        (Faugus, Native, ".local/share/faugus-launcher"),
+        (
+            Faugus,
+            Flatpak,
+            ".var/app/io.github.Faugus.faugus-launcher/data/faugus-launcher",
         ),
     ]
 };

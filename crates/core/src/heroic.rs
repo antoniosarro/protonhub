@@ -399,7 +399,7 @@ fn config_path(root: &Path, game: &str) -> PathBuf {
     root.join("GamesConfig").join(format!("{game}.json"))
 }
 
-fn read_json(path: &Path) -> Result<Option<Value>, Error> {
+pub(crate) fn read_json(path: &Path) -> Result<Option<Value>, Error> {
     let bytes = match fs::read(path) {
         Ok(b) => b,
         Err(e) if e.kind() == io::ErrorKind::NotFound => return Ok(None),

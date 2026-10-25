@@ -5,7 +5,7 @@
 # ProtonHub
 
 **Install and manage Proton, Wine, DXVK and VKD3D builds across Steam,
-Heroic, Lutris, Bottles and WineZGUI.**
+Heroic, Lutris, Bottles, WineZGUI and Faugus Launcher.**
 
 [![CI](https://github.com/antoniosarro/protonhub/actions/workflows/ci.yml/badge.svg)](https://github.com/antoniosarro/protonhub/actions/workflows/ci.yml)
 [![Registry](https://github.com/antoniosarro/protonhub/actions/workflows/registry.yml/badge.svg)](https://github.com/antoniosarro/protonhub/actions/workflows/registry.yml)
@@ -34,8 +34,8 @@ scriptable CLI with JSON output.
   Boxtron and more
   ([the list](docs/manifests.md#the-tools)), from GitHub, Codeberg and
   GitLab.
-- **Every launcher**: Steam, Heroic, Lutris, Bottles and WineZGUI, native,
-  Flatpak or Snap.
+- **Every launcher**: Steam, Heroic, Lutris, Bottles, WineZGUI and Faugus
+  Launcher, native, Flatpak or Snap.
 - **Verified installs**: checksums matched to their asset by name,
   resumable downloads, atomic installs that never leave a half-extracted
   tool behind.
@@ -146,8 +146,9 @@ libadwaita 1.6+, libudev and gettext. [`just`](justfile) lists the recipes:
 
 ## Limitations
 
-- Per-game tools are set for Steam and Heroic only; Lutris, Bottles and
-  WineZGUI get installs and removals.
+- Per-game tools are set for Steam, Heroic and Faugus Launcher only;
+  Lutris, Bottles and WineZGUI get installs and removals. Launch options
+  and prefix tools are for Steam and Heroic games.
 - Launch options are set for Steam and Heroic games, not yet for
   non-Steam shortcuts.
 - Tools only released as CI artifacts (Proton-Tkg, Wine-Tkg, DXVK

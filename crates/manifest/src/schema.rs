@@ -32,6 +32,7 @@ pub enum LauncherKind {
     Lutris,
     Bottles,
     Winezgui,
+    Faugus,
 }
 
 impl LauncherKind {
@@ -43,6 +44,7 @@ impl LauncherKind {
             Self::Lutris => "lutris",
             Self::Bottles => "bottles",
             Self::Winezgui => "winezgui",
+            Self::Faugus => "faugus",
         }
     }
 
@@ -54,6 +56,7 @@ impl LauncherKind {
             Self::Lutris => "Lutris",
             Self::Bottles => "Bottles",
             Self::Winezgui => "WineZGUI",
+            Self::Faugus => "Faugus Launcher",
         }
     }
 }

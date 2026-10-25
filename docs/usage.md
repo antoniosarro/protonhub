@@ -13,14 +13,14 @@ builds and runs it.
 | `protonhub install TOOL[@VERSION] [--launcher L]` | Install a release; the version is a tag, or `latest` (the default) |
 | `protonhub list` | What is in each launcher's tool directories, and which of it protonhub installed |
 | `protonhub remove TOOL@VERSION [--launcher L]` | Remove a version protonhub installed |
-| `protonhub games [--launcher L] [--info]` | Steam's and Heroic's installed games and the tool each runs with ("(default)" when it's the launcher's default); `--info` adds ProtonDB's rating and the anti-cheat status (network, cached for a day) |
+| `protonhub games [--launcher L] [--info]` | Steam's, Heroic's and Faugus Launcher's installed games and the tool each runs with ("(default)" when it's the launcher's default); `--info` adds ProtonDB's rating and the anti-cheat status (network, cached for a day) |
 | `protonhub game GAME [--launcher L] [--info]` | One game: its id, source and tool, its prefix and shader cache (Steam), and with `--info` its ProtonDB rating and anti-cheat status. Every launcher is searched; `--launcher` is needed only when several have a game of that name |
 | `protonhub launch GAME [--set TEXT \| --on ID… --off ID…] [--launcher L]` | A Steam or Heroic game's launch options and the presets they have on; `--set` replaces them (`""` removes them), `--on` and `--off` switch presets ([launch options](#launch-options)) |
 | `protonhub presets` | The launch option presets: their id, name, what each sets, and what it's for |
 | `protonhub tricks GAME [VERB… \| --run PROGRAM] [--launcher L]` | A Steam or Heroic game's Wine prefix, the Wine it runs with, and the winetricks verbs in it; VERBs installs them, `--run` runs `winecfg`, `regedit`, `control` or a Windows program (`.exe`, `.msi`) in it ([prefix tools](#prefix-tools)) |
 | `protonhub verbs` | The winetricks verbs offered by group: their id, group, name and what each is for |
 | `protonhub assign GAME TOOL [--launcher L]` | Set the tool a game runs with. GAME is its id or name, TOOL a tool's id or name from `games`, or `default` (Steam) |
-| `protonhub default [TOOL] [--launcher L]` | Steam's default tool, what games without one of their own run with; with TOOL (a tool's id or name from `games`, or `none` for Steam Play off) sets it |
+| `protonhub default [TOOL] [--launcher L]` | The default tool of Steam or Faugus Launcher, what games without one of their own run with; with TOOL (a tool's id or name from `games`, or on Steam `none` for Steam Play off) sets it |
 | `protonhub usage [--launcher L]` | Each installed tool's size and what uses it: games, the default, `unused`, or `-` where ProtonHub can't tell |
 | `protonhub cleanup [--launcher L] [--yes]` | List the tools nothing uses and the space they take; `--yes` deletes them |
 | `protonhub storage list [--launcher L]` | Each Wine prefix and shader cache in Steam's libraries, largest first, with its app's name, and `(uninstalled)` or `(removed from Steam)` for a leftover |
@@ -163,13 +163,22 @@ there's no `/lib/ld-linux.so.2` for it, as on NixOS, everything runs inside
 their settings back when they exit, which would undo it. Before writing,
 ProtonHub keeps the previous file next to it as
 `<name>.protonhub-backup` (`config/config.vdf` for Steam,
-`GamesConfig/<game>.json` for Heroic).
+`GamesConfig/<game>.json` for Heroic, `games.json` and `config.json` for
+Faugus Launcher).
+
+Faugus Launcher keeps its Protons in a Steam's compatibilitytools.d (the
+native Steam's, or a Flatpak Steam's when that's the only one), Steam
+installed or not: ProtonHub installs its tools there, and a game's runner
+is a directory there by name, or "Default". Games that run natively or
+through Steam are left out. The runners Faugus downloads and updates
+itself (its "… Latest" ones, `UMU-Latest`) never count as unused.
 
 Heroic only has a settings file for a game once its settings were saved
 in Heroic; until then `assign` asks you to open them once.
 
-A tool counts as used when any game in any launcher runs it: Heroic games
-can run Steam's tools, and Lutris games can name any tool by its path.
+A tool counts as used when any game in any launcher runs it, or it's
+another launcher's default: Heroic and Faugus Launcher games can run
+Steam's tools, and Lutris games can name any tool by its path.
 Only directories of tools that games are set to are judged (Steam's
 `compatibilitytools.d`, Heroic's `tools/proton` and `tools/wine`), so
 DXVK and anything in Lutris or Bottles is never called unused. `cleanup`
@@ -201,7 +210,7 @@ protonhub storage remove "Elden Ring" --shader-cache
 
 ## Choosing a launcher
 
-`--launcher` takes a kind (`steam`, `heroic`, `lutris`, `bottles`, `winezgui`) or a kind
+`--launcher` takes a kind (`steam`, `heroic`, `lutris`, `bottles`, `winezgui`, `faugus`) or a kind
 and packaging (`steam:flatpak`, `heroic:native`). Without it, install,
 remove and assign use the one launcher found that fits, and ask you to
 choose when there are several; games, usage and cleanup cover every

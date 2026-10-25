@@ -5,8 +5,8 @@ manifests as the CLI does ([usage.md](usage.md)).
 
 ## Layout
 
-The sidebar lists the launchers found: Steam, Heroic, Lutris, Bottles and
-WineZGUI, with "(Flatpak)" or "(Snap)" when that's how they're installed,
+The sidebar lists the launchers found: Steam, Heroic, Lutris, Bottles,
+WineZGUI and Faugus Launcher, with "(Flatpak)" or "(Snap)" when that's how they're installed,
 how many games and tools each has, and a mark on one that's running. A
 launcher's page has the views **Games** and **Tools**, and on Steam's
 **Storage**; launchers without per-game tools (Lutris, Bottles) have only
@@ -33,9 +33,9 @@ Valve Proton" setting is on) and Lutris's Wine builds, marked "(Steam)"
 or "(Lutris)" where Heroic has the same version. **Search games** filters
 the list.
 **Move Games…** moves every game set to one tool to another at once. On
-Steam, **Default Tool** above the list sets Steam's default, what games
-without a tool of their own run with, or none to turn Steam Play off for
-them. Each change keeps the previous settings file as
+Steam and Faugus Launcher, **Default Tool** above the list sets the
+default, what games without a tool of their own run with, or on Steam
+none to turn Steam Play off for them. Each change keeps the previous settings file as
 `<name>.protonhub-backup`.
 
 A game's row, or its info button, opens its page over the list, with a

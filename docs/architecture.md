@@ -11,7 +11,7 @@ graph TD
     cli --> core
     core --> manifest["manifests<br/>crates/manifest"]
     manifest --> registry[("registry/*.toml")]
-    core --> launchers[("Steam · Heroic · Lutris · Bottles · WineZGUI<br/>data directories")]
+    core --> launchers[("Steam · Heroic · Lutris · Bottles · WineZGUI · Faugus<br/>data directories")]
 ```
 
 ## Crates
@@ -19,7 +19,7 @@ graph TD
 | Crate | Role |
 | --- | --- |
 | `crates/manifest` (`protonhub-manifest`) | The manifest schema, loading `registry/`, and resolving a release to the one asset and checksum for an arch ([manifests.md](manifests.md)) |
-| `crates/core` (`protonhub-core`) | `launcher`: detection (native, Flatpak, Snap). `releases`: GitHub, Forgejo and GitLab releases and fixed URLs, ETag cache, resumable downloads. `install`: the installer pipeline, listing, removal. `games`: games, per-game tools and usage across launchers, with `steam` and `heroic` behind it. `storage`: Steam's prefixes and shader caches, and the ones uninstalled games left. `launch`: launch options, split into variables, programs and arguments, and the presets (`presets.toml`) that switch parts of them. `mangohud`: MangoHud's config files, line by line, and the settings its editor offers (`mangohud.toml`). `prefix`: a game's Wine prefix and the Wine that runs it, winetricks verbs (`verbs.toml`), Wine's tools and Windows programs in it, and runs that can be cancelled. `channels`: keeping tools at their latest release. `lock`: lockfiles. `info`: ProtonDB ratings and Are We Anti-Cheat Yet statuses. `vdf`: Valve's text and binary KeyValues. `paths`: XDG directories. Re-exports `manifest` |
+| `crates/core` (`protonhub-core`) | `launcher`: detection (native, Flatpak, Snap). `releases`: GitHub, Forgejo and GitLab releases and fixed URLs, ETag cache, resumable downloads. `install`: the installer pipeline, listing, removal. `games`: games, per-game tools and usage across launchers, with `steam`, `heroic` and `faugus` behind it. `storage`: Steam's prefixes and shader caches, and the ones uninstalled games left. `launch`: launch options, split into variables, programs and arguments, and the presets (`presets.toml`) that switch parts of them. `mangohud`: MangoHud's config files, line by line, and the settings its editor offers (`mangohud.toml`). `prefix`: a game's Wine prefix and the Wine that runs it, winetricks verbs (`verbs.toml`), Wine's tools and Windows programs in it, and runs that can be cancelled. `channels`: keeping tools at their latest release. `lock`: lockfiles. `info`: ProtonDB ratings and Are We Anti-Cheat Yet statuses. `vdf`: Valve's text and binary KeyValues. `paths`: XDG directories. Re-exports `manifest` |
 | `crates/cli` (`protonhub-cli`, binary `protonhub`) | The command line ([usage.md](usage.md)), and the systemd user timer (`timer.rs`) |
 | `crates/gtk` (`protonhub-gtk`, binary `protonhub-gtk`) | The GTK 4 + libadwaita GUI ([gui.md](gui.md)). `window`: the sidebar, the snapshot read on a worker thread, and jobs. `page`: a launcher's page, a module of a file per tab (`games` with `game_row` and the `game` page and its `prefix` group, `tools`, `storage`). `tool`, `details`: a tool's releases, an installed tool's users. `mangohud`: the MangoHud editor and its preview. `errors`: the error log. `art`: pictures, decoded off the main thread and cached. `gamepad`: gilrs, polled on the main loop. `i18n`: gettext ([translating.md](translating.md)) |
 

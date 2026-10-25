@@ -65,7 +65,8 @@ enum Command {
         #[arg(long)]
         launcher: Option<String>,
     },
-    /// List the games of Steam and Heroic and the tool each runs with
+    /// List the games of Steam, Heroic and Faugus Launcher and the tool each
+    /// runs with
     Games {
         #[arg(long)]
         launcher: Option<String>,
@@ -128,9 +129,9 @@ enum Command {
         #[arg(long)]
         launcher: Option<String>,
     },
-    /// Show Steam's default tool, what games without one of their own run
-    /// with, or set it: a tool's id or name, or "none" to turn Steam Play
-    /// off for them
+    /// Show the default tool of Steam or Faugus Launcher, what games without
+    /// one of their own run with, or set it: a tool's id or name, or for
+    /// Steam "none" to turn Steam Play off for them
     Default {
         tool: Option<String>,
         #[arg(long)]
@@ -740,7 +741,7 @@ fn run(cli: Cli) -> Result<()> {
             let target = pick_one(
                 launcher.as_deref(),
                 has_games,
-                "keep a tool per game (steam, heroic)",
+                "keep a tool per game (steam, heroic, faugus)",
             )?;
             let library = games::library(&target)?.expect("steam and heroic have games");
             let g = find_game(&library, &game)?;
@@ -760,8 +761,12 @@ fn run(cli: Cli) -> Result<()> {
             print(json, format!("{} now runs with {to}", g.name), &choice)
         }
         Command::Default { tool, launcher } => {
-            let target = pick_one(launcher.as_deref(), is_steam, "has a default tool (steam)")?;
-            let library = games::library(&target)?.expect("steam has games");
+            let target = pick_one(
+                launcher.as_deref(),
+                |l| matches!(l.kind, LauncherKind::Steam | LauncherKind::Faugus),
+                "has a default tool (steam, faugus)",
+            )?;
+            let library = games::library(&target)?.expect("steam and faugus have games");
             let Some(tool) = tool else {
                 let text = library
                     .default
@@ -1137,7 +1142,7 @@ fn run(cli: Cli) -> Result<()> {
             let target = pick_one(
                 launcher.as_deref(),
                 has_games,
-                "keep a tool per game (steam, heroic)",
+                "keep a tool per game (steam, heroic, faugus)",
             )?;
             let from = regex::Regex::new(&from)?;
             let moved = games::reassign(&target, &from, &to)?;
@@ -1512,7 +1517,10 @@ fn kind(kind: Kind) -> &'static str {
 
 /// Launchers that keep a compatibility tool per game.
 fn has_games(l: &Launcher) -> bool {
-    matches!(l.kind, LauncherKind::Steam | LauncherKind::Heroic)
+    matches!(
+        l.kind,
+        LauncherKind::Steam | LauncherKind::Heroic | LauncherKind::Faugus
+    )
 }
 
 /// Progress on stderr: a line per step, redrawn in place on a terminal.

@@ -65,7 +65,7 @@ pub(super) fn view(
     bar.append(&search);
     bar.append(&move_games);
     content.append(&bar);
-    if launcher.kind == LauncherKind::Steam {
+    if matches!(launcher.kind, LauncherKind::Steam | LauncherKind::Faugus) {
         content.append(&boxed(&default_row(win, launcher, lib, running)));
     }
     if state.info.iter().any(|(_, i)| i.protondb.is_some()) {
@@ -141,7 +141,8 @@ pub(super) fn view(
     scrolled(&content)
 }
 
-/// Steam's default tool, chosen from its tools or none; choosing sets it.
+/// The launcher's default tool, chosen from its tools, or for Steam none;
+/// choosing sets it.
 fn default_row(
     win: &Rc<Window>,
     launcher: &Launcher,
@@ -149,19 +150,26 @@ fn default_row(
     running: bool,
 ) -> adw::ComboRow {
     // A default that isn't installed any more is shown too, as it is.
-    let mut choices = lib.choices.clone();
+    let mut options: Vec<Option<Choice>> = lib.choices.iter().cloned().map(Some).collect();
     if let Some(d) = &lib.default
-        && !choices.iter().any(|c| c.id == d.id)
+        && !lib.choices.iter().any(|c| c.id == d.id)
     {
-        choices.push(d.clone());
+        options.push(Some(d.clone()));
     }
-    let mut labels = vec![tr("None: Steam Play off", &[])];
-    labels.extend(choices.iter().map(|c| c.name.clone()));
-    let current = lib
-        .default
-        .as_ref()
-        .and_then(|d| choices.iter().position(|c| c.id == d.id))
-        .map_or(0, |i| i + 1);
+    if launcher.kind == LauncherKind::Steam {
+        options.insert(0, None);
+    }
+    let labels: Vec<String> = options
+        .iter()
+        .map(|o| match o {
+            Some(c) => c.name.clone(),
+            None => tr("None: Steam Play off", &[]),
+        })
+        .collect();
+    let current = options
+        .iter()
+        .position(|o| o.as_ref().map(|c| &c.id) == lib.default.as_ref().map(|d| &d.id))
+        .unwrap_or(0);
     let row = adw::ComboRow::builder()
         .title(tr("Default Tool", &[]))
         .subtitle(tr("What games without a tool of their own run with", &[]))
@@ -179,7 +187,7 @@ fn default_row(
         move |row| {
             let at = row.selected() as usize;
             if at != current {
-                win.set_default(&launcher, at.checked_sub(1).and_then(|i| choices.get(i)));
+                win.set_default(&launcher, options[at].as_ref());
             }
         }
     ));

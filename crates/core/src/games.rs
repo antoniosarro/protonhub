@@ -11,7 +11,7 @@ use serde::Serialize;
 
 use crate::install::{self, Entry};
 use crate::launcher::{Launcher, Packaging};
-use crate::{heroic, steam, vdf};
+use crate::{faugus, heroic, steam, vdf};
 
 /// A tool a game can use.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -82,7 +82,9 @@ pub enum Error {
         "Heroic has no settings file for {game} yet; open the game's settings in Heroic once, then try again"
     )]
     NotConfigured { game: String },
-    #[error("Heroic games always name their Wine or Proton; choose one")]
+    #[error(
+        "Heroic games, and Faugus Launcher's default, always name their Wine or Proton; choose one"
+    )]
     NeedsTool,
     #[error("ProtonHub can't set the tool of {launcher} games")]
     Unsupported { launcher: &'static str },
@@ -130,6 +132,7 @@ pub fn library(launcher: &Launcher) -> Result<Option<Library>, Error> {
     match launcher.kind {
         LauncherKind::Steam => steam::library(&launcher.root).map(Some),
         LauncherKind::Heroic => heroic::library(&launcher.root, &beside(launcher)).map(Some),
+        LauncherKind::Faugus => faugus::library(launcher).map(Some),
         LauncherKind::Lutris | LauncherKind::Bottles | LauncherKind::Winezgui => Ok(None),
     }
 }
@@ -153,22 +156,29 @@ pub fn assign_many(launcher: &Launcher, moves: &[(&str, Option<&str>)]) -> Resul
         LauncherKind::Heroic => moves.iter().try_for_each(|&(game, tool)| {
             heroic::assign(&launcher.root, &beside(launcher), game, tool)
         }),
+        LauncherKind::Faugus => moves
+            .iter()
+            .try_for_each(|&(game, tool)| faugus::assign(launcher, game, tool)),
         kind => Err(Error::Unsupported {
             launcher: kind.title(),
         }),
     }
 }
 
-/// Sets the tool Steam's games without one of their own run with, or with
-/// `None` turns Steam Play off for them. Refused while Steam runs, as
-/// `assign` is.
+/// Sets the tool games without one of their own run with, in Steam or
+/// Faugus Launcher; with `None`, Steam Play off for them. Refused while the
+/// launcher runs, as `assign` is.
 pub fn set_default(launcher: &Launcher, tool: Option<&str>) -> Result<(), Error> {
-    if launcher.kind != LauncherKind::Steam {
-        return Err(Error::Unsupported {
+    match launcher.kind {
+        LauncherKind::Steam => assign_many(launcher, &[(steam::DEFAULT, tool)]),
+        LauncherKind::Faugus if is_running(launcher) => Err(Error::Running {
             launcher: launcher.kind.title(),
-        });
+        }),
+        LauncherKind::Faugus => faugus::set_default(launcher, tool.ok_or(Error::NeedsTool)?),
+        kind => Err(Error::Unsupported {
+            launcher: kind.title(),
+        }),
     }
-    assign_many(launcher, &[(steam::DEFAULT, tool)])
 }
 
 /// Moves every game set to a tool matching `from` (its id or name) to the
@@ -211,6 +221,7 @@ pub fn is_running(launcher: &Launcher) -> bool {
     match launcher.kind {
         LauncherKind::Steam => running("steam"),
         LauncherKind::Heroic => running("heroic"),
+        LauncherKind::Faugus => running("faugus-launcher"),
         LauncherKind::Lutris | LauncherKind::Bottles | LauncherKind::Winezgui => false,
     }
 }
@@ -299,6 +310,7 @@ pub fn usage(
         .map(|l| Ok((l, library(l)?)))
         .collect::<Result<Vec<_>, Error>>()?;
     let lutris = lutris_games(launchers)?;
+    let faugus = launchers.iter().any(|l| l.kind == LauncherKind::Faugus);
     let mut all = Vec::new();
     for (launcher, own) in &libraries {
         // Only directories of tools games are set to can be judged; where
@@ -309,12 +321,18 @@ pub fn usage(
                 .iter()
                 .map(|d| launcher.root.join(d))
                 .collect(),
+            LauncherKind::Faugus => launcher
+                .home()
+                .map(|h| faugus::steam_dir(&h).join("compatibilitytools.d"))
+                .into_iter()
+                .collect(),
             _ => Vec::new(),
         };
         let mut usage = Vec::new();
         for td in install::inventory(registry, launcher)? {
             let judged = own.is_some() && runner_dirs.contains(&td.dir);
             for entry in td.entries {
+                let judged = judged && !(faugus && faugus::manages(&entry.dir));
                 let users = judged.then(|| users(&libraries, &lutris, launcher, &entry.dir));
                 usage.push(Usage {
                     size: install::size(&entry.dir),
@@ -378,7 +396,17 @@ fn users(
     let mut users = Users::default();
     for (launcher, lib) in libraries {
         let Some(lib) = lib else { continue };
-        users.default |= launcher == &owner && runs(&lib.default);
+        // Another launcher's default is one of its users too: Heroic's or
+        // Faugus's can be a tool in Steam's directory.
+        if runs(&lib.default) {
+            if launcher == &owner {
+                users.default = true;
+            } else {
+                users
+                    .games
+                    .push(format!("default ({})", launcher.kind.name()));
+            }
+        }
         for g in lib.games.iter().filter(|g| runs(&g.tool)) {
             users.games.push(if launcher == &owner {
                 g.name.clone()

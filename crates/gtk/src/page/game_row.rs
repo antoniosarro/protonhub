@@ -213,10 +213,11 @@ pub(super) fn options(
     lib: &Library,
     game: &Game,
 ) -> (Vec<Option<Choice>>, Vec<String>, Option<usize>) {
-    // Steam games can go back to the default; Heroic's always name one.
+    // Steam's and Faugus's games can go back to the default; Heroic's
+    // always name one.
     let mut options: Vec<Option<Choice>> = Vec::new();
     let mut labels: Vec<String> = Vec::new();
-    if kind == LauncherKind::Steam {
+    if matches!(kind, LauncherKind::Steam | LauncherKind::Faugus) {
         options.push(None);
         labels.push(match &lib.default {
             Some(d) => tr("Default ({tool})", &[("tool", &d.name)]),
@@ -259,6 +260,7 @@ pub(super) fn source(source: &str) -> String {
         "gog" => "GOG".into(),
         "amazon" => "Amazon".into(),
         "sideload" => tr("Sideloaded", &[]),
+        "faugus" => "Faugus Launcher".into(),
         _ => String::new(),
     }
 }
