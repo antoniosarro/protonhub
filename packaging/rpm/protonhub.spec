@@ -2,7 +2,7 @@
 # come from crates.io during %%prep, so on COPR enable networking.
 # Locally: spectool -g -R packaging/rpm/protonhub.spec && rpmbuild -bb packaging/rpm/protonhub.spec
 Name:           protonhub
-Version:        0.1.0
+Version:        0.2.0
 Release:        1%{?dist}
 Summary:        Install and manage Proton, Wine, DXVK and VKD3D builds across game launchers
 License:        MIT
@@ -63,5 +63,10 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/dev.antoniosar
 %{_datadir}/icons/hicolor/512x512/apps/dev.antoniosarro.ProtonHub.png
 
 %changelog
+* Sun Oct 25 2026 Antonio Sarro <tech@antoniosarro.dev> - 0.2.0-1
+- Edit games' launch options, with presets, gamescope and a MangoHud editor
+- Wine prefix tools, Steam storage cleanup, Faugus Launcher support
+- A redesigned GUI: pages instead of dialogs, grids of cards
+
 * Sat Oct 24 2026 Antonio Sarro <tech@antoniosarro.dev> - 0.1.0-1
 - First release

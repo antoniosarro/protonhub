@@ -1,3 +1,11 @@
+protonhub (0.2.0) unstable; urgency=medium
+
+  * Edit games' launch options, with presets, gamescope and a MangoHud editor.
+  * Wine prefix tools, Steam storage cleanup, Faugus Launcher support.
+  * A redesigned GUI: pages instead of dialogs, grids of cards.
+
+ -- Antonio Sarro <tech@antoniosarro.dev>  Sun, 25 Oct 2026 21:00:00 +0100
+
 protonhub (0.1.0) unstable; urgency=medium
 
   * First release.

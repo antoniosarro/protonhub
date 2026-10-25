@@ -1119,7 +1119,7 @@ dependencies = [
 
 [[package]]
 name = "protonhub-cli"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "clap",
  "protonhub-core",
@@ -1130,7 +1130,7 @@ dependencies = [
 
 [[package]]
 name = "protonhub-core"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "flate2",
  "liblzma",
@@ -1149,7 +1149,7 @@ dependencies = [
 
 [[package]]
 name = "protonhub-gtk"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "async-channel",
  "gettext-rs",
@@ -1162,7 +1162,7 @@ dependencies = [
 
 [[package]]
 name = "protonhub-manifest"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "regex",
  "serde",

@@ -37,6 +37,17 @@
     <binary>protonhub-gtk</binary>
   </provides>
   <releases>
-    <release version="0.1.0" date="2026-10-24"/>
+    <release version="0.2.0" date="2026-10-25">
+      <description>
+        <ul>
+          <li>Edit games' launch options by parts, with presets, a gamescope editor and per-game MangoHud settings</li>
+          <li>A MangoHud editor with a live preview</li>
+          <li>Install winetricks components, open Wine's tools or run a Windows program in a game's prefix</li>
+          <li>Clean up Steam's prefixes and shader caches, and those uninstalled games left behind</li>
+          <li>Faugus Launcher support, Steam's default tool, Steam Deck ratings and non-Steam shortcuts</li>
+          <li>A redesigned window: pages instead of dialogs, and games and tools as grids of cards</li>
+        </ul>
+      </description>
+    </release>
   </releases>
 </component>

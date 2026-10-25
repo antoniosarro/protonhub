@@ -4,7 +4,7 @@
 # `makepkg -si` in this directory.
 pkgname=protonhub-git
 _pkgname=protonhub
-pkgver=0.1.0
+pkgver=0.2.0
 pkgrel=1
 pkgdesc='Install and manage Proton, Wine, DXVK and VKD3D builds across game launchers'
 arch=('x86_64' 'aarch64')
