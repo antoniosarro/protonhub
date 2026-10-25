@@ -311,6 +311,12 @@ impl Client {
         self.get_json_aged(url, github, None)
     }
 
+    /// GETs `path` from GitHub's API, as the releases are: revalidated,
+    /// with the token; `None` on 404.
+    pub fn github<T: serde::de::DeserializeOwned>(&self, path: &str) -> Result<Option<T>, Error> {
+        self.get_json(&format!("{}{path}", self.api), true)
+    }
+
     /// GETs JSON from a URL outside GitHub's API, as `get_json` does, but
     /// a cached copy younger than `max_age` is used without asking.
     pub fn fetch_json<T: serde::de::DeserializeOwned>(

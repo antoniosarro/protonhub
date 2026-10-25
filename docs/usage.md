@@ -34,6 +34,7 @@ builds and runs it.
 | `protonhub reassign FROM TO [--launcher L]` | Move every game set to a tool matching FROM (a regex on its id or name) to TO |
 | `protonhub changelog TOOL[@VERSION]` | A release's notes |
 | `protonhub export [-o FILE]`, `apply FILE [--dry-run]` | Copy what's installed to another machine ([lockfiles](#lockfiles)) |
+| `protonhub registry update` | Fetch the tool manifests from ProtonHub's repository now; an installed ProtonHub uses them over its own ([manifests](manifests.md)) |
 | `protonhub registry check DIR` | Validate every manifest in DIR |
 | `protonhub registry verify DIR` | Resolve every tool's latest release, for every arch, over the network; fails if any can't pick exactly one asset and its checksum |
 

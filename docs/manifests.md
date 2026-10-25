@@ -87,8 +87,16 @@ it; a directory of anything else is left alone, and the install fails.
 
 `.github/workflows/registry.yml` runs `registry verify` nightly and on
 changes to `registry/`, so an upstream rename breaks CI before it reaches
-users. Planned: the app fetches the registry from this repository, so a
-fix reaches users without an app release.
+users.
+
+An installed ProtonHub fetches `registry/` from this repository's `main`
+at most once a day (the GUI at start, for its next start; `update`, which
+the timer runs; or `protonhub registry update` now) into
+`~/.cache/protonhub/registry`, and uses those manifests over its own, tool
+by tool, so a fix reaches users without an app release. A fetch whose
+manifests don't load, as when they need a newer ProtonHub, is dropped. A
+build run from a checkout, and `--registry` or `$PROTONHUB_REGISTRY`, use
+only their own.
 
 ## The tools
 

@@ -17,6 +17,7 @@ use protonhub_core::install::{self, Step};
 use protonhub_core::launch;
 use protonhub_core::launcher::{self, Launcher};
 use protonhub_core::manifest::{Arch, LauncherKind, Registry, Tool};
+use protonhub_core::manifests;
 use protonhub_core::paths;
 use protonhub_core::prefix::{self, Prefix};
 use protonhub_core::releases::{self, Client, Version};
@@ -38,7 +39,7 @@ pub struct Env {
 
 impl Env {
     fn load() -> Result<Self, String> {
-        let registry = Registry::load_dir(&paths::registry_dir()).map_err(|e| e.to_string())?;
+        let registry = manifests::load_default(None).map_err(|e| e.to_string())?;
         let home = paths::home().ok_or("HOME is not set")?;
         let cache = paths::cache_dir().ok_or("neither XDG_CACHE_HOME nor HOME is set")?;
         let arch = Arch::host().ok_or("this CPU architecture has no builds")?;
@@ -464,6 +465,12 @@ impl Window {
         app.set_accels_for_action("win.mangohud", &["<Control>m"]);
         app.set_accels_for_action("window.close", &["<Control>q", "<Control>w"]);
         win.reload();
+        // The repository's tool manifests, for the next start; offline or
+        // failing, the ones there are stay.
+        if let (Ok(env), Some(cache), true) = (&win.env, paths::cache_dir(), manifests::used()) {
+            let client = env.client.clone();
+            std::thread::spawn(move || manifests::update(&client, &cache, false));
+        }
         win
     }
 

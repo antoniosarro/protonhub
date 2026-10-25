@@ -11,6 +11,7 @@ use protonhub_core::launch;
 use protonhub_core::launcher::{self, Launcher};
 use protonhub_core::lock::{self, Lock};
 use protonhub_core::manifest::{Arch, LauncherKind, Registry, Tool};
+use protonhub_core::manifests;
 use protonhub_core::paths;
 use protonhub_core::prefix;
 use protonhub_core::releases::{self, Client, Version};
@@ -286,6 +287,9 @@ enum RegistryCommand {
     /// Resolve every tool's latest release in DIR, for every arch, and
     /// report the asset and checksum each picks or why it can't (network)
     Verify { dir: PathBuf },
+    /// Fetch the tool manifests from ProtonHub's repository now; they're
+    /// used over the built-in ones where they load
+    Update,
 }
 
 fn main() -> ExitCode {
@@ -303,7 +307,7 @@ fn run(cli: Cli) -> Result<()> {
     let registry_dir = cli.registry.clone().unwrap_or_else(paths::registry_dir);
     match cli.command {
         Command::Tools => {
-            let registry = Registry::load_dir(&registry_dir)?;
+            let registry = manifests::load_default(cli.registry.as_deref())?;
             #[derive(Serialize)]
             struct Row<'a> {
                 id: &'a str,
@@ -336,7 +340,7 @@ fn run(cli: Cli) -> Result<()> {
             print(json, text, &found)
         }
         Command::Releases { tool, n } => {
-            let registry = Registry::load_dir(&registry_dir)?;
+            let registry = manifests::load_default(cli.registry.as_deref())?;
             let tool = find_tool(&registry, &tool)?;
             let releases = client()?.releases(tool, n)?;
             let text = releases
@@ -351,7 +355,7 @@ fn run(cli: Cli) -> Result<()> {
             print(json, text, &releases)
         }
         Command::Install { spec, launcher } => {
-            let registry = Registry::load_dir(&registry_dir)?;
+            let registry = manifests::load_default(cli.registry.as_deref())?;
             let (id, v) = parse_spec(&spec);
             let tool = find_tool(&registry, id)?;
             let target = pick_launcher(tool, launcher.as_deref())?;
@@ -391,7 +395,7 @@ fn run(cli: Cli) -> Result<()> {
             print(json, text, &entry)
         }
         Command::List => {
-            let registry = Registry::load_dir(&registry_dir)?;
+            let registry = manifests::load_default(cli.registry.as_deref())?;
             #[derive(Serialize)]
             struct Row {
                 launcher: Launcher,
@@ -422,7 +426,7 @@ fn run(cli: Cli) -> Result<()> {
             print(json, text.join("\n"), &rows)
         }
         Command::Remove { spec, launcher } => {
-            let registry = Registry::load_dir(&registry_dir)?;
+            let registry = manifests::load_default(cli.registry.as_deref())?;
             let (id, Some(version)) = parse_spec(&spec) else {
                 return Err("name the version to remove: TOOL@VERSION".into());
             };
@@ -842,7 +846,7 @@ fn run(cli: Cli) -> Result<()> {
             print(json, text, &choice)
         }
         Command::Usage { launcher } => {
-            let registry = Registry::load_dir(&registry_dir)?;
+            let registry = manifests::load_default(cli.registry.as_deref())?;
             #[derive(Serialize)]
             struct Row {
                 launcher: Launcher,
@@ -876,7 +880,7 @@ fn run(cli: Cli) -> Result<()> {
             print(json, text.join("\n"), &rows)
         }
         Command::Cleanup { launcher, yes } => {
-            let registry = Registry::load_dir(&registry_dir)?;
+            let registry = manifests::load_default(cli.registry.as_deref())?;
             let shown = launchers(launcher.as_deref(), has_games)?.1;
             let unused: Vec<_> = games::usage(&registry, &launcher::detect(&home()?))?
                 .into_iter()
@@ -1017,7 +1021,7 @@ fn run(cli: Cli) -> Result<()> {
                     keep,
                     move_games,
                 } => {
-                    let registry = Registry::load_dir(&registry_dir)?;
+                    let registry = manifests::load_default(cli.registry.as_deref())?;
                     let tool = find_tool(&registry, &tool)?;
                     let target = pick_launcher(tool, launcher.as_deref())?;
                     let channel = Channel {
@@ -1092,8 +1096,15 @@ fn run(cli: Cli) -> Result<()> {
                     &channels.list,
                 );
             }
-            let registry = Registry::load_dir(&registry_dir)?;
             let client = client()?;
+            // The repository's manifests first, as the timer runs this daily.
+            if cli.registry.is_none()
+                && manifests::used()
+                && let Err(e) = manifests::update(&client, &cache_dir()?, false)
+            {
+                eprintln!("protonhub: warning: fetching the tool manifests: {e}");
+            }
+            let registry = manifests::load_default(cli.registry.as_deref())?;
             let launchers = launcher::detect(&home()?);
             let downloads = cache_dir()?.join("downloads");
             let cx = channels::Context {
@@ -1202,7 +1213,7 @@ fn run(cli: Cli) -> Result<()> {
             print(json, text, &moved)
         }
         Command::Changelog { spec } => {
-            let registry = Registry::load_dir(&registry_dir)?;
+            let registry = manifests::load_default(cli.registry.as_deref())?;
             let (id, v) = parse_spec(&spec);
             let tool = find_tool(&registry, id)?;
             let release = client()?.release(tool, &version(v))?;
@@ -1220,7 +1231,7 @@ fn run(cli: Cli) -> Result<()> {
             )
         }
         Command::Export { output } => {
-            let registry = Registry::load_dir(&registry_dir)?;
+            let registry = manifests::load_default(cli.registry.as_deref())?;
             let lock = Lock::export(&registry, &launcher::detect(&home()?))?;
             match output {
                 Some(path) => {
@@ -1244,7 +1255,7 @@ fn run(cli: Cli) -> Result<()> {
             }
         }
         Command::Apply { file, dry_run } => {
-            let registry = Registry::load_dir(&registry_dir)?;
+            let registry = manifests::load_default(cli.registry.as_deref())?;
             let text =
                 std::fs::read_to_string(&file).map_err(|e| format!("{}: {e}", file.display()))?;
             let lock = Lock::parse(&text).map_err(|e| format!("{}: {e}", file.display()))?;
@@ -1400,6 +1411,22 @@ fn run(cli: Cli) -> Result<()> {
                 return Err(format!("{failed} of {} checks failed", rows.len()).into());
             }
             Ok(())
+        }
+        Command::Registry(RegistryCommand::Update) => {
+            let cache = cache_dir()?;
+            manifests::update(&client()?, &cache, true)?;
+            let dir = manifests::dir(&cache);
+            let n = Registry::load_dir(&dir)?.tools.len();
+            let used = if manifests::used() {
+                "used over the installed ones"
+            } else {
+                "not used: this ProtonHub runs from a checkout, or $PROTONHUB_REGISTRY names others"
+            };
+            print(
+                json,
+                format!("fetched {n} tools into {}; {used}", dir.display()),
+                &n,
+            )
         }
         Command::Registry(RegistryCommand::Check { dir }) => {
             let n = Registry::load_dir(&dir)?.tools.len();

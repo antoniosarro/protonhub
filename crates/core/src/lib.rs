@@ -11,6 +11,7 @@ pub mod launch;
 pub mod launcher;
 pub mod lock;
 pub mod mangohud;
+pub mod manifests;
 pub mod paths;
 pub mod prefix;
 pub mod releases;

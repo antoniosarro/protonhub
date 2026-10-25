@@ -33,7 +33,8 @@ scriptable CLI with JSON output.
   Wine-Staging, DXVK, DXVK-Sarek, DXVK-NVAPI, vkd3d-proton, Luxtorpeda,
   Boxtron and more
   ([the list](docs/manifests.md#the-tools)), from GitHub, Codeberg and
-  GitLab.
+  GitLab. The list updates from this repository daily, so a fixed or new
+  tool needs no release.
 - **Every launcher**: Steam, Heroic, Lutris, Bottles, WineZGUI and Faugus
   Launcher, native, Flatpak or Snap.
 - **Verified installs**: checksums matched to their asset by name,
@@ -152,8 +153,6 @@ libadwaita 1.6+, libudev and gettext. [`just`](justfile) lists the recipes:
   and prefix tools are for Steam and Heroic games.
 - Tools only released as CI artifacts (Proton-Tkg, Wine-Tkg, DXVK
   nightly) and SteamTinkerLaunch are not covered.
-- The manifests ship with the app; fetching them from this repository, so
-  a fix needs no release, is planned.
 - Inside the Flatpak, ProtonHub can't see whether Steam or Heroic is
   running, can't install the systemd timer, can't preview MangoHud, and
   can't run winetricks.
