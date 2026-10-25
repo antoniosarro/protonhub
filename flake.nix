@@ -41,6 +41,7 @@
             sway # a private headless display for scripts/screenshot.sh
             grim # screenshots of it
             wtype # types into it
+            vulkan-tools # vkcube, which the MangoHud editor previews over
           ];
 
           env.RUST_SRC_PATH = "${pkgs.rustPlatform.rustLibSrc}";
