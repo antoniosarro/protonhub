@@ -8,8 +8,8 @@ use adw::prelude::*;
 use gtk::glib;
 use protonhub_core::launch::{self, Options};
 
-use super::game::mark;
 use crate::i18n::tr;
+use crate::ui::mark;
 
 const FILTER: &[&str] = &["-F", "--filter"];
 /// gamescope's upscaling filters; none for its own default.

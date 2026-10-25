@@ -7,6 +7,7 @@ use adw::prelude::*;
 use gtk::glib;
 
 use crate::i18n::tr;
+use crate::ui;
 use crate::window::Window;
 
 pub struct Entry {
@@ -66,77 +67,59 @@ fn copy_button(text: String) -> gtk::Button {
     button
 }
 
-pub fn show(win: &Rc<Window>) {
-    let list = gtk::ListBox::builder()
-        .selection_mode(gtk::SelectionMode::None)
-        .margin_top(12)
-        .margin_bottom(12)
-        .margin_start(12)
-        .margin_end(12)
-        .valign(gtk::Align::Start)
-        .build();
-    list.add_css_class("boxed-list");
-    for e in win.errors.borrow().iter().rev() {
-        let row = adw::ActionRow::builder()
-            .title(glib::markup_escape_text(&format!(
-                "{} · {}",
-                e.operation, e.time
-            )))
-            .subtitle(glib::markup_escape_text(&e.message))
-            .subtitle_selectable(true)
-            .build();
-        row.add_suffix(&copy_button(e.diagnostics()));
-        list.append(&row);
-    }
-
-    let all: String = win
-        .errors
-        .borrow()
-        .iter()
-        .map(Entry::diagnostics)
-        .collect::<Vec<_>>()
-        .join("\n");
+/// The error log, a place in the sidebar: every failure, newest first.
+pub fn view(win: &Rc<Window>) -> gtk::Widget {
     let copy_all = gtk::Button::builder().label(tr("Copy All", &[])).build();
-    copy_all.connect_clicked(move |b| b.clipboard().set_text(&all));
     let clear = gtk::Button::builder().label(tr("Clear", &[])).build();
-
     let header = adw::HeaderBar::new();
     header.pack_start(&clear);
     header.pack_end(&copy_all);
     let view = adw::ToolbarView::new();
     view.add_top_bar(&header);
-    if win.errors.borrow().is_empty() {
+    let errors = win.errors.borrow();
+    if errors.is_empty() {
         copy_all.set_sensitive(false);
         clear.set_sensitive(false);
-        view.set_content(Some(
-            &adw::StatusPage::builder()
-                .icon_name("emblem-ok-symbolic")
-                .title(tr("No errors", &[]))
-                .build(),
-        ));
-    } else {
-        view.set_content(Some(
-            &gtk::ScrolledWindow::builder()
-                .hscrollbar_policy(gtk::PolicyType::Never)
-                .child(&list)
-                .build(),
-        ));
+        view.set_content(Some(&ui::status(
+            "emblem-ok-symbolic",
+            &tr("No errors", &[]),
+            "",
+        )));
+        return view.upcast();
     }
-    let dialog = adw::Dialog::builder()
-        .title(tr("Errors", &[]))
-        .content_width(560)
-        .content_height(480)
-        .child(&view)
-        .build();
+    let rows: Vec<gtk::Widget> = errors
+        .iter()
+        .rev()
+        .map(|e| {
+            let row = adw::ActionRow::builder()
+                .title(glib::markup_escape_text(&format!(
+                    "{} · {}",
+                    e.operation, e.time
+                )))
+                .subtitle(glib::markup_escape_text(&e.message))
+                .subtitle_selectable(true)
+                .build();
+            row.add_suffix(&copy_button(e.diagnostics()));
+            row.upcast()
+        })
+        .collect();
+    let all: String = errors
+        .iter()
+        .map(Entry::diagnostics)
+        .collect::<Vec<_>>()
+        .join("\n");
+    copy_all.connect_clicked(move |b| b.clipboard().set_text(&all));
     clear.connect_clicked(glib::clone!(
-        #[strong]
-        win,
         #[weak]
-        dialog,
-        move |_| {
-            win.errors_cleared();
-            dialog.close();
-        }
+        win,
+        move |_| win.errors_cleared()
     ));
-    dialog.present(Some(&win.window));
+    view.set_content(Some(&ui::scrolled(
+        win,
+        "errors".into(),
+        &ui::boxed(&rows),
+        1200,
+        &[],
+    )));
+    view.upcast()
 }

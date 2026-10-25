@@ -1,8 +1,9 @@
-//! The MangoHud editor: a dialog of the settings in mangohud.toml for one
-//! config file, the global one or a game's, and a preview of them as they
-//! change. MangoHud doesn't draw over GTK, so the preview is the real one
-//! over vkcube, reading a copy of the settings that it reloads when the
-//! copy changes.
+//! The MangoHud editor: the settings in mangohud.toml for one config
+//! file, the global one (a place in the sidebar) or a game's (a page
+//! over it), a tab per group, and a preview of them as they change.
+//! MangoHud doesn't draw over GTK, so the preview is the real one over
+//! vkcube, reading a copy of the settings that it reloads when the copy
+//! changes.
 
 use std::cell::RefCell;
 use std::path::PathBuf;
@@ -14,11 +15,48 @@ use protonhub_core::mangohud::{self, Config, Kind, Setting};
 use protonhub_core::paths;
 
 use crate::i18n::tr;
+use crate::ui;
 use crate::window::Window;
 
+/// The global settings' editor, for the sidebar's place.
+pub fn global(win: &Rc<Window>) -> gtk::Widget {
+    match mangohud::global_path() {
+        Some(path) => editor(win, path, None).upcast(),
+        None => {
+            let message = "no home directory: HOME isn't set";
+            win.report(tr("Opening the MangoHud settings", &[]), message.into());
+            let view = adw::ToolbarView::new();
+            view.add_top_bar(&adw::HeaderBar::new());
+            view.set_content(Some(&ui::failed(
+                &tr("Opening the MangoHud settings", &[]),
+                message,
+            )));
+            view.upcast()
+        }
+    }
+}
+
+/// A page that edits the settings in `path`, starting from `from`'s while
+/// it doesn't exist yet.
+pub fn page(
+    win: &Rc<Window>,
+    title: &str,
+    path: PathBuf,
+    from: Option<PathBuf>,
+) -> adw::NavigationPage {
+    adw::NavigationPage::builder()
+        .title(title)
+        .child(&editor(win, path, from))
+        .build()
+}
+
 /// Edits the settings in `path`, starting from `from`'s while it doesn't
-/// exist yet.
-pub fn show(win: &Rc<Window>, title: &str, path: PathBuf, from: Option<PathBuf>) {
+/// exist yet: a header bar with the tabs, Preview and Save, over the tab
+/// shown.
+fn editor(win: &Rc<Window>, path: PathBuf, from: Option<PathBuf>) -> adw::ToolbarView {
+    let view = adw::ToolbarView::new();
+    let header = adw::HeaderBar::new();
+    view.add_top_bar(&header);
     let start = if path.exists() {
         &path
     } else {
@@ -27,10 +65,10 @@ pub fn show(win: &Rc<Window>, title: &str, path: PathBuf, from: Option<PathBuf>)
     let config = match mangohud::read(start) {
         Ok(c) => c,
         Err(e) => {
-            return win.report(
-                tr("Reading {file}", &[("file", &start.display().to_string())]),
-                e.to_string(),
-            );
+            let reading = tr("Reading {file}", &[("file", &start.display().to_string())]);
+            view.set_content(Some(&ui::failed(&reading, &e.to_string())));
+            win.report(reading, e.to_string());
+            return view;
         }
     };
     // What's in the file: a new one from `from` differs from it until saved.
@@ -57,7 +95,6 @@ pub fn show(win: &Rc<Window>, title: &str, path: PathBuf, from: Option<PathBuf>)
             tr("Needs MangoHud and vkcube (from vulkan-tools)", &[])
         })
         .build();
-    let header = adw::HeaderBar::new();
     header.pack_start(&show_preview);
     header.pack_end(&save);
 
@@ -82,34 +119,34 @@ pub fn show(win: &Rc<Window>, title: &str, path: PathBuf, from: Option<PathBuf>)
         }
     ));
 
-    // A page per group, a click apart: there are dozens of metrics.
+    // A tab per group, a click apart: there are dozens of metrics, in
+    // two columns.
     let stack = gtk::Stack::new();
     for group in mangohud::groups() {
-        let g = adw::PreferencesGroup::new();
-        for setting in group.setting {
-            g.add(&row(Rc::new(setting), &config, &changed));
-        }
-        let page = adw::PreferencesPage::new();
-        page.add(&g);
-        stack.add_titled(&page, None::<&str>, &group.title);
+        let rows: Vec<gtk::Widget> = group
+            .setting
+            .into_iter()
+            .map(|s| row(Rc::new(s), &config, &changed))
+            .collect();
+        let half = rows.len().div_ceil(2);
+        let columns: Vec<gtk::Widget> = rows
+            .chunks(half.max(1))
+            .map(|rows| {
+                let g = adw::PreferencesGroup::new();
+                for r in rows {
+                    g.add(r);
+                }
+                g.upcast()
+            })
+            .collect();
+        let (first, second) = columns.split_at(columns.len().min(1));
+        let key = format!("mangohud/{}/{}", path.display(), group.title);
+        let columns = ui::columns(first, second);
+        let content = ui::scrolled(win, key, &columns, 1200, &[(&columns, ui::COLUMNS)]);
+        stack.add_titled(&content, None::<&str>, &group.title);
     }
-    let switcher = gtk::StackSwitcher::builder()
-        .stack(&stack)
-        .halign(gtk::Align::Center)
-        .margin_start(12)
-        .margin_end(12)
-        .margin_bottom(6)
-        .build();
-    let view = adw::ToolbarView::new();
-    view.add_top_bar(&header);
-    view.add_top_bar(&switcher);
+    header.set_title_widget(Some(&gtk::StackSwitcher::builder().stack(&stack).build()));
     view.set_content(Some(&stack));
-    let dialog = adw::Dialog::builder()
-        .title(title)
-        .content_width(560)
-        .content_height(640)
-        .child(&view)
-        .build();
 
     // Outside the macros below, where xgettext doesn't look.
     let done = tr("Saved the MangoHud settings", &[]);
@@ -166,12 +203,18 @@ pub fn show(win: &Rc<Window>, title: &str, path: PathBuf, from: Option<PathBuf>)
             }
         }
     ));
-    dialog.connect_closed(move |_| {
-        if let Some(p) = preview.take() {
-            p.force_exit();
+    // Gone with the editor: popped, or another place chosen.
+    view.connect_unmap(glib::clone!(
+        #[weak]
+        show_preview,
+        move |_| {
+            show_preview.set_active(false);
+            if let Some(p) = preview.take() {
+                p.force_exit();
+            }
         }
-    });
-    dialog.present(Some(&win.window));
+    ));
+    view
 }
 
 /// Runs `mangohud vkcube` reading `file`, written from `config` first.

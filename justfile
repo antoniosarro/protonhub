@@ -43,7 +43,7 @@ gui *args: locale
 pot:
     xgettext --language=Rust --from-code=UTF-8 --keyword=tr:1 --keyword=trn:1,2 \
         --add-comments=TRANSLATORS: --package-name=protonhub --sort-by-file \
-        -o po/protonhub.pot crates/gtk/src/*.rs crates/gtk/src/*/*.rs
+        -o po/protonhub.pot $(find crates/gtk/src -name '*.rs' -not -path '*/tests/*' | sort)
     for po in po/*.po; do msgmerge --quiet --update --backup=none "$po" po/protonhub.pot; done
 
 # compile the translations into target/locale (the package installs them to share/locale)

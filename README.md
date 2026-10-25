@@ -74,8 +74,8 @@ scriptable CLI with JSON output.
 <table>
   <tr>
     <td><img src="docs/screenshots/tools.png" alt="A launcher's installed tools with their size and users, and the tools available to install"></td>
-    <td><img src="docs/screenshots/tool.png" alt="A tool's dialog: its repository, keeping it up to date, and its releases"></td>
-    <td><img src="docs/screenshots/details.png" alt="An installed tool's details: its folder and the games that run with it"></td>
+    <td><img src="docs/screenshots/tool.png" alt="A tool's page: its repository, its releases, and keeping it up to date"></td>
+    <td><img src="docs/screenshots/details.png" alt="An installed tool's page: its folder and the games that run with it"></td>
   </tr>
   <tr align="center">
     <td>Installed and available tools</td>

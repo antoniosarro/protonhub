@@ -1,5 +1,6 @@
-//! Preferences: the GitHub token ProtonHub sends, which of Steam's users
-//! launch options go to, and adding ProtonHub to Steam.
+//! Preferences, a place in the sidebar: the GitHub token ProtonHub sends,
+//! which of Steam's users launch options go to, and adding ProtonHub to
+//! Steam.
 
 use std::rc::Rc;
 
@@ -9,10 +10,10 @@ use protonhub_core::manifest::LauncherKind;
 use protonhub_core::{launcher, paths, steam};
 
 use crate::i18n::tr;
+use crate::ui;
 use crate::window::Window;
 
-pub fn show(win: &Rc<Window>) {
-    let page = adw::PreferencesPage::new();
+pub fn view(win: &Rc<Window>) -> gtk::Widget {
     let from_env = std::env::var_os("GITHUB_TOKEN").is_some();
     let github = adw::PreferencesGroup::builder()
         .title(tr("GitHub", &[]))
@@ -37,7 +38,7 @@ pub fn show(win: &Rc<Window>) {
         tr("Saving the GitHub token", &[]),
     );
     token.connect_apply(glib::clone!(
-        #[strong]
+        #[weak]
         win,
         move |row| {
             let text = row.text();
@@ -57,16 +58,22 @@ pub fn show(win: &Rc<Window>) {
         }
     ));
     github.add(&token);
-    page.add(&github);
-    if let Some(group) = steam_users(win) {
-        page.add(&group);
-    }
-    if let Some(group) = add_to_steam(win) {
-        page.add(&group);
-    }
-    let dialog = adw::PreferencesDialog::new();
-    dialog.add(&page);
-    dialog.present(Some(&win.window));
+    let steam: Vec<gtk::Widget> = [steam_users(win), add_to_steam(win)]
+        .into_iter()
+        .flatten()
+        .map(|g| g.upcast())
+        .collect();
+    let content = ui::columns(&[github.upcast()], &steam);
+    let view = adw::ToolbarView::new();
+    view.add_top_bar(&adw::HeaderBar::new());
+    view.set_content(Some(&ui::scrolled(
+        win,
+        "preferences".into(),
+        &content,
+        1200,
+        &[(&content, ui::COLUMNS)],
+    )));
+    view.upcast()
 }
 
 /// Which of Steam's users launch options go to, where a Steam has more

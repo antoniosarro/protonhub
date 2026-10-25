@@ -1,17 +1,17 @@
 //! The GUI: a thin layer over protonhub-core. A sidebar of the launchers
-//! found; each one's page lists its games, with the tool each runs with,
-//! and its tools, with install and remove; anything that fails lands in
-//! the error log.
+//! found; each one's view shows its games as cards, with the tool each
+//! runs with, and its tools, to install and delete; details open as pages
+//! over it. Anything that fails lands in the error log.
 
 mod art;
-mod details;
+mod choices;
 mod errors;
 mod gamepad;
 mod i18n;
-mod mangohud;
-mod page;
-mod preferences;
-mod tool;
+mod pages;
+mod text;
+mod ui;
+mod views;
 mod window;
 
 use adw::prelude::*;

@@ -1,39 +1,86 @@
+/* Grids of cards: a flow box's children are only places for the cards. */
+flowbox.grid > flowboxchild {
+  padding: 0;
+  border-radius: 12px;
+  background: none;
+}
+flowbox.grid > flowboxchild:focus-visible {
+  outline: 2px solid alpha(@accent_color, 0.7);
+  outline-offset: 2px;
+}
+
+/* A game's card: its picture across the top, then its name and tool. */
+.game-card > .art {
+  min-height: 116px;
+  background-color: alpha(currentColor, 0.06);
+}
+.game-card > .art > image { opacity: 0.4; }
+
+/* A tool's card, and the like: a picture beside a line or two. */
+.tile { padding: 12px 14px; }
+
 /* Small rounded labels: ratings, statuses, marks. */
-.pill {
+.tag {
   padding: 2px 9px;
   border-radius: 999px;
   font-size: 0.8em;
   font-weight: 700;
   background-color: alpha(currentColor, 0.14);
 }
-.pill.accent { color: var(--accent-color, @accent_color); }
+.tag.accent { color: var(--accent-color, @accent_color); }
 
-/* ProtonDB's tiers, in its own colors, readable on light and dark: the
-   band at the start of a game's row and the legend's dots. */
+/* The same over a picture, where the picture behind can be any color. */
+.badge {
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 0.8em;
+  font-weight: 700;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+/* A fact about a game at the top of its page: an icon and a few words. */
+.chip {
+  padding: 5px 12px;
+  border-radius: 999px;
+  background-color: alpha(currentColor, 0.08);
+}
+
+/* ProtonDB's tiers, in its own colors, readable on light and dark. */
 .tier-platinum { color: #7f9bb8; }
 .tier-gold { color: #c99a06; }
 .tier-silver { color: #8a8a8a; }
 .tier-bronze { color: #b8692e; }
 .tier-borked { color: #e01b24; }
-.tier-pending, .tier-none { color: transparent; }
-.band, .dot { background-color: currentColor; }
-.band { border-radius: 0 3px 3px 0; }
-.dot { border-radius: 999px; }
-
-/* A game's picture, and the icon behind it while it loads. */
-.thumbnail {
-  min-width: 96px;
-  min-height: 45px;
-  border-radius: 6px;
-  background-color: alpha(currentColor, 0.08);
+.dot {
+  min-width: 8px;
+  min-height: 8px;
+  border-radius: 999px;
+  background-color: currentColor;
 }
-.thumbnail > image { opacity: 0.4; }
-window.narrow .thumbnail { min-width: 45px; }
-/* The same, large, at the top of a game's page, in a narrow window too. */
-.thumbnail.hero, window.narrow .thumbnail.hero {
-  min-width: 320px;
-  min-height: 150px;
+
+/* A game's picture at the top of its page, and in a list. */
+.hero-art, .thumbnail {
   border-radius: 12px;
+  background-color: alpha(currentColor, 0.06);
+}
+.hero-art { min-width: 360px; min-height: 168px; }
+window.narrow .hero-art { min-width: 280px; min-height: 131px; }
+.thumbnail { min-width: 96px; min-height: 45px; border-radius: 6px; }
+.hero-art > image, .thumbnail > image { opacity: 0.4; }
+
+/* The app's place shown, marked as a launcher's row is when chosen. */
+.navigation-sidebar > row.chosen { background-color: alpha(currentColor, 0.1); }
+
+/* How many errors there are, beside the error log in the sidebar. */
+.count {
+  min-width: 12px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 0.8em;
+  font-weight: 700;
+  color: @error_fg_color;
+  background-color: @error_bg_color;
 }
 
 .job-card {
@@ -46,3 +93,6 @@ window.narrow .thumbnail { min-width: 45px; }
    and the text in its fields. */
 .launch-options row.header .subtitle,
 .launch-options text { font-family: monospace; }
+
+/* A release's notes, as the Markdown they're written in. */
+.notes { font-family: monospace; }

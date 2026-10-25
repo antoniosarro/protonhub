@@ -7,20 +7,28 @@ manifests as the CLI does ([usage.md](usage.md)).
 
 The sidebar lists the launchers found: Steam, Heroic, Lutris, Bottles,
 WineZGUI and Faugus Launcher, with "(Flatpak)" or "(Snap)" when that's how they're installed,
-how many games and tools each has, and a mark on one that's running. A
-launcher's page has the views **Games** and **Tools**, and on Steam's
-**Storage**; launchers without per-game tools (Lutris, Bottles) have only
-Tools. In a narrow window the
-sidebar and the page take turns, with a back button.
+how many games and tools each has, and a mark on one that's running.
+Under them are **MangoHud**, **Preferences** and, once something has
+failed, **Errors**. A launcher's view has the tabs **Games** and
+**Tools**, and on Steam's **Storage**; launchers without per-game tools
+(Lutris, Bottles) have only Tools. Games, tools and storage are grids of
+cards, as many to a line as the window fits.
+
+Nothing opens in a dialog: a game, a tool, a cleanup and the like open
+as a page over the view, with a back button at the top left (or Escape,
+Alt+←, or B on a gamepad). Pages put their details in two columns side by
+side, one above the other in a narrow window. Only a deletion asks first,
+in a small alert. In a narrow window the sidebar and the view take
+turns, with a back button.
 
 ## Games
 
-Every installed game, with its picture and where it's from. A band at
-the start of the row is its ProtonDB rating (Steam games), in the colors
-of the legend above the list; hovering it shows the tier and the number
-of reports. Under the name, a shield shows its anti-cheat status from Are
-We Anti-Cheat Yet (Supported, Running, Planned, Broken or Denied), when
-the game has anti-cheat. Both are cached for a day; if a source is down,
+A card for every installed game, with its picture and where it's from.
+On the picture, its ProtonDB rating (Steam games) is at the top left, in
+the tier's color; hovering it shows the number of reports. At the top
+right, a shield shows its anti-cheat status from Are We Anti-Cheat Yet
+(Supported, Running, Planned, Broken or Denied), when the game has
+anti-cheat, colored by how it fares; hovering it says which. Both are cached for a day; if a source is down,
 the page says so and shows the rest. A Steam game Valve rated for the
 Steam Deck shows the rating (Deck Verified, Playable or Unsupported) and,
 on its page, what Valve rated it with (natively, or a Proton's version),
@@ -28,35 +36,35 @@ from Steam's own app cache. Pictures come from Steam's library
 cache, else Steam's CDN, and from Heroic's library; downloaded ones are
 cached in `~/.cache/protonhub/files`.
 
-The list at the end of each row is the tool the game runs with: choose
+The list at the bottom of each card is the tool the game runs with: choose
 another to change it. On Steam, "Default (…)" leaves the game to Steam's
 default. Heroic's list is the one Heroic shows: its own tools, Steam's
 Protons in compatibilitytools.d (Valve's Protons too, when Heroic's "show
 Valve Proton" setting is on) and Lutris's Wine builds, marked "(Steam)"
 or "(Lutris)" where Heroic has the same version. **Search games** filters
 the list.
-**Move Games…** moves every game set to one tool to another at once.
-**Launch Options…** (Steam and Heroic) switches presets on or off for the
-games ticked, each switch Unchanged, On or Off, leaving the rest of each
-game's options as they are; Steam's settings are written once for them
-all. On
-Steam and Faugus Launcher, **Default Tool** above the list sets the
+**Move Games…** opens a page that moves every game set to one tool to
+another at once. **Launch Options…** (Steam and Heroic) opens a page with
+the games beside the presets, to switch those on or off for the games
+ticked, each switch Unchanged, On or Off, leaving the rest of each game's
+options as they are; Steam's settings are written once for them all. On
+Steam and Faugus Launcher, **Default Tool** beside the search sets the
 default, what games without a tool of their own run with, or on Steam
 none to turn Steam Play off for them. Each change keeps the previous settings file as
 `<name>.protonhub-backup`.
 
-A game's row, or its info button, opens its page over the list, with a
-back button at the top left (or Escape, Alt+←, or B on a gamepad): its picture, its
-ProtonDB rating and anti-cheat status, the tool it runs with (to change,
-as in its row), its launch options (Steam, Heroic), its prefix and shader cache
-on Steam (each with its size, a button to open its folder and one to
-delete it, as in [Storage](#storage)), its Wine prefix, its ProtonDB,
-SteamDB and Steam store pages, and its app id.
+A game's card opens its page. At the top are its picture, its app id,
+its ProtonDB rating, anti-cheat status and Deck rating, the tool it runs
+with (to change, as on its card), and buttons to its ProtonDB, SteamDB
+and Steam store pages. Under them, its launch options (Steam, Heroic) are
+beside its Wine prefix and, on Steam, its prefix and shader cache (each
+with its size, a button to open its folder and one to delete it, as in
+[Storage](#storage)).
 
 **Wine Prefix** (Steam, Heroic) shows the prefix's folder and the
-components winetricks installed in it. **Install…** picks more: common
-ones by group, those installed already ticked, and any other verb by name
-(Enter installs). The install is a job in the sidebar, with winetricks'
+components winetricks installed in it. **Install…** opens a page that
+picks more: common ones by group, side by side, those installed already
+ticked, and any other verb by name (Enter installs). The install is a job in the sidebar, with winetricks'
 latest line and a Cancel button. **Wine's Tools** opens winecfg, regedit
 or the control panel in the prefix, and **Run a Windows Program** an
 `.exe` or `.msi` of your choice, all with the game's own Wine or Proton
@@ -90,36 +98,37 @@ settings saved in Heroic once before ProtonHub can change it.
 ## Tools
 
 - When some tools are unused, a row at the top says how much space they
-  take, and **Clean Up…** deletes them after listing them once more. It
-  deletes tools installed by other apps too.
+  take, and **Clean Up…** opens a page that lists them, with **Delete**
+  in its header bar. It deletes tools installed by other apps too.
 - **Installed** lists everything in the launcher's tool directories,
   installed by ProtonHub, by hand or by another app. Each shows its size
   and what uses it ("used by Warframe", "used by the default and 3
   games"), and is marked **Default** or **Unused**. Games of other
   launchers count (Heroic can run Steam's tools).
-- The info button on an installed tool (or the row itself) opens its
-  details: its folder (with a button to open it), whether its checksum
-  was verified, every game that runs with it, and **Delete…**. Deleting
+- An installed tool's card opens its page: its folder (with a button to
+  open it), whether its checksum was verified, every game that runs with
+  it, and **Delete…**. Deleting
   works whether or not something uses the tool; when something does, the
   confirmation lists the games that won't start until they're given
   another tool.
-- **From Steam** (on Steam's page) lists Valve's Protons (Proton 10.0,
+- **From Steam** (on Steam's view) lists Valve's Protons (Proton 10.0,
   Hotfix, Experimental…), which Steam installs as apps of their own, with
-  their size and what uses them. Their details can delete one as Steam's
+  their size and what uses them. Their pages can delete one as Steam's
   uninstall does: its app manifest, then its files. Only while Steam
   isn't running, which would undo it; Steam downloads it again when a
   game or the default that uses it starts. Clean Up never deletes these.
 - **Available** lists the tools the launcher can use, with the owner's
   avatar where the tool is on GitHub, and marks those kept up to date.
 
-Choosing an available tool opens its dialog: its repository, where it
-installs, **Keep up to date**, and its newest releases. "Latest" marks the
-newest stable one, installed versions are ticked, the notes button shows a
-release's notes, and focus starts on the newest one not installed, so
-Enter installs it.
+Choosing an available tool opens its page: its repository and where it
+installs, then its newest releases beside **Keep up to date**. "Latest"
+marks the newest stable one, installed versions are ticked, the notes
+button opens a page of a release's notes, and focus starts on the newest
+one not installed, so Enter installs it. The page stays open while the
+release installs, and ticks it once it's in.
 
 **Keep up to date** makes the tool a channel
-([usage.md](usage.md#channels)): turn it on, choose how many versions to
+([usage.md](usage.md#channels)): switch it on, choose how many versions to
 keep and whether games move to new releases, and **Update** installs the
 latest release now. The daily timer (`protonhub timer enable`) does the
 same unattended.
@@ -130,13 +139,14 @@ Steam's page has the games' Wine prefixes and shader caches
 ([usage.md](usage.md#storage)):
 
 - When uninstalled games left some behind, a row at the top says how much
-  space they take; it opens to list them, and **Clean Up…** deletes them
-  after asking. Saves of games without Steam Cloud are lost with their
-  prefixes.
-- **Games** lists each game's prefix and shader cache with their sizes,
-  the largest first. Its menu resets the prefix (the game makes a new one
-  when it next runs, without the saves and settings kept in the old one)
-  or deletes the shader cache (Steam builds it again).
+  space they take, and **Clean Up…** opens a page that lists them, with
+  **Delete** in its header bar. Saves of games without Steam Cloud are
+  lost with their prefixes.
+- **Games** has a card per game with its prefix and shader cache and
+  their sizes, the largest first; a card opens the game's page. Its menu
+  resets the prefix (the game makes a new one when it next runs, without
+  the saves and settings kept in the old one) or deletes the shader cache
+  (Steam builds it again).
 
 Both are off while Steam runs.
 
@@ -154,12 +164,12 @@ Steam to see the new tool.
 
 ## MangoHud
 
-The display button in the sidebar's header bar (Ctrl+M) edits MangoHud's
-global settings, `~/.config/MangoHud/MangoHud.conf`; a game's own, from
-its page, are in `~/.config/MangoHud/protonhub/`, and its launch options
-name them in `MANGOHUD_CONFIGFILE`. The editor has a tab each for the
-metrics, what it shows about the game, the layout, the colors and the
-controls; the settings are data, in
+**MangoHud** in the sidebar (Ctrl+M) edits MangoHud's global settings,
+`~/.config/MangoHud/MangoHud.conf`; a game's own, from its page, open as
+a page of their own, and are in `~/.config/MangoHud/protonhub/`, and its
+launch options name them in `MANGOHUD_CONFIGFILE`. The editor has a tab
+each for the metrics, what it shows about the game, the layout, the
+colors and the controls, its settings in two columns; the settings are data, in
 [`mangohud.toml`](../crates/core/mangohud.toml). A setting at MangoHud's
 default is left out of the file, and lines the editor doesn't show stay as
 they were. With `legacy_layout=0` in the file, MangoHud shows only the
@@ -173,9 +183,9 @@ isn't available inside the Flatpak.
 
 ## Errors
 
-A failure shows a toast with **Details**, and a warning button appears in
-the header bar. The error log lists every failure with its time and full
-message. The copy button on each, or **Copy All**, copies it with
+A failure shows a toast with **Details**, and **Errors** appears in the
+sidebar with how many there are. The error log lists every failure with
+its time and full message. The copy button on each, or **Copy All**, copies it with
 ProtonHub's version and platform, ready for a bug report.
 
 If ProtonHub can't start at all (the registry doesn't load, or `HOME` isn't
@@ -184,7 +194,8 @@ set), the window says why instead of showing launchers.
 ## Gamepad and Steam Deck
 
 A gamepad drives the window: the D-pad or left stick moves the focus, A
-activates, B closes a dialog, and the shoulder buttons switch launchers. In
+activates, B goes back from a page (or closes an alert), and the shoulder
+buttons switch launchers. In
 the Steam Deck's Game Mode (gamescope), the window starts fullscreen.
 
 ## Language
