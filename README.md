@@ -41,10 +41,11 @@ scriptable CLI with JSON output.
 - **Per-game tools**: set the tool each Steam and Heroic game runs with,
   one at a time or in bulk, with the previous settings file kept as a
   backup.
-- **Launch options**: edit a Steam or Heroic game's launch options, with switches
-  for MangoHud, GameMode, Native Wayland, HDR, NTSync, FSR 4 and DLSS
-  upgrades and Proton's log, defined as data in
-  [`presets.toml`](crates/core/presets.toml).
+- **Launch options**: edit a Steam or Heroic game's launch options, with
+  35 switches (MangoHud, GameMode, Native Wayland, HDR, FSR 4, DLSS
+  and XeSS upgrades, WoW64, NVAPI, Anti-Lag and more) defined as data in
+  [`presets.toml`](crates/core/presets.toml), each saying which Proton
+  builds read it, and gamescope's resolution, frame rate and upscaling.
 - **Prefix tools**: install winetricks components (Visual C++, .NET,
   DirectX, fonts…) into a Steam or Heroic game's prefix with the game's own
   Proton, open winecfg or regedit there, or run a Windows program in it.

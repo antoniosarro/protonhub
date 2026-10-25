@@ -1,7 +1,9 @@
 # Launch option presets: the switches on a game's page. Each sets
 # environment variables before the game (`env`), runs it inside a program
 # (`wrapper`), or both. Proton's variables change between releases, and not
-# every build reads every one: say which do in the description.
+# every build reads every one: say which do in the description, as their
+# `proton` scripts read them. Those with a `group` are under that heading,
+# in the order the groups first appear.
 
 [[preset]]
 id = "mangohud"
@@ -18,35 +20,227 @@ wrapper = "gamemoderun"
 [[preset]]
 id = "wayland"
 name = "Native Wayland"
-description = "Wine's Wayland driver instead of XWayland, in Proton builds that have it"
+description = "Wine's Wayland driver instead of XWayland, in GE-Proton and Proton-CachyOS; Steam's overlay and Steam Input don't reach it"
 env = { PROTON_ENABLE_WAYLAND = "1" }
 
 [[preset]]
 id = "hdr"
 name = "HDR"
-description = "HDR output, with Native Wayland, in Proton builds that have it"
+description = "HDR output, with Native Wayland, in GE-Proton"
 env = { PROTON_ENABLE_HDR = "1" }
-
-[[preset]]
-id = "ntsync"
-name = "NTSync"
-description = "Windows' synchronization in the kernel, for GE-Proton and Proton-CachyOS"
-env = { PROTON_USE_NTSYNC = "1" }
-
-[[preset]]
-id = "fsr4"
-name = "FSR 4 Upgrade"
-description = "Upgrades FSR 3.1 to FSR 4 on AMD GPUs that have it, for GE-Proton and Proton-CachyOS"
-env = { PROTON_FSR4_UPGRADE = "1" }
-
-[[preset]]
-id = "dlss"
-name = "DLSS Upgrade"
-description = "Upgrades DLSS to its newest version on NVIDIA GPUs, for GE-Proton and Proton-CachyOS"
-env = { PROTON_DLSS_UPGRADE = "1" }
 
 [[preset]]
 id = "log"
 name = "Proton Log"
 description = "Writes steam-<app id>.log to your home folder, for a bug report"
 env = { PROTON_LOG = "1" }
+
+[[preset]]
+id = "fsr4"
+group = "Upscaling"
+name = "FSR 4 Upgrade"
+description = "Upgrades FSR 3.1 to FSR 4 on AMD GPUs that have it, in GE-Proton and Proton-CachyOS"
+env = { PROTON_FSR4_UPGRADE = "1" }
+
+[[preset]]
+id = "fsr4-rdna3"
+group = "Upscaling"
+name = "FSR 4 on RDNA 3"
+description = "FSR 4 on Radeon RX 7000 GPUs, slower than on RX 9000, in Proton-CachyOS and GE-Proton 10"
+env = { PROTON_FSR4_RDNA3_UPGRADE = "1" }
+
+[[preset]]
+id = "mlfg"
+group = "Upscaling"
+name = "FSR 4 Frame Generation"
+description = "Upgrades FSR frame generation to FSR 4's, in GE-Proton 11 and Proton-CachyOS"
+env = { PROTON_MLFG_UPGRADE = "1" }
+
+[[preset]]
+id = "fsr4-hud"
+group = "Upscaling"
+name = "FSR 4 Indicator"
+description = "Shows on screen whether FSR 4 is on, in GE-Proton and Proton-CachyOS"
+env = { PROTON_FSR4_INDICATOR = "1" }
+
+[[preset]]
+id = "dlss"
+group = "Upscaling"
+name = "DLSS Upgrade"
+description = "Upgrades DLSS to its newest version on NVIDIA GPUs, in GE-Proton and Proton-CachyOS"
+env = { PROTON_DLSS_UPGRADE = "1" }
+
+[[preset]]
+id = "dlss-hud"
+group = "Upscaling"
+name = "DLSS Indicator"
+description = "Shows on screen which DLSS version runs, in GE-Proton and Proton-CachyOS"
+env = { PROTON_DLSS_INDICATOR = "1" }
+
+[[preset]]
+id = "xess"
+group = "Upscaling"
+name = "XeSS Upgrade"
+description = "Upgrades XeSS to its newest version, in GE-Proton and Proton-CachyOS"
+env = { PROTON_XESS_UPGRADE = "1" }
+
+[[preset]]
+id = "optiscaler"
+group = "Upscaling"
+name = "OptiScaler"
+description = "Swaps the game's DLSS, FSR or XeSS for another, in GE-Proton 11 and Proton-CachyOS"
+env = { PROTON_USE_OPTISCALER = "1" }
+
+[[preset]]
+id = "wow64"
+group = "Proton"
+name = "WoW64"
+description = "Runs 32-bit games through 64-bit Wine, without 32-bit libraries, in Proton 11 and its forks"
+env = { PROTON_USE_WOW64 = "1" }
+
+[[preset]]
+id = "laa"
+group = "Proton"
+name = "Large Address Aware"
+description = "Lets 32-bit games use 4 GB of memory instead of 2, for old games that run out"
+env = { PROTON_FORCE_LARGE_ADDRESS_AWARE = "1" }
+
+[[preset]]
+id = "wined3d"
+group = "Proton"
+name = "WineD3D"
+description = "Direct3D 8 to 11 through OpenGL instead of DXVK, for GPUs without Vulkan or games DXVK breaks"
+env = { PROTON_USE_WINED3D = "1" }
+
+[[preset]]
+id = "no-ntsync"
+group = "Proton"
+name = "No NTSync"
+description = "Wine's synchronization through fsync instead of the kernel's NTSync, in GE-Proton, for games that hang with it"
+env = { PROTON_NO_NTSYNC = "1" }
+
+[[preset]]
+id = "no-fsync"
+group = "Proton"
+name = "No fsync"
+description = "Wine's synchronization without fsync, for games that hang with it"
+env = { PROTON_NO_FSYNC = "1" }
+
+[[preset]]
+id = "heap-delay-free"
+group = "Proton"
+name = "Delay Freeing Memory"
+description = "For games that crash using memory after freeing it"
+env = { PROTON_HEAP_DELAY_FREE = "1" }
+
+[[preset]]
+id = "writecopy"
+group = "Proton"
+name = "Simulate Write-Copy"
+description = "Copy-on-write memory as on Windows, for some old games and copy protections, in GE-Proton and Proton-CachyOS"
+env = { WINE_SIMULATE_WRITECOPY = "1" }
+
+[[preset]]
+id = "sdl"
+group = "Proton"
+name = "SDL Controllers"
+description = "Controllers through SDL instead of Steam Input, in GE-Proton and Proton-CachyOS, for controllers a game doesn't see"
+env = { PROTON_PREFER_SDL = "1" }
+
+[[preset]]
+id = "hide-apu"
+group = "GPU"
+name = "APU as a Discrete GPU"
+description = "Reports an AMD APU as a discrete GPU, for games that refuse integrated graphics"
+env = { PROTON_HIDE_APU = "1" }
+
+[[preset]]
+id = "hide-nvidia"
+group = "GPU"
+name = "NVIDIA GPU as AMD"
+description = "Reports an NVIDIA GPU as an AMD one, for games that misbehave on NVIDIA's Windows driver paths"
+env = { PROTON_HIDE_NVIDIA_GPU = "1" }
+
+[[preset]]
+id = "no-nvapi"
+group = "GPU"
+name = "No NVAPI"
+description = "Hides NVIDIA's API from the game, and with it DLSS and Reflex, for games that crash with it"
+env = { PROTON_DISABLE_NVAPI = "1" }
+
+[[preset]]
+id = "force-nvapi"
+group = "GPU"
+name = "NVAPI on AMD"
+description = "NVIDIA's API on other GPUs too, for Reflex on AMD; it can break FSR 4"
+env = { PROTON_FORCE_NVAPI = "1" }
+
+[[preset]]
+id = "nvidia-libs"
+group = "GPU"
+name = "NVIDIA Libraries"
+description = "PhysX, CUDA and NVENC for the game, in GE-Proton and Proton-CachyOS; DLSS doesn't need them"
+env = { PROTON_NVIDIA_LIBS = "1" }
+
+[[preset]]
+id = "anti-lag"
+group = "GPU"
+name = "Anti-Lag"
+description = "Mesa's Anti-Lag for AMD GPUs, in games that support AMD Anti-Lag 2"
+env = { ENABLE_LAYER_MESA_ANTI_LAG = "1" }
+
+[[preset]]
+id = "dxvk-low-latency"
+group = "GPU"
+name = "Low Latency for DirectX 11"
+description = "DXVK's frame pacing for lower input latency in Direct3D 9 to 11 games, in Proton-CachyOS"
+env = { PROTON_DXVK_LOWLATENCY = "1" }
+
+[[preset]]
+id = "prime"
+group = "GPU"
+name = "Discrete GPU"
+description = "The discrete GPU of a laptop with two, with Mesa's drivers"
+env = { DRI_PRIME = "1" }
+
+[[preset]]
+id = "glthread"
+group = "GPU"
+name = "OpenGL Threading"
+description = "Mesa's OpenGL work on a thread of its own, faster in some OpenGL games"
+env = { mesa_glthread = "true" }
+
+[[preset]]
+id = "dxvk-no-log"
+group = "GPU"
+name = "No DXVK Log"
+description = "DXVK writes no log files"
+env = { DXVK_LOG_LEVEL = "none" }
+
+[[preset]]
+id = "vkbasalt"
+group = "Other"
+name = "vkBasalt"
+description = "Sharpening and other effects through vkBasalt, set in its own vkBasalt.conf; GE-Proton brings its own"
+env = { ENABLE_VKBASALT = "1" }
+
+[[preset]]
+id = "obs"
+group = "Other"
+name = "OBS Game Capture"
+description = "Lets OBS capture the game with obs-vkcapture, which needs installing"
+env = { OBS_VKCAPTURE = "1" }
+
+[[preset]]
+id = "desktop-profile"
+group = "Other"
+name = "Desktop Settings on Steam Deck"
+description = "Tells games they don't run on a Steam Deck, for their desktop settings"
+env = { SteamDeck = "0" }
+
+[[preset]]
+id = "pulse-latency"
+group = "Other"
+name = "Low Audio Latency"
+description = "60 ms of audio latency with PulseAudio or PipeWire, for crackling or late sound"
+env = { PULSE_LATENCY_MSEC = "60" }

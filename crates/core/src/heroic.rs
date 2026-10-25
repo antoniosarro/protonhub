@@ -149,8 +149,8 @@ pub fn launch_options(root: &Path) -> Result<Vec<(String, String)>, Error> {
 
 /// Sets `game`'s variables, programs and arguments from `text`, launch
 /// options in Steam's form. Heroic keeps each program with its arguments:
-/// a word starts a program when it's the first, one the settings had, or a
-/// preset's, and is the one before's argument otherwise.
+/// a word starts a program when it's the first, one the settings had, a
+/// preset's or gamescope, and is the one before's argument otherwise.
 pub fn set_launch_options(root: &Path, game: &str, text: &str) -> Result<(), Error> {
     let options = Options::parse(text).ok_or(Error::Unclosed)?;
     let presets = launch::presets();
@@ -159,7 +159,8 @@ pub fn set_launch_options(root: &Path, game: &str, text: &str) -> Result<(), Err
         let mut programs: Vec<Vec<String>> = Vec::new();
         for word in options.wrappers {
             let starts = had.iter().any(|w| w.first() == Some(&word))
-                || presets.iter().any(|p| p.wrapper.as_ref() == Some(&word));
+                || presets.iter().any(|p| p.wrapper.as_ref() == Some(&word))
+                || word == launch::GAMESCOPE;
             match programs.last_mut() {
                 Some(program) if !starts => program.push(word),
                 _ => programs.push(vec![word]),

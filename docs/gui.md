@@ -57,9 +57,12 @@ to edit them by parts: a row per variable, its name and value side by side
 (a name no shell would set is marked, and left out), with **Add
 Variable**; the programs it runs in; its arguments; and the whole as text.
 Below it is a switch for each preset ([usage.md](usage.md#launch-options)):
-MangoHud, GameMode, Native Wayland, HDR, NTSync, FSR 4 and DLSS upgrades,
-and Proton's log. The parts and switches show what the text has on and
-edit it; **Save** (or Enter in any field) writes it to the launcher. A
+MangoHud, GameMode, Native Wayland, HDR and Proton's log, then
+**Gamescope**, whose switch runs the game in gamescope and whose rows set
+its output and game resolution, frame rate, upscaling filter, fullscreen,
+HDR and MangoHud, and a row for each group of the other presets
+(Upscaling, Proton, GPU, Other) naming those it has on. The parts and
+switches show what the text has on and edit it; **Save** (or Enter in any field) writes it to the launcher. A
 switch for a program that isn't installed says so, since the game wouldn't
 start with it. **Own MangoHud Settings** points the game at a MangoHud
 file of its own ([MangoHud](#mangohud)), made as a copy of the global one;

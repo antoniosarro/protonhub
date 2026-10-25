@@ -422,7 +422,7 @@ fn launch_group(
     ));
     // Outside the macro below, where xgettext doesn't look.
     let hints = [tr("Name", &[]), tr("Value", &[]), tr("Remove", &[])];
-    let add_pair: Rc<dyn Fn(&str, &str) -> gtk::Entry> = Rc::new(glib::clone!(
+    let add_pair: AddPair = Rc::new(glib::clone!(
         #[strong]
         pairs,
         #[strong]
@@ -574,6 +574,7 @@ fn launch_group(
         )]
         .into(),
         wrapper: None,
+        group: None,
     });
     let mut presets = launch::presets();
     if let Some(own) = &own {
@@ -583,7 +584,10 @@ fn launch_group(
             .map_or(0, |i| i + 1);
         presets.insert(at, own.clone());
     }
+    // Those with a heading are in a row of their own for it, after
+    // gamescope.
     let mut switches = Vec::new();
+    let mut groups: Vec<(String, adw::ExpanderRow)> = Vec::new();
     for preset in presets {
         // Inside a Flatpak, the host's programs aren't on PATH to look for.
         let missing = preset.wrapper.as_deref().filter(|w| {
@@ -600,8 +604,25 @@ fn launch_group(
             .title(glib::markup_escape_text(&preset.name))
             .subtitle(glib::markup_escape_text(&subtitle))
             .build();
-        group.add(&row);
+        match &preset.group {
+            None => group.add(&row),
+            Some(title) => {
+                if !groups.iter().any(|(t, _)| t == title) {
+                    let expander = adw::ExpanderRow::builder()
+                        .title(glib::markup_escape_text(title))
+                        .subtitle_lines(1)
+                        .build();
+                    groups.push((title.clone(), expander));
+                }
+                let (_, expander) = groups.iter().find(|(t, _)| t == title).unwrap();
+                expander.add_row(&row);
+            }
+        }
         switches.push((preset, row));
+    }
+    group.add(&super::gamescope::row(&text, running, &on_enter));
+    for (_, expander) in &groups {
+        group.add(expander);
     }
     if let Some((path, row)) = own.as_ref().and_then(|own| {
         let path = mangohud::game_path(&state.launcher, &game.id)?;
@@ -625,6 +646,15 @@ fn launch_group(
             for (preset, row) in switches.iter() {
                 row.set_sensitive(!running && options.is_some());
                 row.set_active(options.as_ref().is_some_and(|o| o.has(preset)));
+            }
+            // A heading's row names the switches it has on.
+            for (title, expander) in &groups {
+                let on: Vec<_> = switches
+                    .iter()
+                    .filter(|(p, row)| p.group.as_ref() == Some(title) && row.is_active())
+                    .map(|(p, _)| p.name.as_str())
+                    .collect();
+                expander.set_subtitle(&glib::markup_escape_text(&on.join(", ")));
             }
             syncing.set(false);
         }
@@ -700,8 +730,12 @@ fn own_settings(win: &Rc<Window>, game: &Game, path: std::path::PathBuf, row: &a
     ));
 }
 
+/// Adds a variable's row with its name and value, and gives its name's
+/// entry.
+type AddPair = Rc<dyn Fn(&str, &str) -> gtk::Entry>;
+
 /// Marks `widget` as holding text that can't be used.
-fn mark(widget: &impl IsA<gtk::Widget>, error: bool) {
+pub(super) fn mark(widget: &impl IsA<gtk::Widget>, error: bool) {
     if error {
         widget.add_css_class("error");
     } else {

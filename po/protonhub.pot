@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: protonhub\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-25 10:35+0100\n"
+"POT-Creation-Date: 2026-10-25 14:03+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -185,7 +185,7 @@ msgstr ""
 msgid "Saved the MangoHud settings"
 msgstr ""
 
-#: crates/gtk/src/mangohud.rs:116 crates/gtk/src/page/game.rs:675
+#: crates/gtk/src/mangohud.rs:116 crates/gtk/src/page/game.rs:705
 #, rust-format
 msgid "Writing {file}"
 msgstr ""
@@ -194,7 +194,7 @@ msgstr ""
 msgid "Starting the preview"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:97 crates/gtk/src/page/mod.rs:85
+#: crates/gtk/src/page/game.rs:97 crates/gtk/src/page/mod.rs:86
 msgid "Storage"
 msgstr ""
 
@@ -308,33 +308,33 @@ msgstr ""
 msgid "This game's MangoHud settings instead of the global ones"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:594
+#: crates/gtk/src/page/game.rs:598 crates/gtk/src/page/gamescope.rs:30
 #, rust-format
 msgid "{program} isn't installed: the game won't start with it"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:667
+#: crates/gtk/src/page/game.rs:697
 msgid "Edit"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:674
+#: crates/gtk/src/page/game.rs:704
 #, rust-format
 msgid "MangoHud for {game}"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:720
+#: crates/gtk/src/page/game.rs:754
 msgid "On the Web"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:724
+#: crates/gtk/src/page/game.rs:758
 msgid "ProtonDB Reports"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:728
+#: crates/gtk/src/page/game.rs:762
 msgid "SteamDB"
 msgstr ""
 
-#: crates/gtk/src/page/game.rs:732
+#: crates/gtk/src/page/game.rs:766
 msgid "Steam Store"
 msgstr ""
 
@@ -464,38 +464,104 @@ msgstr ""
 msgid "Move Games"
 msgstr ""
 
-#: crates/gtk/src/page/mod.rs:32
+#: crates/gtk/src/page/gamescope.rs:27
+msgid "Gamescope"
+msgstr ""
+
+#: crates/gtk/src/page/gamescope.rs:35
+msgid ""
+"Runs the game in a compositor of its own, at the resolution and frame rate "
+"set here"
+msgstr ""
+
+#: crates/gtk/src/page/gamescope.rs:42
+msgid "Output Width"
+msgstr ""
+
+#: crates/gtk/src/page/gamescope.rs:43
+msgid "Output Height"
+msgstr ""
+
+#: crates/gtk/src/page/gamescope.rs:44
+msgid "Game Width"
+msgstr ""
+
+#: crates/gtk/src/page/gamescope.rs:45
+msgid "Game Height"
+msgstr ""
+
+#: crates/gtk/src/page/gamescope.rs:46
+msgid "Frame Rate"
+msgstr ""
+
+#: crates/gtk/src/page/gamescope.rs:64 crates/gtk/src/page/tools.rs:151
+msgid "Default"
+msgstr ""
+
+#: crates/gtk/src/page/gamescope.rs:67
+msgid "Linear"
+msgstr ""
+
+#: crates/gtk/src/page/gamescope.rs:68
+msgid "Nearest Neighbor"
+msgstr ""
+
+#: crates/gtk/src/page/gamescope.rs:69
+msgid "Pixel Art"
+msgstr ""
+
+#: crates/gtk/src/page/gamescope.rs:72
+msgid "Upscaling"
+msgstr ""
+
+#: crates/gtk/src/page/gamescope.rs:79
+msgid "Fullscreen"
+msgstr ""
+
+#: crates/gtk/src/page/gamescope.rs:80
+msgid "HDR"
+msgstr ""
+
+#: crates/gtk/src/page/gamescope.rs:82 crates/gtk/src/window.rs:409
+msgid "MangoHud"
+msgstr ""
+
+#: crates/gtk/src/page/gamescope.rs:84
+msgid "Drawn by gamescope, as it recommends over the MangoHud switch"
+msgstr ""
+
+#: crates/gtk/src/page/mod.rs:33
 #, rust-format
 msgid ""
 "{launcher} is running: quit it to change a game's tool, or it will undo the "
 "change"
 msgstr ""
 
-#: crates/gtk/src/page/mod.rs:37
+#: crates/gtk/src/page/mod.rs:38
 #, rust-format
 msgid ""
 "Quit {launcher} before changing a game's tool: from inside a Flatpak, "
 "ProtonHub can't tell whether it's running"
 msgstr ""
 
-#: crates/gtk/src/page/mod.rs:49 crates/gtk/src/page/mod.rs:58
+#: crates/gtk/src/page/mod.rs:50 crates/gtk/src/page/mod.rs:59
 #: crates/gtk/src/page/storage.rs:125
 msgid "Games"
 msgstr ""
 
-#: crates/gtk/src/page/mod.rs:56
+#: crates/gtk/src/page/mod.rs:57
 msgid "Can't read the games"
 msgstr ""
 
-#: crates/gtk/src/page/mod.rs:65
+#: crates/gtk/src/page/mod.rs:66
 msgid "Can't read the tool directories"
 msgstr ""
 
-#: crates/gtk/src/page/mod.rs:70
+#: crates/gtk/src/page/mod.rs:71
 msgid "Tools"
 msgstr ""
 
-#: crates/gtk/src/page/mod.rs:77
+#: crates/gtk/src/page/mod.rs:78
 msgid "Can't read the prefixes and shader caches"
 msgstr ""
 
@@ -704,10 +770,6 @@ msgid_plural "{n} tools · {size}"
 msgstr[0] ""
 msgstr[1] ""
 
-#: crates/gtk/src/page/tools.rs:151
-msgid "Default"
-msgstr ""
-
 #: crates/gtk/src/page/tools.rs:153
 msgid "Unused"
 msgstr ""
@@ -887,10 +949,6 @@ msgstr ""
 
 #: crates/gtk/src/window.rs:362
 msgid "Cancelling…"
-msgstr ""
-
-#: crates/gtk/src/window.rs:409
-msgid "MangoHud"
 msgstr ""
 
 #: crates/gtk/src/window.rs:410

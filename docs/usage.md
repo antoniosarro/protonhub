@@ -108,7 +108,10 @@ arguments…`: variables, the programs the game runs in, and after
 `%command%` the game's own arguments. A preset sets variables, adds a
 program (MangoHud's `mangohud`, GameMode's `gamemoderun`), or both;
 switching it off takes them out again and leaves everything else as it
-was. Presets are data, in [`presets.toml`](../crates/core/presets.toml).
+was. Presets are data, in [`presets.toml`](../crates/core/presets.toml);
+each says which Proton builds read its variables, as their `proton`
+scripts do. gamescope is a program with arguments of its own,
+`gamescope ARGS… --`, which the GUI edits by option.
 
 Heroic has no such text: a game's settings file
 (`GamesConfig/<app>.json`) keeps its variables, the programs it runs in
@@ -117,7 +120,7 @@ and GameMode of its own. ProtonHub shows them in the same form, with
 Heroic's switches as `mangohud` and `gamemoderun`, and writes them back
 apart, setting Heroic's switches for those two programs. A program's
 arguments are the words after it up to the next program: one the
-settings already had, or a preset's. Like the game's tool, they can be
+settings already had, a preset's, or gamescope. Like the game's tool, they can be
 changed once the game's settings were saved in Heroic.
 
 Like `assign`, changing them is refused while the launcher runs, and the

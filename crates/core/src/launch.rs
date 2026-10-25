@@ -14,6 +14,10 @@ use crate::{heroic, steam};
 /// What Steam replaces with the game's own command line.
 const COMMAND: &str = "%command%";
 
+/// The compositor a game can run in, at a resolution and refresh rate of
+/// its own: `gamescope ARGS… -- %command%`.
+pub const GAMESCOPE: &str = "gamescope";
+
 /// Launch options split into their parts. Words ProtonHub doesn't know are
 /// kept where they were.
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize)]
@@ -88,6 +92,97 @@ impl Options {
             }
         }
     }
+
+    /// gamescope's arguments, when the game runs in it.
+    pub fn gamescope(&self) -> Option<&[String]> {
+        let (at, end) = self.gamescope_span()?;
+        Some(&self.wrappers[at + 1..end])
+    }
+
+    /// Runs the game in gamescope with `args`, innermost, or with none not
+    /// in it.
+    pub fn set_gamescope(&mut self, args: Option<Vec<String>>) {
+        let words: Vec<String> = args
+            .map(|args| {
+                let mut words = vec![GAMESCOPE.to_owned()];
+                words.extend(args);
+                words.push("--".to_owned());
+                words
+            })
+            .unwrap_or_default();
+        match self.gamescope_span() {
+            Some((at, end)) => {
+                let end = (end + 1).min(self.wrappers.len());
+                self.wrappers.splice(at..end, words);
+            }
+            None => self.wrappers.extend(words),
+        }
+    }
+
+    /// Where gamescope is among the programs, and where its `--` is, or the
+    /// end.
+    fn gamescope_span(&self) -> Option<(usize, usize)> {
+        let at = self.wrappers.iter().position(|w| w == GAMESCOPE)?;
+        let end = self.wrappers[at..]
+            .iter()
+            .position(|w| w == "--")
+            .map_or(self.wrappers.len(), |i| at + i);
+        Some((at, end))
+    }
+}
+
+/// The value of a program's option among its `args`, written `-W 1920`,
+/// `--output-width 1920` or `--output-width=1920`.
+pub fn option(args: &[String], names: &[&str]) -> Option<String> {
+    args.iter().enumerate().find_map(|(i, arg)| {
+        if names.contains(&arg.as_str()) {
+            return args.get(i + 1).cloned();
+        }
+        names
+            .iter()
+            .find_map(|n| arg.strip_prefix(n)?.strip_prefix('='))
+            .map(str::to_owned)
+    })
+}
+
+/// Sets a program's option to `value` where it was, written the first of
+/// `names`' way, or with none takes it out, however it was written.
+pub fn set_option(args: &mut Vec<String>, names: &[&str], value: Option<&str>) {
+    let mut at = None;
+    let mut i = 0;
+    while i < args.len() {
+        if names.contains(&args[i].as_str()) {
+            at.get_or_insert(i);
+            args.drain(i..(i + 2).min(args.len()));
+        } else if names
+            .iter()
+            .any(|n| args[i].strip_prefix(n).is_some_and(|r| r.starts_with('=')))
+        {
+            at.get_or_insert(i);
+            args.remove(i);
+        } else {
+            i += 1;
+        }
+    }
+    if let Some(value) = value {
+        let at = at.unwrap_or(args.len());
+        args.splice(at..at, [names[0].to_owned(), value.to_owned()]);
+    }
+}
+
+/// Whether a program's switch, an option without a value, is among its
+/// `args`.
+pub fn flag(args: &[String], names: &[&str]) -> bool {
+    args.iter().any(|a| names.contains(&a.as_str()))
+}
+
+/// Switches a program's switch on, or off however it was written.
+pub fn set_flag(args: &mut Vec<String>, names: &[&str], on: bool) {
+    if !on {
+        args.retain(|a| !names.contains(&a.as_str()));
+    } else if !flag(args, names) {
+        args.push(names[0].to_owned());
+    }
 }
 
 /// Launch options as text Steam runs through a shell. Values are quoted
@@ -152,6 +247,8 @@ pub struct Preset {
     #[serde(default)]
     pub env: BTreeMap<String, String>,
     pub wrapper: Option<String>,
+    /// The heading it's under on the page; none for the first switches.
+    pub group: Option<String>,
 }
 
 /// The presets, from presets.toml, in its order.
@@ -298,6 +395,48 @@ mod tests {
         assert_eq!(Options::parse(&text), Some(o), "it reads back");
         assert_eq!(Options::parse("FOO='open %command%"), None);
         assert_eq!(Options::parse("").unwrap().to_string(), "");
+    }
+
+    #[test]
+    fn runs_the_game_in_gamescope_and_edits_its_options() {
+        let mut o = Options::parse("mangohud %command% -novid").unwrap();
+        assert_eq!(o.gamescope(), None);
+        o.set_gamescope(Some(vec!["-f".into()]));
+        assert_eq!(o.to_string(), "mangohud gamescope -f -- %command% -novid");
+
+        let mut o =
+            Options::parse("gamescope --output-width=1280 -r 60 -- protonhax init %command%")
+                .unwrap();
+        let mut args = o.gamescope().unwrap().to_vec();
+        assert_eq!(
+            option(&args, &["-W", "--output-width"]).as_deref(),
+            Some("1280")
+        );
+        assert_eq!(
+            option(&args, &["-r", "--nested-refresh"]).as_deref(),
+            Some("60")
+        );
+        assert_eq!(option(&args, &["-H", "--output-height"]), None);
+        set_option(&mut args, &["-W", "--output-width"], Some("2560"));
+        set_option(&mut args, &["-r", "--nested-refresh"], None);
+        set_flag(&mut args, &["-f", "--fullscreen"], true);
+        set_flag(&mut args, &["-f", "--fullscreen"], true);
+        assert_eq!(args, ["-W", "2560", "-f"]);
+        assert!(flag(&args, &["-f", "--fullscreen"]));
+        o.set_gamescope(Some(args));
+        assert_eq!(
+            o.to_string(),
+            "gamescope -W 2560 -f -- protonhax init %command%",
+            "the programs after it are kept"
+        );
+        o.set_gamescope(None);
+        assert_eq!(o.to_string(), "protonhax init %command%");
+
+        // Without its --, the rest are gamescope's.
+        let mut o = Options::parse("gamescope -f %command%").unwrap();
+        assert_eq!(o.gamescope().unwrap(), ["-f"]);
+        o.set_gamescope(None);
+        assert_eq!(o.to_string(), "%command%");
     }
 
     fn local_config(root: &Path, account: &str, apps: &str) -> std::path::PathBuf {

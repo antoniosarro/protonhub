@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: protonhub\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-25 10:35+0100\n"
+"POT-Creation-Date: 2026-10-25 14:03+0100\n"
 "PO-Revision-Date: 2026-10-10 22:25+0200\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: Italian\n"
@@ -189,7 +189,7 @@ msgstr "Richiede MangoHud e vkcube (da vulkan-tools)"
 msgid "Saved the MangoHud settings"
 msgstr "Impostazioni di MangoHud salvate"
 
-#: crates/gtk/src/mangohud.rs:116 crates/gtk/src/page/game.rs:675
+#: crates/gtk/src/mangohud.rs:116 crates/gtk/src/page/game.rs:705
 #, rust-format
 msgid "Writing {file}"
 msgstr "Scrittura di {file}"
@@ -198,7 +198,7 @@ msgstr "Scrittura di {file}"
 msgid "Starting the preview"
 msgstr "Avvio dell'anteprima"
 
-#: crates/gtk/src/page/game.rs:97 crates/gtk/src/page/mod.rs:85
+#: crates/gtk/src/page/game.rs:97 crates/gtk/src/page/mod.rs:86
 msgid "Storage"
 msgstr "Archiviazione"
 
@@ -316,33 +316,33 @@ msgstr "Impostazioni di MangoHud proprie"
 msgid "This game's MangoHud settings instead of the global ones"
 msgstr "Le impostazioni di MangoHud di questo gioco al posto di quelle globali"
 
-#: crates/gtk/src/page/game.rs:594
+#: crates/gtk/src/page/game.rs:598 crates/gtk/src/page/gamescope.rs:30
 #, rust-format
 msgid "{program} isn't installed: the game won't start with it"
 msgstr "{program} non è installato: il gioco non si avvierà con esso"
 
-#: crates/gtk/src/page/game.rs:667
+#: crates/gtk/src/page/game.rs:697
 msgid "Edit"
 msgstr "Modifica"
 
-#: crates/gtk/src/page/game.rs:674
+#: crates/gtk/src/page/game.rs:704
 #, rust-format
 msgid "MangoHud for {game}"
 msgstr "MangoHud per {game}"
 
-#: crates/gtk/src/page/game.rs:720
+#: crates/gtk/src/page/game.rs:754
 msgid "On the Web"
 msgstr "Sul web"
 
-#: crates/gtk/src/page/game.rs:724
+#: crates/gtk/src/page/game.rs:758
 msgid "ProtonDB Reports"
 msgstr "Segnalazioni su ProtonDB"
 
-#: crates/gtk/src/page/game.rs:728
+#: crates/gtk/src/page/game.rs:762
 msgid "SteamDB"
 msgstr "SteamDB"
 
-#: crates/gtk/src/page/game.rs:732
+#: crates/gtk/src/page/game.rs:766
 msgid "Steam Store"
 msgstr "Negozio di Steam"
 
@@ -472,7 +472,75 @@ msgstr "Sposta"
 msgid "Move Games"
 msgstr "Sposta giochi"
 
-#: crates/gtk/src/page/mod.rs:32
+#: crates/gtk/src/page/gamescope.rs:27
+msgid "Gamescope"
+msgstr "Gamescope"
+
+#: crates/gtk/src/page/gamescope.rs:35
+msgid ""
+"Runs the game in a compositor of its own, at the resolution and frame rate "
+"set here"
+msgstr ""
+"Avvia il gioco in un compositor tutto suo, alla risoluzione e frequenza "
+"impostate qui"
+
+#: crates/gtk/src/page/gamescope.rs:42
+msgid "Output Width"
+msgstr "Larghezza di uscita"
+
+#: crates/gtk/src/page/gamescope.rs:43
+msgid "Output Height"
+msgstr "Altezza di uscita"
+
+#: crates/gtk/src/page/gamescope.rs:44
+msgid "Game Width"
+msgstr "Larghezza del gioco"
+
+#: crates/gtk/src/page/gamescope.rs:45
+msgid "Game Height"
+msgstr "Altezza del gioco"
+
+#: crates/gtk/src/page/gamescope.rs:46
+msgid "Frame Rate"
+msgstr "Frequenza dei fotogrammi"
+
+#: crates/gtk/src/page/gamescope.rs:64 crates/gtk/src/page/tools.rs:151
+msgid "Default"
+msgstr "Predefinito"
+
+#: crates/gtk/src/page/gamescope.rs:67
+msgid "Linear"
+msgstr "Lineare"
+
+#: crates/gtk/src/page/gamescope.rs:68
+msgid "Nearest Neighbor"
+msgstr "Pixel più vicino"
+
+#: crates/gtk/src/page/gamescope.rs:69
+msgid "Pixel Art"
+msgstr "Pixel art"
+
+#: crates/gtk/src/page/gamescope.rs:72
+msgid "Upscaling"
+msgstr "Upscaling"
+
+#: crates/gtk/src/page/gamescope.rs:79
+msgid "Fullscreen"
+msgstr "Schermo intero"
+
+#: crates/gtk/src/page/gamescope.rs:80
+msgid "HDR"
+msgstr "HDR"
+
+#: crates/gtk/src/page/gamescope.rs:82 crates/gtk/src/window.rs:409
+msgid "MangoHud"
+msgstr "MangoHud"
+
+#: crates/gtk/src/page/gamescope.rs:84
+msgid "Drawn by gamescope, as it recommends over the MangoHud switch"
+msgstr "Disegnato da gamescope, come consiglia al posto dell'interruttore MangoHud"
+
+#: crates/gtk/src/page/mod.rs:33
 #, rust-format
 msgid ""
 "{launcher} is running: quit it to change a game's tool, or it will undo the "
@@ -481,7 +549,7 @@ msgstr ""
 "{launcher} è in esecuzione: chiudilo per cambiare lo strumento di un gioco, "
 "o annullerà la modifica"
 
-#: crates/gtk/src/page/mod.rs:37
+#: crates/gtk/src/page/mod.rs:38
 #, rust-format
 msgid ""
 "Quit {launcher} before changing a game's tool: from inside a Flatpak, "
@@ -490,24 +558,24 @@ msgstr ""
 "Chiudi {launcher} prima di cambiare lo strumento di un gioco: dentro un "
 "Flatpak, ProtonHub non può sapere se è in esecuzione"
 
-#: crates/gtk/src/page/mod.rs:49 crates/gtk/src/page/mod.rs:58
+#: crates/gtk/src/page/mod.rs:50 crates/gtk/src/page/mod.rs:59
 #: crates/gtk/src/page/storage.rs:125
 msgid "Games"
 msgstr "Giochi"
 
-#: crates/gtk/src/page/mod.rs:56
+#: crates/gtk/src/page/mod.rs:57
 msgid "Can't read the games"
 msgstr "Impossibile leggere i giochi"
 
-#: crates/gtk/src/page/mod.rs:65
+#: crates/gtk/src/page/mod.rs:66
 msgid "Can't read the tool directories"
 msgstr "Impossibile leggere le cartelle degli strumenti"
 
-#: crates/gtk/src/page/mod.rs:70
+#: crates/gtk/src/page/mod.rs:71
 msgid "Tools"
 msgstr "Strumenti"
 
-#: crates/gtk/src/page/mod.rs:77
+#: crates/gtk/src/page/mod.rs:78
 msgid "Can't read the prefixes and shader caches"
 msgstr "Impossibile leggere i prefissi e le cache degli shader"
 
@@ -532,7 +600,7 @@ msgid "Wine's Tools"
 msgstr "Strumenti di Wine"
 
 #: crates/gtk/src/page/prefix.rs:84
-#, fuzzy, rust-format
+#, rust-format
 msgid "Starting a program in the prefix of {game}"
 msgstr "Avvio di un programma nel prefisso di {game}"
 
@@ -723,10 +791,6 @@ msgid_plural "{n} tools · {size}"
 msgstr[0] "{n} strumento · {size}"
 msgstr[1] "{n} strumenti · {size}"
 
-#: crates/gtk/src/page/tools.rs:151
-msgid "Default"
-msgstr "Predefinito"
-
 #: crates/gtk/src/page/tools.rs:153
 msgid "Unused"
 msgstr "Inutilizzato"
@@ -913,10 +977,6 @@ msgstr "Impostazioni di MangoHud (Ctrl+M)"
 msgid "Cancelling…"
 msgstr "Annullamento…"
 
-#: crates/gtk/src/window.rs:409
-msgid "MangoHud"
-msgstr "MangoHud"
-
 #: crates/gtk/src/window.rs:410
 msgid "Opening the MangoHud settings"
 msgstr "Apertura delle impostazioni di MangoHud"
@@ -1072,12 +1132,12 @@ msgid "Setting the launch options of {game}"
 msgstr "Impostazione delle opzioni di avvio di {game}"
 
 #: crates/gtk/src/window.rs:879
-#, fuzzy, rust-format
+#, rust-format
 msgid "Installing {verbs} into {game}"
 msgstr "Installazione di {verbs} in {game}"
 
 #: crates/gtk/src/window.rs:883
-#, fuzzy, rust-format
+#, rust-format
 msgid "Installed {verbs} into {game}"
 msgstr "{verbs} installato in {game}"
 
