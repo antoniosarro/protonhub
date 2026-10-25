@@ -29,8 +29,9 @@ scriptable CLI with JSON output.
 
 ## Features
 
-- **18 tools**: GE-Proton, Proton-CachyOS, Wine-GE, Kron4ek Wine, DXVK,
-  DXVK-NVAPI, vkd3d-proton, Luxtorpeda, Boxtron and more
+- **22 tools**: GE-Proton, Proton-CachyOS, Wine-GE, Kron4ek's Wine and
+  Wine-Staging, DXVK, DXVK-Sarek, DXVK-NVAPI, vkd3d-proton, Luxtorpeda,
+  Boxtron and more
   ([the list](docs/manifests.md#the-tools)), from GitHub, Codeberg and
   GitLab.
 - **Every launcher**: Steam, Heroic, Lutris, Bottles and WineZGUI, native,

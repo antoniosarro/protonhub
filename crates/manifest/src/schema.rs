@@ -168,6 +168,10 @@ pub struct Tool {
     /// The directory to install into, for archives without exactly one
     /// top-level directory, or to rename it; `{tag}` is the release's tag.
     pub dir: Option<String>,
+    /// With `dir`: the directory inside the archive's top-level one that is
+    /// the tool, for archives that hold more (DXVK-Sarek's hold its source,
+    /// with the tool in `build`).
+    pub subdir: Option<String>,
     /// Programs the tool needs on the host, which it doesn't bring.
     pub requires: Vec<String>,
     /// The directory, relative to the launcher's data directory, the tool is
@@ -185,6 +189,7 @@ struct RawTool {
     asset: BTreeMap<String, String>,
     checksum: Option<Checksum>,
     dir: Option<String>,
+    subdir: Option<String>,
     #[serde(default)]
     requires: Vec<String>,
     launchers: BTreeMap<LauncherKind, PathBuf>,
@@ -297,6 +302,13 @@ fn compile(path: &Path, id: &str, raw: RawTool) -> Result<Tool, LoadError> {
     {
         return Err(invalid("dir must be a plain directory name"));
     }
+    if let Some(subdir) = &raw.subdir
+        && (raw.dir.is_none() || subdir.is_empty() || !is_plain_relative(Path::new(subdir)))
+    {
+        return Err(invalid(
+            "subdir must be relative, without .., and comes with a dir",
+        ));
+    }
     if raw.launchers.values().any(|d| !is_plain_relative(d)) {
         return Err(invalid("launcher directories must be relative, without .."));
     }
@@ -337,6 +349,7 @@ fn compile(path: &Path, id: &str, raw: RawTool) -> Result<Tool, LoadError> {
         asset,
         checksum: raw.checksum,
         dir: raw.dir,
+        subdir: raw.subdir,
         requires: raw.requires,
         launchers: raw.launchers,
     })
@@ -417,6 +430,14 @@ mod tests {
                     "github = \"GloriousEggroll/proton-ge-custom\"",
                     "url = \"https://x/a.tar.gz\"",
                 ),
+            ),
+            (
+                "subdir without a dir",
+                GE.replace("name ", "subdir = 'build'\n name "),
+            ),
+            (
+                "escaping subdir",
+                GE.replace("name ", "dir = 'a'\n subdir = '../b'\n name "),
             ),
             ("escaping dir", GE.replace("tools/proton", "../proton")),
             ("absolute dir", GE.replace("tools/proton", "/opt/proton")),

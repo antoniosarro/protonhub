@@ -19,10 +19,38 @@ tag       = '^lutris-(wine-)?[0-9]'
 asset     = { x86_64 = '^wine-lutris-[0-9][0-9.-]*-x86_64\.tar\.xz$' }
 launchers = { lutris = "runners/wine", bottles = "runners", winezgui = "Runners" }
 
+# Kron4ek's releases are Wine's (11.20), each with a plain, a staging and a
+# staging-tkg build, also as wow64 and x86 ones, and Proton's Wine
+# (proton-11.0-2) as releases of their own.
 [kron4ek-wine]
 name      = "Kron4ek Wine (vanilla)"
 source    = { github = "Kron4ek/Wine-Builds" }
-# The plain amd64 build; each release also has staging, tkg, wow64 and x86.
+tag       = '^[0-9]'
 asset     = { x86_64 = '^wine-[0-9][0-9.]*-amd64\.tar\.xz$' }
+checksum  = { pattern = "sha256sums.txt", algo = "sha256" }
+launchers = { lutris = "runners/wine", bottles = "runners", winezgui = "Runners" }
+
+[kron4ek-wine-staging]
+name      = "Kron4ek Wine-Staging"
+source    = { github = "Kron4ek/Wine-Builds" }
+tag       = '^[0-9]'
+asset     = { x86_64 = '^wine-[0-9][0-9.]*-staging-amd64\.tar\.xz$' }
+checksum  = { pattern = "sha256sums.txt", algo = "sha256" }
+launchers = { lutris = "runners/wine", bottles = "runners", winezgui = "Runners" }
+
+[kron4ek-wine-staging-tkg]
+name      = "Kron4ek Wine-Staging-Tkg"
+source    = { github = "Kron4ek/Wine-Builds" }
+tag       = '^[0-9]'
+asset     = { x86_64 = '^wine-[0-9][0-9.]*-staging-tkg-amd64\.tar\.xz$' }
+checksum  = { pattern = "sha256sums.txt", algo = "sha256" }
+launchers = { lutris = "runners/wine", bottles = "runners", winezgui = "Runners" }
+
+[kron4ek-wine-proton]
+name      = "Kron4ek Wine-Proton"
+source    = { github = "Kron4ek/Wine-Builds" }
+# Not proton-exp-*, the experimental branch's builds.
+tag       = '^proton-[0-9]'
+asset     = { x86_64 = '^wine-proton-[0-9][0-9.]*-[0-9a-z]+-amd64\.tar\.xz$' }
 checksum  = { pattern = "sha256sums.txt", algo = "sha256" }
 launchers = { lutris = "runners/wine", bottles = "runners", winezgui = "Runners" }

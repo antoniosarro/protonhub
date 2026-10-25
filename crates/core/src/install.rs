@@ -189,12 +189,16 @@ pub fn install_release(
     })?;
 
     // The archive's one top-level directory, or with a `dir` in the
-    // manifest, its contents under that name.
+    // manifest, its contents (or its `subdir`'s) under that name.
     let top = match &tool.dir {
         None => single_dir(&unpacked, &asset.name)?,
         Some(template) => {
             let name = template.replace("{tag}", &release.tag.replace('/', "-"));
-            let contents = single_dir(&unpacked, &asset.name).unwrap_or_else(|_| unpacked.clone());
+            let mut contents =
+                single_dir(&unpacked, &asset.name).unwrap_or_else(|_| unpacked.clone());
+            if let Some(subdir) = &tool.subdir {
+                contents.push(subdir);
+            }
             let named = staging.join(name);
             fs::rename(&contents, &named).map_err(io_err(&named))?;
             named
@@ -793,6 +797,27 @@ mod tests {
             fs::read_to_string(entry.dir.join("x64/nvapi64.dll")).unwrap(),
             "dll"
         );
+    }
+
+    // DXVK-Sarek's archives hold its source, with the DLLs in build/.
+    #[test]
+    fn subdir_is_what_goes_into_the_named_directory() {
+        let home = TempDir::new("subdir");
+        let archive = gz(&tar(&[
+            ("dxvk-sarek-1.14.1/build/x64/d3d11.dll", "dll"),
+            ("dxvk-sarek-1.14.1/src/dxvk.cpp", "src"),
+        ]));
+        let (server, _) = github(("v1.14.1", vec![("dxvk-sarek-1.14.1.tar.gz", archive)]));
+        let t = tool(
+            "source = { github = \"o/r\" }\nasset = { any = '\\.tar\\.gz$' }\ndir = \"dxvk-sarek-{tag}\"\nsubdir = \"build\"",
+        );
+        let entry = install_into(&home, &server, &t, &mut |_| {}).unwrap();
+        assert_eq!(entry.dir.file_name().unwrap(), "dxvk-sarek-v1.14.1");
+        assert_eq!(
+            fs::read_to_string(entry.dir.join("x64/d3d11.dll")).unwrap(),
+            "dll"
+        );
+        assert!(!entry.dir.join("src").exists());
     }
 
     // Steam-Play-None's branch archive holds Steam-Play-None-main/.

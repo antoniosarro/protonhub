@@ -14,6 +14,16 @@ source    = { gitlab = "https://gitlab.com/Ph42oN/dxvk-gplasync" }
 asset     = { any = '^dxvk-gplasync-v.*\.tar\.gz$' }
 launchers = { lutris = "runtime/dxvk", bottles = "dxvk" }
 
+[dxvk-sarek]
+name      = "DXVK-Sarek"
+source    = { github = "pythonlover02/DXVK-Sarek" }
+# DXVK 1.10 kept up to date, for GPUs without Vulkan 1.3. Its archives hold
+# the source, with the DLLs in build/x32 and build/x64.
+asset     = { any = '^dxvk-sarek-[0-9][0-9.]*\.tar\.gz$' }
+dir       = "dxvk-sarek-{tag}"
+subdir    = "build"
+launchers = { lutris = "runtime/dxvk", heroic = "tools/dxvk", bottles = "dxvk" }
+
 [dxvk-nvapi]
 name      = "DXVK-NVAPI"
 source    = { github = "jp7677/dxvk-nvapi" }

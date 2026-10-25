@@ -21,6 +21,7 @@ launchers = { steam = "compatibilitytools.d", heroic = "tools/proton" }
 | `asset` | A regex per architecture: `x86_64`, `aarch64`, or `any` for every arch an explicit key doesn't name. Exactly one asset of a release must match |
 | `checksum` | Optional. `pattern` is the checksum file's exact name, `algo` is `sha256` or `sha512`. See [Checksums](#checksums) |
 | `dir` | Optional. The directory name to install into, `{tag}` being the release's tag: for archives without exactly one top-level directory (DXVK-NVAPI), or to rename the one they have (Steam-Play-None's `Steam-Play-None-main`) |
+| `subdir` | Optional, with `dir`. The directory inside the archive's top-level one that is the tool, for archives that hold more: DXVK-Sarek's hold its source, with the DLLs in `build` |
 | `requires` | Optional. Programs the tool needs on the host and doesn't bring (Roberta needs `scummvm`). Installing works without them, with a warning |
 | `launchers` | For each launcher (`steam`, `heroic`, `lutris`, `bottles`, `winezgui`), the directory under its data directory that versions are extracted into. Relative, without `..` |
 
@@ -98,8 +99,8 @@ fix reaches users without an app release.
 | Boxtron, Roberta | GitHub | Steam |
 | Steam-Play-None | the main branch's archive | Steam |
 | Wine-GE | GitHub | Lutris, Heroic, Bottles, WineZGUI |
-| Lutris-Wine, Kron4ek Wine (vanilla) | GitHub | Lutris, Bottles, WineZGUI |
-| DXVK, DXVK-NVAPI | GitHub | Lutris, Heroic, Bottles |
+| Lutris-Wine, Kron4ek Wine (vanilla, Staging, Staging-Tkg, Proton) | GitHub | Lutris, Bottles, WineZGUI |
+| DXVK, DXVK-Sarek, DXVK-NVAPI | GitHub | Lutris, Heroic, Bottles |
 | DXVK GPL-Async | GitLab | Lutris, Bottles |
 | vkd3d-proton | GitHub | Lutris, Heroic, Bottles |
 | vkd3d-lutris | GitHub | Lutris, Heroic |
