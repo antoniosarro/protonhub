@@ -72,7 +72,9 @@ switches show what the text has on and edit it; **Save** (or Enter in any field)
 switch for a program that isn't installed says so, since the game wouldn't
 start with it. **Own MangoHud Settings** points the game at a MangoHud
 file of its own ([MangoHud](#mangohud)), made as a copy of the global one;
-its edit button opens it. Non-Steam shortcuts keep theirs in Steam.
+its edit button opens it. A non-Steam shortcut's launch options are in
+its entry in Steam's shortcuts, and its page has a **Shortcut** group to
+change its name, target and start folder, as its properties in Steam do.
 
 While Steam, Heroic or Faugus Launcher runs, its games can't be changed
 (it would overwrite the change when it exits), and a banner says so. On

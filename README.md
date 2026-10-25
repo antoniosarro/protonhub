@@ -150,8 +150,6 @@ libadwaita 1.6+, libudev and gettext. [`just`](justfile) lists the recipes:
 - Per-game tools are set for Steam, Heroic and Faugus Launcher only;
   Lutris, Bottles and WineZGUI get installs and removals. Launch options
   and prefix tools are for Steam and Heroic games.
-- Launch options are set for Steam and Heroic games, not yet for
-  non-Steam shortcuts.
 - Tools only released as CI artifacts (Proton-Tkg, Wine-Tkg, DXVK
   nightly) and SteamTinkerLaunch are not covered.
 - The manifests ship with the app; fetching them from this repository, so

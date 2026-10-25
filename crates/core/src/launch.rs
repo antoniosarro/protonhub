@@ -481,7 +481,12 @@ mod tests {
         let backup = fs::read_to_string(backup).unwrap();
         assert!(backup.contains("gamemoderun %command%") && backup.contains("PROTON_LOG=1"));
 
-        assert!(matches!(set(&l, "4294967291", "x"), Err(Error::Shortcut)));
+        // A shortcut's are in its entry in shortcuts.vdf.
+        set(&l, "4294967291", "-novid").unwrap();
+        let options = all(&l).unwrap().unwrap();
+        assert!(options.contains(&("4294967291".to_owned(), "-novid".to_owned())));
+        let shortcuts = crate::steam::shortcuts(&l.root).unwrap();
+        assert_eq!(shortcuts[0].1.name, "My Shortcut", "the rest kept");
         assert!(matches!(set(&l, "99", "x"), Err(Error::UnknownGame { .. })));
     }
 

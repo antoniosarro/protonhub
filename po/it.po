@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: protonhub\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-25 15:38+0100\n"
+"POT-Creation-Date: 2026-10-25 15:44+0100\n"
 "PO-Revision-Date: 2026-10-10 22:25+0200\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: Italian\n"
@@ -151,13 +151,13 @@ msgstr "Nessun errore"
 msgid "Errors"
 msgstr "Errori"
 
-#: crates/gtk/src/i18n.rs:64 crates/gtk/src/window.rs:972
+#: crates/gtk/src/i18n.rs:64 crates/gtk/src/window.rs:989
 #, rust-format
 msgid "{game} now runs with {tool}"
 msgstr "{game} ora usa {tool}"
 
 #: crates/gtk/src/i18n.rs:69 crates/gtk/src/i18n.rs:70
-#: crates/gtk/src/page/tools.rs:322 crates/gtk/src/window.rs:1105
+#: crates/gtk/src/page/tools.rs:322 crates/gtk/src/window.rs:1122
 #, rust-format
 msgid "{n} game"
 msgid_plural "{n} games"
@@ -169,7 +169,7 @@ msgstr[1] "{n} giochi"
 msgid "Reading {file}"
 msgstr "Lettura di {file}"
 
-#: crates/gtk/src/mangohud.rs:47 crates/gtk/src/page/game.rs:319
+#: crates/gtk/src/mangohud.rs:47 crates/gtk/src/page/game.rs:375
 msgid "Save"
 msgstr "Salva"
 
@@ -189,7 +189,7 @@ msgstr "Richiede MangoHud e vkcube (da vulkan-tools)"
 msgid "Saved the MangoHud settings"
 msgstr "Impostazioni di MangoHud salvate"
 
-#: crates/gtk/src/mangohud.rs:116 crates/gtk/src/page/game.rs:722
+#: crates/gtk/src/mangohud.rs:116 crates/gtk/src/page/game.rs:778
 #, rust-format
 msgid "Writing {file}"
 msgstr "Scrittura di {file}"
@@ -198,81 +198,95 @@ msgstr "Scrittura di {file}"
 msgid "Starting the preview"
 msgstr "Avvio dell'anteprima"
 
-#: crates/gtk/src/page/game.rs:98 crates/gtk/src/page/mod.rs:115
+#: crates/gtk/src/page/game.rs:101 crates/gtk/src/page/mod.rs:115
 msgid "Storage"
 msgstr "Archiviazione"
 
-#: crates/gtk/src/page/game.rs:103 crates/gtk/src/page/storage.rs:137
+#: crates/gtk/src/page/game.rs:106 crates/gtk/src/page/storage.rs:137
 msgid "No prefixes or shader caches"
 msgstr "Nessun prefisso o cache degli shader"
 
-#: crates/gtk/src/page/game.rs:104 crates/gtk/src/page/storage.rs:138
+#: crates/gtk/src/page/game.rs:107 crates/gtk/src/page/storage.rs:138
 msgid "Steam makes them when a game first runs"
 msgstr "Steam li crea al primo avvio di un gioco"
 
-#: crates/gtk/src/page/game.rs:144
+#: crates/gtk/src/page/game.rs:147
 msgid "Steam App ID"
 msgstr "ID app di Steam"
 
-#: crates/gtk/src/page/game.rs:145
+#: crates/gtk/src/page/game.rs:148
 msgid "Faugus Game ID"
 msgstr "ID del gioco in Faugus"
 
-#: crates/gtk/src/page/game.rs:146
+#: crates/gtk/src/page/game.rs:149
 msgid "Heroic App Name"
 msgstr "Nome app di Heroic"
 
-#: crates/gtk/src/page/game.rs:177
+#: crates/gtk/src/page/game.rs:180
 msgid "On Linux"
 msgstr "Su Linux"
 
-#: crates/gtk/src/page/game.rs:181
+#: crates/gtk/src/page/game.rs:184
 msgid "ProtonDB"
 msgstr "ProtonDB"
 
-#: crates/gtk/src/page/game.rs:183
+#: crates/gtk/src/page/game.rs:186
 #, rust-format
 msgid "{tier}, from {n} report"
 msgid_plural "{tier}, from {n} reports"
 msgstr[0] "{tier}, da {n} segnalazione"
 msgstr[1] "{tier}, da {n} segnalazioni"
 
-#: crates/gtk/src/page/game.rs:201
+#: crates/gtk/src/page/game.rs:204
 msgid "Anti-cheat"
 msgstr "Anti-cheat"
 
-#: crates/gtk/src/page/game.rs:213
+#: crates/gtk/src/page/game.rs:216
 msgid "Steam Deck"
 msgstr "Steam Deck"
 
-#: crates/gtk/src/page/game.rs:232
+#: crates/gtk/src/page/game.rs:242
+msgid "Shortcut"
+msgstr "Collegamento"
+
+#: crates/gtk/src/page/game.rs:244
+msgid "As its properties in Steam show them; a path with spaces is quoted"
+msgstr "Come li mostrano le sue proprietà in Steam; un percorso con spazi è tra virgolette"
+
+#: crates/gtk/src/page/game.rs:249 crates/gtk/src/page/game.rs:497
+msgid "Name"
+msgstr "Nome"
+
+#: crates/gtk/src/page/game.rs:250
+msgid "Target"
+msgstr "Destinazione"
+
+#: crates/gtk/src/page/game.rs:251
+msgid "Start In"
+msgstr "Avvia in"
+
+#: crates/gtk/src/page/game.rs:299
 msgid "Compatibility Tool"
 msgstr "Strumento di compatibilità"
 
-#: crates/gtk/src/page/game.rs:236
+#: crates/gtk/src/page/game.rs:303
 msgid "Runs With"
 msgstr "Si avvia con"
 
-#: crates/gtk/src/page/game.rs:247
+#: crates/gtk/src/page/game.rs:314
 #, rust-format
 msgid "Quit {launcher} to change it"
 msgstr "Chiudi {launcher} per cambiarlo"
 
-#: crates/gtk/src/page/game.rs:275
+#: crates/gtk/src/page/game.rs:342
 msgid "Launch Options"
 msgstr "Opzioni di avvio"
 
-#: crates/gtk/src/page/game.rs:281
+#: crates/gtk/src/page/game.rs:348
 msgid "Can't read the launch options"
 msgstr "Impossibile leggere le opzioni di avvio"
 
-#: crates/gtk/src/page/game.rs:288
-msgid "Set a non-Steam game's launch options in its properties in Steam"
-msgstr ""
-"Imposta le opzioni di avvio di un gioco non di Steam nelle sue proprietà in "
-"Steam"
-
-#: crates/gtk/src/page/game.rs:297
+#: crates/gtk/src/page/game.rs:353
 msgid ""
 "The switches edit the text; save it to change the game. Not every Proton "
 "build reads every option."
@@ -280,77 +294,73 @@ msgstr ""
 "Gli interruttori modificano il testo; salvalo per cambiare il gioco. Non "
 "tutte le versioni di Proton leggono ogni opzione."
 
-#: crates/gtk/src/page/game.rs:307
+#: crates/gtk/src/page/game.rs:363
 msgid "As text"
 msgstr "Come testo"
 
-#: crates/gtk/src/page/game.rs:312
+#: crates/gtk/src/page/game.rs:368
 msgid "Launch options"
 msgstr "Opzioni di avvio"
 
-#: crates/gtk/src/page/game.rs:355
+#: crates/gtk/src/page/game.rs:411
 msgid "Add Variable"
 msgstr "Aggiungi variabile"
 
-#: crates/gtk/src/page/game.rs:375
+#: crates/gtk/src/page/game.rs:431
 msgid "Programs it runs in"
 msgstr "Programmi in cui viene eseguito"
 
-#: crates/gtk/src/page/game.rs:377
+#: crates/gtk/src/page/game.rs:433
 msgid "Arguments"
 msgstr "Argomenti"
 
-#: crates/gtk/src/page/game.rs:441
-msgid "Name"
-msgstr "Nome"
-
-#: crates/gtk/src/page/game.rs:441
+#: crates/gtk/src/page/game.rs:497
 msgid "Remove"
 msgstr "Rimuovi"
 
-#: crates/gtk/src/page/game.rs:441
+#: crates/gtk/src/page/game.rs:497
 msgid "Value"
 msgstr "Valore"
 
-#: crates/gtk/src/page/game.rs:521
+#: crates/gtk/src/page/game.rs:577
 msgid "None"
 msgstr "Nessuna"
 
-#: crates/gtk/src/page/game.rs:583
+#: crates/gtk/src/page/game.rs:639
 msgid "Own MangoHud Settings"
 msgstr "Impostazioni di MangoHud proprie"
 
-#: crates/gtk/src/page/game.rs:585
+#: crates/gtk/src/page/game.rs:641
 msgid "This game's MangoHud settings instead of the global ones"
 msgstr "Le impostazioni di MangoHud di questo gioco al posto di quelle globali"
 
-#: crates/gtk/src/page/game.rs:615 crates/gtk/src/page/gamescope.rs:30
+#: crates/gtk/src/page/game.rs:671 crates/gtk/src/page/gamescope.rs:30
 #, rust-format
 msgid "{program} isn't installed: the game won't start with it"
 msgstr "{program} non è installato: il gioco non si avvierà con esso"
 
-#: crates/gtk/src/page/game.rs:714
+#: crates/gtk/src/page/game.rs:770
 msgid "Edit"
 msgstr "Modifica"
 
-#: crates/gtk/src/page/game.rs:721
+#: crates/gtk/src/page/game.rs:777
 #, rust-format
 msgid "MangoHud for {game}"
 msgstr "MangoHud per {game}"
 
-#: crates/gtk/src/page/game.rs:771
+#: crates/gtk/src/page/game.rs:827
 msgid "On the Web"
 msgstr "Sul web"
 
-#: crates/gtk/src/page/game.rs:775
+#: crates/gtk/src/page/game.rs:831
 msgid "ProtonDB Reports"
 msgstr "Segnalazioni su ProtonDB"
 
-#: crates/gtk/src/page/game.rs:779
+#: crates/gtk/src/page/game.rs:835
 msgid "SteamDB"
 msgstr "SteamDB"
 
-#: crates/gtk/src/page/game.rs:783
+#: crates/gtk/src/page/game.rs:839
 msgid "Steam Store"
 msgstr "Negozio di Steam"
 
@@ -1109,172 +1119,187 @@ msgstr "{version} installato; riavvia Steam per usarlo"
 msgid "Installed {version}"
 msgstr "{version} installato"
 
-#: crates/gtk/src/window.rs:703
+#: crates/gtk/src/window.rs:706
+#, rust-format
+msgid "Saved {game}"
+msgstr "{game} salvato"
+
+#: crates/gtk/src/window.rs:708
+#, rust-format
+msgid "Changing {game}"
+msgstr "Modifica di {game}"
+
+#: crates/gtk/src/window.rs:720
 msgid "Quitting Steam"
 msgstr "Chiusura di Steam"
 
-#: crates/gtk/src/window.rs:705
+#: crates/gtk/src/window.rs:722
 msgid "Steam quit: change its games, then start it again"
 msgstr "Steam è chiuso: modifica i suoi giochi, poi riavvialo"
 
-#: crates/gtk/src/window.rs:713 crates/gtk/src/window.rs:714
+#: crates/gtk/src/window.rs:730 crates/gtk/src/window.rs:731
 msgid "Starting Steam"
 msgstr "Avvio di Steam"
 
-#: crates/gtk/src/window.rs:721 crates/gtk/src/window.rs:736
+#: crates/gtk/src/window.rs:738 crates/gtk/src/window.rs:753
 #, rust-format
 msgid "Deleting {tool}"
 msgstr "Eliminazione di {tool}"
 
-#: crates/gtk/src/window.rs:724 crates/gtk/src/window.rs:743
+#: crates/gtk/src/window.rs:741 crates/gtk/src/window.rs:760
 #, rust-format
 msgid "Deleted {tool}"
 msgstr "{tool} eliminato"
 
-#: crates/gtk/src/window.rs:740
+#: crates/gtk/src/window.rs:757
 msgid "Steam is running: quit it first"
 msgstr "Steam è in esecuzione: chiudilo prima"
 
-#: crates/gtk/src/window.rs:750
+#: crates/gtk/src/window.rs:767
 #, rust-format
 msgid "Deleting {n} unused tool"
 msgid_plural "Deleting {n} unused tools"
 msgstr[0] "Eliminazione di {n} strumento inutilizzato"
 msgstr[1] "Eliminazione di {n} strumenti inutilizzati"
 
-#: crates/gtk/src/window.rs:759 crates/gtk/src/window.rs:776
+#: crates/gtk/src/window.rs:776 crates/gtk/src/window.rs:793
 #, rust-format
 msgid "Freed {size}"
 msgstr "Liberati {size}"
 
-#: crates/gtk/src/window.rs:767
+#: crates/gtk/src/window.rs:784
 #, rust-format
 msgid "Deleting {n} folder"
 msgid_plural "Deleting {n} folders"
 msgstr[0] "Eliminazione di {n} cartella"
 msgstr[1] "Eliminazione di {n} cartelle"
 
-#: crates/gtk/src/window.rs:783
+#: crates/gtk/src/window.rs:800
 #, rust-format
 msgid "Updating {tool}"
 msgstr "Aggiornamento di {tool}"
 
-#: crates/gtk/src/window.rs:785
+#: crates/gtk/src/window.rs:802
 #, rust-format
 msgid "Stopped updating {tool}"
 msgstr "Aggiornamento di {tool} interrotto"
 
-#: crates/gtk/src/window.rs:811
+#: crates/gtk/src/window.rs:828
 #, rust-format
 msgid "installed {version}"
 msgstr "{version} installato"
 
-#: crates/gtk/src/window.rs:815
+#: crates/gtk/src/window.rs:832
 #, rust-format
 msgid "moved {n} game onto it"
 msgid_plural "moved {n} games onto it"
 msgstr[0] "{n} gioco spostato sulla nuova versione"
 msgstr[1] "{n} giochi spostati sulla nuova versione"
 
-#: crates/gtk/src/window.rs:823
+#: crates/gtk/src/window.rs:840
 #, rust-format
 msgid "deleted {n} old version"
 msgid_plural "deleted {n} old versions"
 msgstr[0] "{n} versione vecchia eliminata"
 msgstr[1] "{n} versioni vecchie eliminate"
 
-#: crates/gtk/src/window.rs:831
+#: crates/gtk/src/window.rs:848
 #, rust-format
 msgid "{version} is up to date"
 msgstr "{version} è aggiornato"
 
-#: crates/gtk/src/window.rs:851
+#: crates/gtk/src/window.rs:868
 msgid "Reading the channels"
 msgstr "Lettura dei canali"
 
-#: crates/gtk/src/window.rs:860 crates/gtk/src/window.rs:868
+#: crates/gtk/src/window.rs:877 crates/gtk/src/window.rs:885
 msgid "Saving the channels"
 msgstr "Salvataggio dei canali"
 
-#: crates/gtk/src/window.rs:883
+#: crates/gtk/src/window.rs:900
 #, rust-format
 msgid "Moved {n} game to {tool}"
 msgid_plural "Moved {n} games to {tool}"
 msgstr[0] "{n} gioco spostato su {tool}"
 msgstr[1] "{n} giochi spostati su {tool}"
 
-#: crates/gtk/src/window.rs:889
+#: crates/gtk/src/window.rs:906
 #, rust-format
 msgid "Moving games to {tool}"
 msgstr "Spostamento dei giochi su {tool}"
 
-#: crates/gtk/src/window.rs:901
+#: crates/gtk/src/window.rs:918
 #, rust-format
 msgid "{game} now launches without options"
 msgstr "{game} ora si avvia senza opzioni"
 
-#: crates/gtk/src/window.rs:906
+#: crates/gtk/src/window.rs:923
 #, rust-format
 msgid "Saved the launch options of {game}"
 msgstr "Opzioni di avvio di {game} salvate"
 
-#: crates/gtk/src/window.rs:912
+#: crates/gtk/src/window.rs:929
 #, rust-format
 msgid "Setting the launch options of {game}"
 msgstr "Impostazione delle opzioni di avvio di {game}"
 
-#: crates/gtk/src/window.rs:926
+#: crates/gtk/src/window.rs:943
 #, rust-format
 msgid "Installing {verbs} into {game}"
 msgstr "Installazione di {verbs} in {game}"
 
-#: crates/gtk/src/window.rs:930
+#: crates/gtk/src/window.rs:947
 #, rust-format
 msgid "Installed {verbs} into {game}"
 msgstr "{verbs} installato in {game}"
 
-#: crates/gtk/src/window.rs:933
+#: crates/gtk/src/window.rs:950
 #, rust-format
 msgid "Stopped installing into {game}"
 msgstr "Installazione in {game} interrotta"
 
-#: crates/gtk/src/window.rs:975
+#: crates/gtk/src/window.rs:992
 #, rust-format
 msgid "{game} now runs with the default"
 msgstr "{game} ora usa lo strumento predefinito"
 
-#: crates/gtk/src/window.rs:979
+#: crates/gtk/src/window.rs:996
 #, rust-format
 msgid "Setting the tool of {game}"
 msgstr "Impostazione dello strumento di {game}"
 
-#: crates/gtk/src/window.rs:993
+#: crates/gtk/src/window.rs:1010
 #, rust-format
 msgid "Games without a tool of their own now run with {tool}"
 msgstr "I giochi senza uno strumento proprio ora girano con {tool}"
 
-#: crates/gtk/src/window.rs:997
+#: crates/gtk/src/window.rs:1014
 msgid "Steam Play is off for games without a tool of their own"
 msgstr "Steam Play è disattivato per i giochi senza uno strumento proprio"
 
-#: crates/gtk/src/window.rs:1001
+#: crates/gtk/src/window.rs:1018
 msgid "Setting the default tool"
 msgstr "Impostazione dello strumento predefinito"
 
-#: crates/gtk/src/window.rs:1024
+#: crates/gtk/src/window.rs:1041
 msgid "Wait for the current job to finish"
 msgstr "Attendi che l'operazione in corso finisca"
 
-#: crates/gtk/src/window.rs:1107
+#: crates/gtk/src/window.rs:1124
 #, rust-format
 msgid "{n} tool"
 msgid_plural "{n} tools"
 msgstr[0] "{n} strumento"
 msgstr[1] "{n} strumenti"
 
-#: crates/gtk/src/window.rs:1133
+#: crates/gtk/src/window.rs:1150
 msgid "Running"
 msgstr "In esecuzione"
+
+#~ msgid "Set a non-Steam game's launch options in its properties in Steam"
+#~ msgstr ""
+#~ "Imposta le opzioni di avvio di un gioco non di Steam nelle sue proprietà "
+#~ "in Steam"
 
 #~ msgid "No game runs with it."
 #~ msgstr "Nessun gioco lo usa."

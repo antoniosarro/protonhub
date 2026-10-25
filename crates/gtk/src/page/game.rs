@@ -12,7 +12,7 @@ use protonhub_core::info::Info;
 use protonhub_core::install::human_size;
 use protonhub_core::launch::{self, Options};
 use protonhub_core::launcher::Launcher;
-use protonhub_core::mangohud;
+use protonhub_core::{mangohud, steam};
 
 use super::game_row::{deck_rating, deck_text, options, source, thumbnail, tier_name};
 use super::storage::{self, kind_name};
@@ -84,6 +84,9 @@ fn build(
     page.add(&top);
 
     if let Some(group) = ratings(state, game) {
+        page.add(&group);
+    }
+    if let Some(group) = shortcut_group(win, state, game) {
         page.add(&group);
     }
     page.add(&tool_group(win, state, lib, game));
@@ -221,6 +224,70 @@ fn ratings(state: &LauncherState, game: &Game) -> Option<adw::PreferencesGroup> 
     Some(group)
 }
 
+/// A non-Steam shortcut's name, target and start folder, to change as its
+/// properties in Steam do.
+fn shortcut_group(
+    win: &Rc<Window>,
+    state: &LauncherState,
+    game: &Game,
+) -> Option<adw::PreferencesGroup> {
+    if game.source != "shortcut" {
+        return None;
+    }
+    let (_, shortcut) = steam::shortcuts(&state.launcher.root)
+        .ok()?
+        .into_iter()
+        .find(|(id, _)| *id == game.id)?;
+    let group = adw::PreferencesGroup::builder()
+        .title(tr("Shortcut", &[]))
+        .description(tr(
+            "As its properties in Steam show them; a path with spaces is quoted",
+            &[],
+        ))
+        .build();
+    let rows: Vec<adw::EntryRow> = [
+        (tr("Name", &[]), &shortcut.name),
+        (tr("Target", &[]), &shortcut.target),
+        (tr("Start In", &[]), &shortcut.start_dir),
+    ]
+    .into_iter()
+    .map(|(title, text)| {
+        let row = adw::EntryRow::builder()
+            .title(title)
+            .text(text.as_str())
+            .show_apply_button(true)
+            .sensitive(!state.running)
+            .build();
+        group.add(&row);
+        row
+    })
+    .collect();
+    let rows = Rc::new(rows);
+    for row in rows.iter() {
+        row.connect_apply(glib::clone!(
+            #[strong]
+            win,
+            #[strong]
+            rows,
+            #[strong(rename_to = launcher)]
+            state.launcher,
+            #[strong]
+            game,
+            move |_| {
+                let [name, target, start_dir] = [0, 1, 2].map(|i| rows[i].text().to_string());
+                let to = steam::Shortcut {
+                    name,
+                    target,
+                    start_dir,
+                    launch_options: String::new(),
+                };
+                win.edit_shortcut(&launcher, &game, &to);
+            }
+        ));
+    }
+    Some(group)
+}
+
 /// The tool it runs with, to change, as its row's list does.
 fn tool_group(
     win: &Rc<Window>,
@@ -282,17 +349,6 @@ fn launch_group(
             return Some(group);
         }
     };
-    if game.source == "shortcut" {
-        let row = adw::ActionRow::builder()
-            .title(tr(
-                "Set a non-Steam game's launch options in its properties in Steam",
-                &[],
-            ))
-            .build();
-        row.add_css_class("dim-label");
-        group.add(&row);
-        return Some(group);
-    }
     group.set_description(Some(&tr(
         "The switches edit the text; save it to change the game. Not every Proton build reads every option.",
         &[],

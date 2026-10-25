@@ -1,7 +1,7 @@
 //! Valve's KeyValues formats: the text one (config.vdf, appmanifest_*.acf,
 //! compatibilitytool.vdf), read and written in Steam's own layout so a
 //! rewrite changes only what was edited, and the binary one
-//! (shortcuts.vdf, appinfo.vdf), read only.
+//! (shortcuts.vdf, appinfo.vdf), read, and written for shortcuts.vdf.
 
 use std::fmt::Write;
 
@@ -253,6 +253,34 @@ fn escape(s: &str) -> String {
     s.replace('\\', "\\\\").replace('"', "\\\"")
 }
 
+/// Writes the binary format with strings, objects and each number an
+/// int32, as shortcuts.vdf holds; a file that held other types doesn't
+/// read back the same, which is how a caller tells.
+pub fn to_binary(obj: &Obj) -> Vec<u8> {
+    fn write(obj: &Obj, out: &mut Vec<u8>) {
+        for (k, v) in &obj.0 {
+            let (kind, value): (u8, Vec<u8>) = match v {
+                Value::Str(s) => (0x01, [s.as_bytes(), &[0]].concat()),
+                Value::Int(n) => (0x02, (*n as i32).to_le_bytes().to_vec()),
+                Value::Obj(o) => {
+                    let mut inner = Vec::new();
+                    write(o, &mut inner);
+                    inner.push(0x08);
+                    (0x00, inner)
+                }
+            };
+            out.push(kind);
+            out.extend(k.as_bytes());
+            out.push(0);
+            out.extend(value);
+        }
+    }
+    let mut out = Vec::new();
+    write(obj, &mut out);
+    out.push(0x08);
+    out
+}
+
 /// Parses the binary format (shortcuts.vdf).
 pub fn parse_binary(bytes: &[u8]) -> Result<Obj, ParseError> {
     let mut pos = 0;
@@ -445,6 +473,7 @@ mod tests {
         assert_eq!(game.get("AppID"), Some(&Value::Int(-1_234_567_890)));
         assert_eq!(game.str("appname"), Some("My Game"));
         assert!(parse_binary(&b[..b.len() - 6]).is_err());
+        assert_eq!(to_binary(&obj), b, "it writes back the same");
     }
 
     #[test]

@@ -14,6 +14,7 @@ use protonhub_core::manifest::{Arch, LauncherKind, Registry, Tool};
 use protonhub_core::paths;
 use protonhub_core::prefix;
 use protonhub_core::releases::{self, Client, Version};
+use protonhub_core::steam;
 use protonhub_core::storage::{self, Kind};
 use serde::Serialize;
 
@@ -134,6 +135,19 @@ enum Command {
     /// Steam "none" to turn Steam Play off for them
     Default {
         tool: Option<String>,
+        #[arg(long)]
+        launcher: Option<String>,
+    },
+    /// Show a non-Steam shortcut's name, target and start folder, or change
+    /// them; its launch options are `launch`'s
+    Shortcut {
+        game: String,
+        #[arg(long)]
+        name: Option<String>,
+        #[arg(long)]
+        target: Option<String>,
+        #[arg(long)]
+        start_in: Option<String>,
         #[arg(long)]
         launcher: Option<String>,
     },
@@ -768,6 +782,32 @@ fn run(cli: Cli) -> Result<()> {
             games::assign(&target, &g.id, choice.map(|c| c.id.as_str()))?;
             let to = choice.map_or("the default".into(), |c| c.name.clone());
             print(json, format!("{} now runs with {to}", g.name), &choice)
+        }
+        Command::Shortcut {
+            game,
+            name,
+            target,
+            start_in,
+            launcher,
+        } => {
+            let target_launcher = pick_one(launcher.as_deref(), is_steam, "has shortcuts (steam)")?;
+            let library = games::library(&target_launcher)?.expect("steam has games");
+            let g = find_game(&library, &game)?;
+            let (_, mut s) = steam::shortcuts(&target_launcher.root)?
+                .into_iter()
+                .find(|(id, _)| *id == g.id)
+                .ok_or_else(|| format!("{} isn't a non-Steam shortcut", g.name))?;
+            if name.is_some() || target.is_some() || start_in.is_some() {
+                s.name = name.unwrap_or(s.name);
+                s.target = target.unwrap_or(s.target);
+                s.start_dir = start_in.unwrap_or(s.start_dir);
+                games::edit_shortcut(&target_launcher, &g.id, &s.name, &s.target, &s.start_dir)?;
+            }
+            let text = format!(
+                "name\t{}\ntarget\t{}\nstart in\t{}\nlaunch options\t{}",
+                s.name, s.target, s.start_dir, s.launch_options
+            );
+            print(json, text, &s)
         }
         Command::Default { tool, launcher } => {
             let target = pick_one(

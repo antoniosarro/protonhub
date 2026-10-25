@@ -379,55 +379,147 @@ fn installed(
 
     for user in subdirs(&root.join("userdata"))? {
         let path = user.join("config/shortcuts.vdf");
-        let bytes = match fs::read(&path) {
-            Ok(b) => b,
-            Err(e) if e.kind() == io::ErrorKind::NotFound => continue,
-            Err(source) => return Err(Error::Io { path, source }),
-        };
-        let obj = match vdf::parse_binary(&bytes) {
-            Ok(o) => o,
-            Err(e) => {
-                problems.push(format!("{}: {e}", path.display()));
+        let obj = match read_binary(&path) {
+            Ok(Some(o)) => o,
+            Ok(None) => continue,
+            Err(Error::Vdf { source, .. }) => {
+                problems.push(format!("{}: {source}", path.display()));
                 continue;
             }
+            Err(e) => return Err(e),
         };
         for (_, s) in obj
             .obj("shortcuts")
             .map(|o| o.0.as_slice())
             .unwrap_or_default()
         {
-            let Some(s) = s.as_obj() else { continue };
-            let (Some(Value::Int(id)), Some(name)) = (s.get("appid"), s.str("AppName")) else {
-                continue;
-            };
-            // Stored signed; Steam's mapping uses the unsigned value.
-            games.push(((*id as u32).to_string(), name.to_owned(), "shortcut"));
+            if let Some((id, s)) = s.as_obj().and_then(read_shortcut) {
+                games.push((id, s.name, "shortcut"));
+            }
         }
     }
     Ok(games)
 }
 
-/// The launch options of each game that has some, by app id, from the
-/// settings of the user `local_config` picks.
+/// The launch options of each game that has some, by app id: a Steam
+/// game's from the settings of the user `local_config` picks, a shortcut's
+/// from its entry in shortcuts.vdf.
 pub fn launch_options(root: &Path) -> Result<Vec<(String, String)>, Error> {
+    let mut all: Vec<(String, String)> = shortcuts(root)?
+        .into_iter()
+        .filter(|(_, s)| !s.launch_options.is_empty())
+        .map(|(id, s)| (id, s.launch_options))
+        .collect();
     let Some(config) = read_text(&local_config(root)?)? else {
-        return Ok(Vec::new());
+        return Ok(all);
     };
     let apps = config
         .path(&APPS)
         .map(|a| a.0.as_slice())
         .unwrap_or_default();
-    Ok(apps
-        .iter()
-        .filter_map(|(id, app)| {
-            let options = app.as_obj()?.str("LaunchOptions")?;
-            (!options.is_empty()).then(|| (id.clone(), options.to_owned()))
-        })
-        .collect())
+    all.extend(apps.iter().filter_map(|(id, app)| {
+        let options = app.as_obj()?.str("LaunchOptions")?;
+        (!options.is_empty()).then(|| (id.clone(), options.to_owned()))
+    }));
+    Ok(all)
+}
+
+/// A non-Steam shortcut's settings, as its properties in Steam show them.
+/// The target and start folder are as Steam keeps them, often quoted.
+#[derive(Debug, Clone, Default, PartialEq, Eq, serde::Serialize)]
+pub struct Shortcut {
+    pub name: String,
+    pub target: String,
+    pub start_dir: String,
+    pub launch_options: String,
+}
+
+/// Each user's shortcuts, by app id.
+pub fn shortcuts(root: &Path) -> Result<Vec<(String, Shortcut)>, Error> {
+    let mut all = Vec::new();
+    for user in subdirs(&root.join("userdata"))? {
+        let path = user.join("config/shortcuts.vdf");
+        let Some(obj) = read_binary(&path)? else {
+            continue;
+        };
+        for (_, s) in obj
+            .obj("shortcuts")
+            .map(|o| o.0.as_slice())
+            .unwrap_or_default()
+        {
+            if let Some((id, shortcut)) = s.as_obj().and_then(read_shortcut) {
+                all.push((id, shortcut));
+            }
+        }
+    }
+    Ok(all)
+}
+
+/// The fields of a shortcut, the keys Steam writes them under.
+const SHORTCUT_KEYS: [&str; 4] = ["AppName", "Exe", "StartDir", "LaunchOptions"];
+
+fn read_shortcut(s: &Obj) -> Option<(String, Shortcut)> {
+    let Some(Value::Int(id)) = s.get("appid") else {
+        return None;
+    };
+    let [name, target, start_dir, launch_options] =
+        SHORTCUT_KEYS.map(|k| s.str(k).unwrap_or_default().to_owned());
+    // Stored signed; Steam's mapping uses the unsigned value.
+    Some((
+        (*id as u32).to_string(),
+        Shortcut {
+            name,
+            target,
+            start_dir,
+            launch_options,
+        },
+    ))
+}
+
+/// Sets shortcut `game`'s settings to `to`, in the shortcuts.vdf that has
+/// it; refused for a file ProtonHub couldn't write back as it was.
+pub fn set_shortcut(root: &Path, game: &str, to: &Shortcut) -> Result<(), Error> {
+    for user in subdirs(&root.join("userdata"))? {
+        let path = user.join("config/shortcuts.vdf");
+        let Some(bytes) = fs::read(&path).ok() else {
+            continue;
+        };
+        let mut obj = vdf::parse_binary(&bytes).map_err(|source| Error::Vdf {
+            path: path.clone(),
+            source,
+        })?;
+        let Some(entry) = obj
+            .path_mut(&["shortcuts"])
+            .0
+            .iter_mut()
+            .find_map(|(_, s)| {
+                let Value::Obj(s) = s else { return None };
+                read_shortcut(s)
+                    .is_some_and(|(id, _)| id == game)
+                    .then_some(s)
+            })
+        else {
+            continue;
+        };
+        if vdf::to_binary(&vdf::parse_binary(&bytes).expect("parsed above")) != bytes {
+            return Err(Error::Format {
+                path,
+                message: "it holds values ProtonHub can't write back as they were".into(),
+            });
+        }
+        let values = [&to.name, &to.target, &to.start_dir, &to.launch_options];
+        for (key, value) in SHORTCUT_KEYS.into_iter().zip(values) {
+            entry.set(key, Value::Str(value.clone()));
+        }
+        return crate::games::write_with_backup(&path, &vdf::to_binary(&obj));
+    }
+    Err(Error::UnknownGame {
+        id: game.to_owned(),
+    })
 }
 
 /// Sets `game`'s launch options to `text`, or with an empty one removes
-/// them. A shortcut's are in shortcuts.vdf, which ProtonHub doesn't write.
+/// them: a Steam game's in the user's settings, a shortcut's in its entry.
 pub fn set_launch_options(root: &Path, game: &str, text: &str) -> Result<(), Error> {
     let lib = library(root)?;
     let found = lib
@@ -438,7 +530,14 @@ pub fn set_launch_options(root: &Path, game: &str, text: &str) -> Result<(), Err
             id: game.to_owned(),
         })?;
     if found.source == "shortcut" {
-        return Err(Error::Shortcut);
+        let (_, mut shortcut) = shortcuts(root)?
+            .into_iter()
+            .find(|(id, _)| id == game)
+            .ok_or_else(|| Error::UnknownGame {
+                id: game.to_owned(),
+            })?;
+        shortcut.launch_options = text.to_owned();
+        return set_shortcut(root, game, &shortcut);
     }
     let path = local_config(root)?;
     let mut config = read_text(&path)?.ok_or_else(|| Error::Format {
@@ -490,6 +589,26 @@ fn local_config(root: &Path) -> Result<PathBuf, Error> {
             ),
         }),
     }
+}
+
+/// A binary KeyValues file, or none where there isn't one.
+fn read_binary(path: &Path) -> Result<Option<Obj>, Error> {
+    let bytes = match fs::read(path) {
+        Ok(b) => b,
+        Err(e) if e.kind() == io::ErrorKind::NotFound => return Ok(None),
+        Err(source) => {
+            return Err(Error::Io {
+                path: path.to_owned(),
+                source,
+            });
+        }
+    };
+    vdf::parse_binary(&bytes)
+        .map(Some)
+        .map_err(|source| Error::Vdf {
+            path: path.to_owned(),
+            source,
+        })
 }
 
 /// The id of every app installed in any library, games or not, from its
@@ -677,6 +796,42 @@ pub(crate) fn same_dir(a: &Path, b: &Path) -> bool {
 mod tests {
     use super::*;
     use crate::testutil::TempDir;
+
+    #[test]
+    fn a_shortcut_is_edited_or_its_file_left_alone() {
+        let home = TempDir::new("steam-shortcut");
+        let root = home.join("Steam");
+        let file = |extra: &[u8]| {
+            let mut b = vec![0x00];
+            b.extend(b"shortcuts\0\x000\0\x02appid\0");
+            b.extend((-5i32).to_le_bytes());
+            b.extend(b"\x01AppName\0Game\0\x01Exe\0\"/g/game.exe\"\0");
+            b.extend(extra);
+            b.extend([0x08, 0x08, 0x08]);
+            b
+        };
+        let path = root.join("userdata/1/config/shortcuts.vdf");
+        fs::create_dir_all(path.parent().unwrap()).unwrap();
+        fs::write(&path, file(&[])).unwrap();
+        let (id, mut s) = shortcuts(&root).unwrap().remove(0);
+        assert_eq!(
+            (id.as_str(), s.target.as_str()),
+            ("4294967291", "\"/g/game.exe\"")
+        );
+        s.name = "Renamed".into();
+        s.start_dir = "\"/g\"".into();
+        set_shortcut(&root, &id, &s).unwrap();
+        assert_eq!(shortcuts(&root).unwrap()[0].1, s);
+
+        // A float doesn't write back as it was: the file is left alone.
+        let mut float = vec![0x03];
+        float.extend(b"x\0");
+        float.extend(1.5f32.to_le_bytes());
+        fs::write(&path, file(&float)).unwrap();
+        let err = set_shortcut(&root, &id, &s).unwrap_err();
+        assert!(matches!(err, Error::Format { .. }), "{err}");
+        assert_eq!(fs::read(&path).unwrap(), file(&float));
+    }
 
     #[test]
     fn art_from_the_library_cache_or_the_cdn() {

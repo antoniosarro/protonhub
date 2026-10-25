@@ -695,6 +695,23 @@ impl Window {
         });
     }
 
+    /// Renames a Steam shortcut and sets what it runs and where.
+    pub fn edit_shortcut(
+        self: &Rc<Self>,
+        launcher: &Launcher,
+        game: &games::Game,
+        to: &steam::Shortcut,
+    ) {
+        match games::edit_shortcut(launcher, &game.id, &to.name, &to.target, &to.start_dir) {
+            Ok(()) => self.toast(&tr("Saved {game}", &[("game", &to.name)])),
+            Err(e) => self.report(
+                tr("Changing {game}", &[("game", &game.name)]),
+                e.to_string(),
+            ),
+        }
+        self.reload();
+    }
+
     /// Quits `launcher`, a Steam, so its games can be changed; its page
     /// then offers to start it again.
     pub fn quit_steam(self: &Rc<Self>, launcher: &Launcher) {

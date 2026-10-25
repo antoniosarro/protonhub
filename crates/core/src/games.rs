@@ -111,10 +111,6 @@ pub enum Error {
     NeedsTool,
     #[error("ProtonHub can't set the tool of {launcher} games")]
     Unsupported { launcher: &'static str },
-    #[error(
-        "ProtonHub can't change a non-Steam game's launch options yet; set them in its properties in Steam"
-    )]
-    Shortcut,
     #[error("the launch options have an unclosed quote")]
     Unclosed,
     #[error("{game} has no Wine prefix yet; run it once, then try again")]
@@ -202,6 +198,39 @@ pub fn set_default(launcher: &Launcher, tool: Option<&str>) -> Result<(), Error>
             launcher: kind.title(),
         }),
     }
+}
+
+/// Renames Steam shortcut `game` and sets what it runs and where, keeping
+/// its launch options. Refused while Steam runs, which would write its own
+/// back.
+pub fn edit_shortcut(
+    launcher: &Launcher,
+    game: &str,
+    name: &str,
+    target: &str,
+    start_dir: &str,
+) -> Result<(), Error> {
+    if is_running(launcher) {
+        return Err(Error::Running {
+            launcher: launcher.kind.title(),
+        });
+    }
+    let (_, current) = steam::shortcuts(&launcher.root)?
+        .into_iter()
+        .find(|(id, _)| id == game)
+        .ok_or_else(|| Error::UnknownGame {
+            id: game.to_owned(),
+        })?;
+    steam::set_shortcut(
+        &launcher.root,
+        game,
+        &steam::Shortcut {
+            name: name.to_owned(),
+            target: target.to_owned(),
+            start_dir: start_dir.to_owned(),
+            ..current
+        },
+    )
 }
 
 /// Moves every game set to a tool matching `from` (its id or name) to the
