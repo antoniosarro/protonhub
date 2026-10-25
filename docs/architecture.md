@@ -19,9 +19,9 @@ graph TD
 | Crate | Role |
 | --- | --- |
 | `crates/manifest` (`protonhub-manifest`) | The manifest schema, loading `registry/`, and resolving a release to the one asset and checksum for an arch ([manifests.md](manifests.md)) |
-| `crates/core` (`protonhub-core`) | `launcher`: detection (native, Flatpak, Snap). `releases`: GitHub, Forgejo and GitLab releases and fixed URLs, ETag cache, resumable downloads. `install`: the installer pipeline, listing, removal. `games`: games, per-game tools and usage across launchers, with `steam`, `heroic` and `faugus` behind it. `storage`: Steam's prefixes and shader caches, and the ones uninstalled games left. `launch`: launch options, split into variables, programs and arguments, and the presets (`presets.toml`) that switch parts of them. `mangohud`: MangoHud's config files, line by line, and the settings its editor offers (`mangohud.toml`). `prefix`: a game's Wine prefix and the Wine that runs it, winetricks verbs (`verbs.toml`), Wine's tools and Windows programs in it, and runs that can be cancelled. `channels`: keeping tools at their latest release. `lock`: lockfiles. `info`: ProtonDB ratings and Are We Anti-Cheat Yet statuses. `vdf`: Valve's text and binary KeyValues. `paths`: XDG directories. Re-exports `manifest` |
-| `crates/cli` (`protonhub-cli`, binary `protonhub`) | The command line ([usage.md](usage.md)), and the systemd user timer (`timer.rs`) |
-| `crates/gtk` (`protonhub-gtk`, binary `protonhub-gtk`) | The GTK 4 + libadwaita GUI ([gui.md](gui.md)). `window`: the sidebar, the snapshot read on a worker thread, and jobs. `page`: a launcher's page, a module of a file per tab (`games` with `game_row` and the `game` page and its `prefix` group, `tools`, `storage`). `tool`, `details`: a tool's releases, an installed tool's users. `mangohud`: the MangoHud editor and its preview. `errors`: the error log. `art`: pictures, decoded off the main thread and cached. `gamepad`: gilrs, polled on the main loop. `i18n`: gettext ([translating.md](translating.md)) |
+| `crates/core` (`protonhub-core`) | `launcher`: detection (native, Flatpak, Snap). `releases`: GitHub, Forgejo and GitLab releases and fixed URLs (`raw`: the APIs' shapes), ETag cache and resumable downloads (`http`). `install`: the installer pipeline, listing, removal (`unpack`: checksums and extraction). `games`: games and per-game tools, and usage across launchers (`usage`), with `steam` (its `shortcuts`, `user` settings, `officials` and `appinfo` cache), `heroic` and `faugus` behind it. `files`: reading a launcher's file that may not be there, writing one with a backup. `storage`: Steam's prefixes and shader caches, and the ones uninstalled games left. `launch`: launch options, split into variables, programs and arguments, and the presets (`presets.toml`) that switch parts of them. `mangohud`: MangoHud's config files, line by line, and the settings its editor offers (`mangohud.toml`). `prefix`: a game's Wine prefix and the Wine that runs it, winetricks verbs (`verbs.toml`), Wine's tools and Windows programs in it, and runs that can be cancelled. `channels`: keeping tools at their latest release. `lock`: lockfiles. `info`: ProtonDB ratings and Are We Anti-Cheat Yet statuses. `vdf`: Valve's text and binary KeyValues. `paths`: XDG directories. Re-exports `manifest` |
+| `crates/cli` (`protonhub-cli`, binary `protonhub`) | The command line ([usage.md](usage.md)): `args`, what clap reads; `commands`, a function per command in a file per group (`tools`, `games`, `launch`, `storage`, `channels`, `lock`, `registry`); `common`, finding the tool, launcher or game a command names; `progress`; and the systemd user timer (`timer`) |
+| `crates/gtk` (`protonhub-gtk`, binary `protonhub-gtk`) | The GTK 4 + libadwaita GUI ([gui.md](gui.md)). `window`: the sidebar, the navigation view pages are pushed onto, the snapshot read on a worker thread (`snapshot`), jobs (`jobs`) and quick changes (`actions`). `views`: a launcher's view, a file per tab (`games` with `game_card`, `tools`, `storage`). `pages`: what's pushed over a view, each with the `Route` a redraw builds it again from (`game` with its launch options, gamescope, prefix and storage groups; `tool`, `installed`, `cleanup`, `move_games`, `bulk_launch`, `tricks`, `mangohud`, `preferences`). `ui`: the widgets they share, how they're laid out (`layout`: card grids, columns, page tops) and the pieces (`widgets`). `choices`, `text`: the tools a list offers, and things in words. `errors`: the error log. `art`: pictures, decoded off the main thread and cached. `gamepad`: gilrs, polled on the main loop. `i18n`: gettext ([translating.md](translating.md)) |
 
 `crates/gtk` is a workspace member but not a default member: plain `cargo
 build` and `cargo test` skip it, so the core's edit-test loop doesn't link
@@ -43,9 +43,13 @@ GTK. `just gui` and `just gui-check` build it, and so does the Nix package.
   is an error. Taking the first match would pair GE-Proton11's x86_64
   tarball with its aarch64 checksum.
 - **Testable without a machine.** Launcher detection takes the home
-  directory as an argument, so tests build fixture homes; manifest tests
-  use asset lists recorded from real releases
-  (`crates/manifest/tests/registry.rs`).
+  directory as an argument, so tests build fixture homes
+  (`crates/core/src/tests/testutil.rs`); manifest tests use asset lists
+  recorded from real releases (`crates/manifest/tests/registry.rs`).
+- **Tests beside the code, not in it.** A module's unit tests are in its
+  crate's `src/tests/`, a file per module, declared with
+  `#[cfg(test)] #[path = "tests/<module>.rs"] mod tests;` so they still
+  reach the module's private items.
 
 ## Games and launcher settings
 
@@ -131,7 +135,7 @@ the reset time.
 
 ### Tests
 
-`crates/core/src/testutil.rs` has a localhost HTTP server that answers
+`crates/core/src/tests/testutil.rs` has a localhost HTTP server that answers
 from a closure and logs requests, so the client and the whole pipeline are
 tested without the network: ETag revalidation, the rate limit, resuming,
 checksum mismatches, bad archive layouts and path traversal.

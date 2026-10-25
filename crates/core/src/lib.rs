@@ -3,6 +3,7 @@
 
 pub mod channels;
 pub mod faugus;
+mod files;
 pub mod games;
 pub mod heroic;
 pub mod info;
@@ -22,4 +23,5 @@ pub mod vdf;
 pub use protonhub_manifest as manifest;
 
 #[cfg(test)]
+#[path = "tests/testutil.rs"]
 mod testutil;

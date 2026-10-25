@@ -6,11 +6,11 @@
 //! it uses the default in config.json.
 
 use std::fs;
-use std::io;
 use std::path::{Path, PathBuf};
 
 use serde_json::{Map, Value, json};
 
+use crate::files::{optional, read_json};
 use crate::games::{Choice, Error, Game, Library};
 use crate::launch::{self, Options};
 use crate::launcher::Launcher;
@@ -121,11 +121,8 @@ const SWITCHES: [(&str, &str); 2] = [("showMangohud", "mangohud"), ("useGameMode
 /// MangoHud and GameMode switches among them), %command% and its
 /// arguments. Games without any are left out.
 pub fn launch_options(root: &Path) -> Result<Vec<(String, String)>, Error> {
-    let dir = root.join("GamesConfig");
-    let entries = match fs::read_dir(&dir) {
-        Ok(e) => e,
-        Err(e) if e.kind() == io::ErrorKind::NotFound => return Ok(Vec::new()),
-        Err(source) => return Err(Error::Io { path: dir, source }),
+    let Some(entries) = optional(&root.join("GamesConfig"), fs::read_dir)? else {
+        return Ok(Vec::new());
     };
     let mut all = Vec::new();
     for path in entries.flatten().map(|e| e.path()) {
@@ -263,7 +260,7 @@ fn edit_settings(
         })?;
     change(settings);
     let text = serde_json::to_string_pretty(&config).expect("JSON values serialize");
-    crate::games::write_with_backup(&path, text.as_bytes())
+    crate::files::write_with_backup(&path, text.as_bytes())
 }
 
 /// The Proton and Wine builds in Heroic's tool directories, then those
@@ -323,7 +320,7 @@ fn tools(root: &Path, beside: &[Launcher]) -> Vec<Choice> {
             if choices.iter().any(|c| {
                 c.dir
                     .as_deref()
-                    .is_some_and(|d| crate::steam::same_dir(d, &path))
+                    .is_some_and(|d| crate::files::same_dir(d, &path))
             }) {
                 continue;
             }
@@ -360,7 +357,7 @@ fn listed(choices: &[Choice], own: Choice) -> Choice {
             choices.iter().find(|c| {
                 c.dir
                     .as_deref()
-                    .is_some_and(|cd| crate::steam::same_dir(cd, d))
+                    .is_some_and(|cd| crate::files::same_dir(cd, d))
             })
         })
         .cloned()
@@ -398,23 +395,4 @@ pub(crate) fn settings(root: &Path, game: &str) -> Result<Option<Value>, Error> 
 
 fn config_path(root: &Path, game: &str) -> PathBuf {
     root.join("GamesConfig").join(format!("{game}.json"))
-}
-
-pub(crate) fn read_json(path: &Path) -> Result<Option<Value>, Error> {
-    let bytes = match fs::read(path) {
-        Ok(b) => b,
-        Err(e) if e.kind() == io::ErrorKind::NotFound => return Ok(None),
-        Err(source) => {
-            return Err(Error::Io {
-                path: path.to_owned(),
-                source,
-            });
-        }
-    };
-    serde_json::from_slice(&bytes)
-        .map(Some)
-        .map_err(|source| Error::Json {
-            path: path.to_owned(),
-            source,
-        })
 }
