@@ -1094,6 +1094,19 @@ impl Window {
                             win.busy.set(false);
                             win.job.stop.take();
                             win.job.revealer.set_reveal_child(false);
+                            // Away from the window, its end is a notification
+                            // too.
+                            if !win.window.is_active()
+                                && let Some(app) = win.window.application()
+                            {
+                                let body = match &result {
+                                    Ok(done) => done.as_str(),
+                                    Err(e) => e.lines().next().unwrap_or_default(),
+                                };
+                                let note = gio::Notification::new(&title);
+                                note.set_body(Some(body));
+                                app.send_notification(Some("job"), &note);
+                            }
                             match result {
                                 Ok(done) => win.toast(&done),
                                 Err(e) => win.report(title.clone(), e),

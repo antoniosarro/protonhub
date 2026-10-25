@@ -144,7 +144,8 @@ downloading, verifying the checksum, extracting) with a progress bar and
 the MiB done; buttons that would start another job are disabled until it
 ends. An install or update has a Cancel button, which stops its download;
 what was downloaded stays, and the next try resumes from it. A toast
-reports the result. After installing into Steam, restart
+reports the result, and a desktop notification too when the window isn't
+the active one. After installing into Steam, restart
 Steam to see the new tool.
 
 ## MangoHud
