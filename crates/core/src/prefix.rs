@@ -47,6 +47,7 @@ pub fn find(launcher: &Launcher, game: &Game) -> Result<Prefix, Error> {
     match launcher.kind {
         LauncherKind::Steam => steam(&launcher.root, game),
         LauncherKind::Heroic => heroic(&launcher.root, game),
+        LauncherKind::Faugus => faugus(launcher, game),
         kind => Err(Error::Unsupported {
             launcher: kind.title(),
         }),
@@ -80,6 +81,25 @@ fn steam(root: &Path, game: &Game) -> Result<Prefix, Error> {
         dir: data.join("pfx"),
         wine,
     })
+}
+
+/// A Faugus game's prefix is its `prefix`, Wine's own (umu links Proton's
+/// `pfx` to it), run with its runner.
+fn faugus(launcher: &Launcher, game: &Game) -> Result<Prefix, Error> {
+    let dir = crate::faugus::prefix(launcher, &game.id)?
+        .filter(|d| d.join("drive_c").is_dir())
+        .ok_or_else(|| Error::NoPrefix {
+            game: game.name.clone(),
+        })?;
+    let wine = game
+        .tool
+        .as_ref()
+        .and_then(|t| t.dir.as_deref())
+        .and_then(proton_wine)
+        .ok_or_else(|| Error::NoWine {
+            game: game.name.clone(),
+        })?;
+    Ok(Prefix { dir, wine })
 }
 
 fn heroic(root: &Path, game: &Game) -> Result<Prefix, Error> {

@@ -49,7 +49,7 @@ scriptable CLI with JSON output.
   [`presets.toml`](crates/core/presets.toml), each saying which Proton
   builds read it, and gamescope's resolution, frame rate and upscaling.
 - **Prefix tools**: install winetricks components (Visual C++, .NET,
-  DirectX, fonts…) into a Steam or Heroic game's prefix with the game's own
+  DirectX, fonts…) into a Steam, Heroic or Faugus game's prefix with its own
   Proton, open winecfg or regedit there, or run a Windows program in it.
 - **MangoHud editor**: its global settings, or a game's own, with a live
   preview of the real MangoHud over vkcube as you change them.
@@ -151,7 +151,7 @@ libadwaita 1.6+, libudev and gettext. [`just`](justfile) lists the recipes:
 
 - Per-game tools are set for Steam, Heroic and Faugus Launcher only;
   Lutris, Bottles and WineZGUI get installs and removals. Launch options
-  and prefix tools are for Steam and Heroic games.
+  are for Steam and Heroic games, prefix tools for Faugus's too.
 - Tools only released as CI artifacts (Proton-Tkg, Wine-Tkg, DXVK
   nightly) and SteamTinkerLaunch are not covered.
 - Inside the Flatpak, ProtonHub can't see whether Steam or Heroic is

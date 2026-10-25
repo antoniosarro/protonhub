@@ -121,6 +121,23 @@ pub fn library(launcher: &Launcher) -> Result<Library, Error> {
     })
 }
 
+/// `game`'s prefix, as its settings name it; none if they name none.
+pub fn prefix(launcher: &Launcher, game: &str) -> Result<Option<PathBuf>, Error> {
+    let list = read_json(&launcher.root.join("games.json"))?.unwrap_or_else(|| json!([]));
+    let home = launcher.home().unwrap_or_default();
+    Ok(list
+        .as_array()
+        .into_iter()
+        .flatten()
+        .find(|g| g["gameid"] == json!(game))
+        .and_then(|g| g["prefix"].as_str())
+        .filter(|p| !p.is_empty())
+        .map(|p| match p.strip_prefix("~/") {
+            Some(rest) => home.join(rest),
+            None => PathBuf::from(p),
+        }))
+}
+
 /// Sets `game`'s runner to the choice `tool`, or with `None` to the
 /// default.
 pub fn assign(launcher: &Launcher, game: &str, tool: Option<&str>) -> Result<(), Error> {
@@ -332,6 +349,30 @@ mod tests {
             Some(home.join(".local/share/Steam/compatibilitytools.d")),
             "its tools go in Steam's directory"
         );
+    }
+
+    #[test]
+    fn a_games_prefix_runs_with_its_runner() {
+        let home = TempDir::new("faugus-prefix");
+        let l = faugus(&home);
+        let pfx = home.join("Faugus/witcher");
+        fs::create_dir_all(pfx.join("drive_c")).unwrap();
+        write(
+            &l.root.join("games.json"),
+            r#"[{"gameid": "witcher", "title": "The Witcher", "runner": "GE-Proton10-34", "prefix": "~/Faugus/witcher"},
+                {"gameid": "celeste", "title": "Celeste", "runner": "Default", "prefix": ""}]"#,
+        );
+        let wine =
+            home.join(".local/share/Steam/compatibilitytools.d/GE-Proton10-34/files/bin/wine");
+        write(&wine, "");
+        let lib = library(&l).unwrap();
+        let game = |id: &str| lib.games.iter().find(|g| g.id == id).unwrap();
+        let found = crate::prefix::find(&l, game("witcher")).unwrap();
+        assert_eq!((found.dir, found.wine), (pfx, wine));
+        assert!(matches!(
+            crate::prefix::find(&l, game("celeste")),
+            Err(Error::NoPrefix { .. })
+        ));
     }
 
     #[test]

@@ -23,7 +23,7 @@ pub fn group(
 ) -> Option<adw::PreferencesGroup> {
     if !matches!(
         state.launcher.kind,
-        LauncherKind::Steam | LauncherKind::Heroic
+        LauncherKind::Steam | LauncherKind::Heroic | LauncherKind::Faugus
     ) {
         return None;
     }

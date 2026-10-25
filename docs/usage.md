@@ -20,7 +20,7 @@ builds and runs it.
 | `protonhub shortcut GAME [--name N] [--target T] [--start-in D] [--launcher L]` | A non-Steam shortcut's name, target, start folder and launch options; the options change it (Steam not running). Its launch options are `launch`'s |
 | `protonhub launch GAME [--set TEXT \| --on ID… --off ID…] [--launcher L]` | A Steam game's, non-Steam shortcut's or Heroic game's launch options and the presets they have on; `--set` replaces them (`""` removes them), `--on` and `--off` switch presets ([launch options](#launch-options)) |
 | `protonhub presets` | The launch option presets: their id, name, what each sets, and what it's for |
-| `protonhub tricks GAME [VERB… \| --run PROGRAM] [--launcher L]` | A Steam or Heroic game's Wine prefix, the Wine it runs with, and the winetricks verbs in it; VERBs installs them, `--run` runs `winecfg`, `regedit`, `control` or a Windows program (`.exe`, `.msi`) in it ([prefix tools](#prefix-tools)) |
+| `protonhub tricks GAME [VERB… \| --run PROGRAM] [--launcher L]` | A Steam, Heroic or Faugus Launcher game's Wine prefix, the Wine it runs with, and the winetricks verbs in it; VERBs installs them, `--run` runs `winecfg`, `regedit`, `control` or a Windows program (`.exe`, `.msi`) in it ([prefix tools](#prefix-tools)) |
 | `protonhub verbs` | The winetricks verbs offered by group: their id, group, name and what each is for |
 | `protonhub assign GAME TOOL [--launcher L]` | Set the tool a game runs with. GAME is its id or name, TOOL a tool's id or name from `games`, or `default` (Steam) |
 | `protonhub default [TOOL] [--launcher L]` | The default tool of Steam or Faugus Launcher, what games without one of their own run with; with TOOL (a tool's id or name from `games`, or on Steam `none` for Steam Play off) sets it |
@@ -154,6 +154,9 @@ game's own Wine or Proton, as protontricks does for Steam:
 - A Heroic game's prefix and Wine are `winePrefix` and `wineVersion` in its
   settings file, with the prefix in `pfx/` for a Proton. Like its tool, it
   needs its settings saved in Heroic once.
+- A Faugus Launcher game's prefix is the `prefix` its settings name (umu
+  makes that Wine's prefix, with Proton's `pfx` linked to it), run with
+  its runner's Wine.
 
 `winetricks.log` in the prefix lists what winetricks installed. Installers
 run unattended (`-q`) where they allow it; some still show windows, and
