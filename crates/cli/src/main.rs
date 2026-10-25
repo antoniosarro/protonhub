@@ -159,6 +159,12 @@ enum Command {
         #[arg(long)]
         launcher: Option<String>,
     },
+    /// Add ProtonHub to Steam's library as a non-Steam game, to open it
+    /// from Game Mode on a Steam Deck (Steam not running)
+    AddToSteam {
+        #[arg(long)]
+        launcher: Option<String>,
+    },
     /// Show each installed tool's size and the games that use it
     Usage {
         #[arg(long)]
@@ -845,6 +851,18 @@ fn run(cli: Cli) -> Result<()> {
                 })
                 .collect();
             print(json, text.join("\n"), &users)
+        }
+        Command::AddToSteam { launcher } => {
+            let target = pick_one(launcher.as_deref(), is_steam, "has a library (steam)")?;
+            let (shortcut, icon) = steam::own_shortcut().ok_or(
+                "protonhub-gtk is neither on PATH nor beside this program, so Steam couldn't start it",
+            )?;
+            let text = if games::add_shortcut(&target, &shortcut, &icon)? {
+                format!("added {} to Steam's library", shortcut.target)
+            } else {
+                "ProtonHub is in Steam's library already".into()
+            };
+            print(json, text, &shortcut)
         }
         Command::Default { tool, launcher } => {
             let target = pick_one(

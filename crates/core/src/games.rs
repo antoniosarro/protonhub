@@ -233,6 +233,17 @@ pub fn edit_shortcut(
     )
 }
 
+/// Adds a non-Steam shortcut to Steam, as `steam::add_shortcut` does;
+/// refused while Steam runs, which would write its own list back.
+pub fn add_shortcut(launcher: &Launcher, add: &steam::Shortcut, icon: &str) -> Result<bool, Error> {
+    if is_running(launcher) {
+        return Err(Error::Running {
+            launcher: launcher.kind.title(),
+        });
+    }
+    steam::add_shortcut(&launcher.root, add, icon)
+}
+
 /// Moves every game set to a tool matching `from` (its id or name) to the
 /// tool `to`, and returns their names. Games on the launcher's default
 /// stay on it.

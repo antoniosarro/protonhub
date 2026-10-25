@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: protonhub\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-25 15:57+0100\n"
+"POT-Creation-Date: 2026-10-25 16:01+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -949,20 +949,56 @@ msgstr ""
 msgid "Saving the GitHub token"
 msgstr ""
 
-#: crates/gtk/src/preferences.rs:83
+#: crates/gtk/src/preferences.rs:86
 msgid "Steam Profile"
 msgstr ""
 
-#: crates/gtk/src/preferences.rs:85
+#: crates/gtk/src/preferences.rs:88
 msgid "The user whose launch options ProtonHub shows and changes"
 msgstr ""
 
-#: crates/gtk/src/preferences.rs:91
+#: crates/gtk/src/preferences.rs:94
 msgid "The one signed in last"
 msgstr ""
 
-#: crates/gtk/src/preferences.rs:92
+#: crates/gtk/src/preferences.rs:95
 msgid "Choosing the Steam profile"
+msgstr ""
+
+#: crates/gtk/src/preferences.rs:147
+msgid "ProtonHub in Steam"
+msgstr ""
+
+#: crates/gtk/src/preferences.rs:149
+msgid ""
+"Adds ProtonHub to Steam's library as a non-Steam game, to open it from Game "
+"Mode on a Steam Deck"
+msgstr ""
+
+#: crates/gtk/src/preferences.rs:154
+msgid ""
+"protonhub-gtk is neither on PATH nor beside this program, so Steam couldn't "
+"start it"
+msgstr ""
+
+#: crates/gtk/src/preferences.rs:159
+msgid "ProtonHub is in Steam's library; start Steam to see it"
+msgstr ""
+
+#: crates/gtk/src/preferences.rs:162
+msgid "ProtonHub is in Steam's library already"
+msgstr ""
+
+#: crates/gtk/src/preferences.rs:163
+msgid "Adding ProtonHub to Steam"
+msgstr ""
+
+#: crates/gtk/src/preferences.rs:171
+msgid "Quit Steam first: it rewrites its library when it exits"
+msgstr ""
+
+#: crates/gtk/src/preferences.rs:179
+msgid "Add"
 msgstr ""
 
 #: crates/gtk/src/tool.rs:48

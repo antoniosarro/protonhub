@@ -518,6 +518,123 @@ pub fn set_shortcut(root: &Path, game: &str, to: &Shortcut) -> Result<(), Error>
     })
 }
 
+/// ProtonHub's own shortcut, and its icon: its GUI as found on PATH, which
+/// stays put across upgrades (a Nix store path doesn't), else beside this
+/// binary; inside its Flatpak, run through Flatpak. None where the GUI
+/// isn't to be found.
+pub fn own_shortcut() -> Option<(Shortcut, String)> {
+    const ID: &str = "dev.antoniosarro.ProtonHub";
+    let name = "ProtonHub".to_owned();
+    if std::env::var_os("FLATPAK_ID").is_some() {
+        let shortcut = Shortcut {
+            name,
+            target: "\"/usr/bin/flatpak\"".into(),
+            start_dir: "\"/usr/bin\"".into(),
+            launch_options: format!("run {ID}"),
+        };
+        return Some((shortcut, String::new()));
+    }
+    let beside = std::env::current_exe()
+        .ok()
+        .and_then(|e| Some(e.parent()?.join("protonhub-gtk")));
+    let exe = std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default())
+        .map(|d| d.join("protonhub-gtk"))
+        .chain(beside)
+        .find(|p| p.is_file())?;
+    let icon = exe
+        .parent()
+        .and_then(Path::parent)
+        .map(|prefix| prefix.join(format!("share/icons/hicolor/512x512/apps/{ID}.png")))
+        .filter(|i| i.is_file())
+        .map(|i| i.to_string_lossy().into_owned())
+        .unwrap_or_default();
+    let quoted = |p: &Path| format!("\"{}\"", p.display());
+    let shortcut = Shortcut {
+        name,
+        target: quoted(&exe),
+        start_dir: exe.parent().map(quoted).unwrap_or_default(),
+        launch_options: String::new(),
+    };
+    Some((shortcut, icon))
+}
+
+/// Adds a non-Steam shortcut for the user `local_config` picks, as Steam's
+/// "Add a Non-Steam Game" does, unless they have one with that name and
+/// target already; whether it added it. `target` and `start_dir` are as
+/// Steam keeps them, quoted.
+pub fn add_shortcut(root: &Path, add: &Shortcut, icon: &str) -> Result<bool, Error> {
+    let path = local_config(root)?.with_file_name("shortcuts.vdf");
+    let bytes = fs::read(&path).unwrap_or_default();
+    let mut obj = if bytes.is_empty() {
+        Obj::default()
+    } else {
+        let obj = vdf::parse_binary(&bytes).map_err(|source| Error::Vdf {
+            path: path.clone(),
+            source,
+        })?;
+        if vdf::to_binary(&obj) != bytes {
+            return Err(Error::Format {
+                path,
+                message: "it holds values ProtonHub can't write back as they were".into(),
+            });
+        }
+        obj
+    };
+    let list = obj.path_mut(&["shortcuts"]);
+    let there = list.0.iter().any(|(_, s)| {
+        s.as_obj()
+            .and_then(read_shortcut)
+            .is_some_and(|(_, s)| s.name == add.name && s.target == add.target)
+    });
+    if there {
+        return Ok(false);
+    }
+    // The id tools like Steam ROM Manager give a shortcut, the CRC-32 of
+    // its target and name with the top bit set; Steam keeps the id it
+    // finds.
+    let mut crc = flate2::Crc::new();
+    crc.update(format!("{}{}", add.target, add.name).as_bytes());
+    let id = (crc.sum() | 0x8000_0000) as i32;
+    let mut entry = Obj::default();
+    let str = |s: &str| Value::Str(s.to_owned());
+    for (key, value) in [
+        ("appid", Value::Int(id.into())),
+        ("AppName", str(&add.name)),
+        ("Exe", str(&add.target)),
+        ("StartDir", str(&add.start_dir)),
+        ("icon", str(icon)),
+        ("ShortcutPath", str("")),
+        ("LaunchOptions", str(&add.launch_options)),
+        ("IsHidden", Value::Int(0)),
+        ("AllowDesktopConfig", Value::Int(1)),
+        ("AllowOverlay", Value::Int(1)),
+        ("OpenVR", Value::Int(0)),
+        ("Devkit", Value::Int(0)),
+        ("DevkitGameID", str("")),
+        ("DevkitOverrideAppID", Value::Int(0)),
+        ("LastPlayTime", Value::Int(0)),
+        ("FlatpakAppID", str("")),
+        ("sortas", str("")),
+        ("tags", Value::Obj(Obj::default())),
+    ] {
+        entry.set(key, value);
+    }
+    // Entries are keyed 0, 1, 2…
+    let key = (0..)
+        .map(|n: usize| n.to_string())
+        .find(|k| list.get(k).is_none())
+        .expect("a free key");
+    list.set(&key, Value::Obj(entry));
+    if let Some(dir) = path.parent() {
+        fs::create_dir_all(dir).map_err(|source| Error::Io {
+            path: dir.to_owned(),
+            source,
+        })?;
+    }
+    crate::games::write_with_backup(&path, &vdf::to_binary(&obj))?;
+    Ok(true)
+}
+
 /// Sets `game`'s launch options to `text`, or with an empty one removes
 /// them: a Steam game's in the user's settings, a shortcut's in its entry.
 pub fn set_launch_options(root: &Path, game: &str, text: &str) -> Result<(), Error> {
@@ -855,6 +972,34 @@ pub(crate) fn same_dir(a: &Path, b: &Path) -> bool {
 mod tests {
     use super::*;
     use crate::testutil::TempDir;
+
+    #[test]
+    fn adds_a_shortcut_once_for_the_user_signed_in_last() {
+        let home = TempDir::new("steam-add");
+        let root = home.join("Steam");
+        let config = root.join("userdata/1/config");
+        fs::create_dir_all(&config).unwrap();
+        fs::write(
+            config.join("localconfig.vdf"),
+            "\"UserLocalConfigStore\"\n{\n}\n",
+        )
+        .unwrap();
+        let add = Shortcut {
+            name: "ProtonHub".into(),
+            target: "\"/usr/bin/protonhub-gtk\"".into(),
+            start_dir: "\"/usr/bin\"".into(),
+            launch_options: String::new(),
+        };
+        assert!(add_shortcut(&root, &add, "").unwrap());
+        assert!(!add_shortcut(&root, &add, "").unwrap(), "once");
+        let all = shortcuts(&root).unwrap();
+        assert_eq!(all.len(), 1);
+        assert_eq!(all[0].1, add);
+        // The CRC-32 of target and name, with the top bit set.
+        let mut crc = flate2::Crc::new();
+        crc.update(b"\"/usr/bin/protonhub-gtk\"ProtonHub");
+        assert_eq!(all[0].0, (crc.sum() | 0x8000_0000).to_string());
+    }
 
     #[test]
     fn a_chosen_user_gets_the_launch_options_where_they_have_settings() {

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: protonhub\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-25 15:57+0100\n"
+"POT-Creation-Date: 2026-10-25 16:01+0100\n"
 "PO-Revision-Date: 2026-10-10 22:25+0200\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: Italian\n"
@@ -977,21 +977,53 @@ msgstr "Token rimosso"
 msgid "Saving the GitHub token"
 msgstr "Salvataggio del token di GitHub"
 
-#: crates/gtk/src/preferences.rs:83
+#: crates/gtk/src/preferences.rs:86
 msgid "Steam Profile"
 msgstr "Profilo di Steam"
 
-#: crates/gtk/src/preferences.rs:85
+#: crates/gtk/src/preferences.rs:88
 msgid "The user whose launch options ProtonHub shows and changes"
 msgstr "L'utente di cui ProtonHub mostra e modifica le opzioni di avvio"
 
-#: crates/gtk/src/preferences.rs:91
+#: crates/gtk/src/preferences.rs:94
 msgid "The one signed in last"
 msgstr "L'ultimo che ha effettuato l'accesso"
 
-#: crates/gtk/src/preferences.rs:92
+#: crates/gtk/src/preferences.rs:95
 msgid "Choosing the Steam profile"
 msgstr "Scelta del profilo di Steam"
+
+#: crates/gtk/src/preferences.rs:147
+msgid "ProtonHub in Steam"
+msgstr "ProtonHub in Steam"
+
+#: crates/gtk/src/preferences.rs:149
+msgid "Adds ProtonHub to Steam's library as a non-Steam game, to open it from Game Mode on a Steam Deck"
+msgstr "Aggiunge ProtonHub alla libreria di Steam come gioco non di Steam, per aprirlo dalla modalità Gioco di uno Steam Deck"
+
+#: crates/gtk/src/preferences.rs:154
+msgid "protonhub-gtk is neither on PATH nor beside this program, so Steam couldn't start it"
+msgstr "protonhub-gtk non è né nel PATH né accanto a questo programma, quindi Steam non potrebbe avviarlo"
+
+#: crates/gtk/src/preferences.rs:159
+msgid "ProtonHub is in Steam's library; start Steam to see it"
+msgstr "ProtonHub è nella libreria di Steam; avvia Steam per vederlo"
+
+#: crates/gtk/src/preferences.rs:162
+msgid "ProtonHub is in Steam's library already"
+msgstr "ProtonHub è già nella libreria di Steam"
+
+#: crates/gtk/src/preferences.rs:163
+msgid "Adding ProtonHub to Steam"
+msgstr "Aggiunta di ProtonHub a Steam"
+
+#: crates/gtk/src/preferences.rs:171
+msgid "Quit Steam first: it rewrites its library when it exits"
+msgstr "Chiudi prima Steam: quando si chiude riscrive la sua libreria"
+
+#: crates/gtk/src/preferences.rs:179
+msgid "Add"
+msgstr "Aggiungi"
 
 #: crates/gtk/src/tool.rs:48
 #, rust-format

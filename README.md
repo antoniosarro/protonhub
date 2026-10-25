@@ -65,7 +65,8 @@ scriptable CLI with JSON output.
 - **Lockfiles**: export what is installed on one machine and apply it on
   another.
 - **Gamepad and Steam Deck**: the D-pad drives the window, which starts
-  fullscreen in Game Mode.
+  fullscreen in Game Mode; one button adds ProtonHub to Steam's library
+  to open it there.
 - **Error log**: every failure with its full message and a button that
   copies it with the version and platform for a bug report.
 

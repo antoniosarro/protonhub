@@ -1,5 +1,5 @@
-//! Preferences: the GitHub token ProtonHub sends, and which of Steam's
-//! users launch options go to.
+//! Preferences: the GitHub token ProtonHub sends, which of Steam's users
+//! launch options go to, and adding ProtonHub to Steam.
 
 use std::rc::Rc;
 
@@ -59,6 +59,9 @@ pub fn show(win: &Rc<Window>) {
     github.add(&token);
     page.add(&github);
     if let Some(group) = steam_users(win) {
+        page.add(&group);
+    }
+    if let Some(group) = add_to_steam(win) {
         page.add(&group);
     }
     let dialog = adw::PreferencesDialog::new();
@@ -124,6 +127,86 @@ fn steam_users(win: &Rc<Window>) -> Option<adw::PreferencesGroup> {
                 }
             }
         ));
+        group.add(&row);
+    }
+    Some(group)
+}
+
+/// A button per Steam that adds ProtonHub to its library, to open from
+/// Game Mode on a Steam Deck.
+fn add_to_steam(win: &Rc<Window>) -> Option<adw::PreferencesGroup> {
+    let home = win.env.as_ref().ok()?.home.clone();
+    let steams: Vec<_> = launcher::detect(&home)
+        .into_iter()
+        .filter(|l| l.kind == LauncherKind::Steam)
+        .collect();
+    if steams.is_empty() {
+        return None;
+    }
+    let group = adw::PreferencesGroup::builder()
+        .title(tr("ProtonHub in Steam", &[]))
+        .description(tr(
+            "Adds ProtonHub to Steam's library as a non-Steam game, to open it from Game Mode on a Steam Deck",
+            &[],
+        ))
+        .build();
+    let missing = tr(
+        "protonhub-gtk is neither on PATH nor beside this program, so Steam couldn't start it",
+        &[],
+    );
+    let (added, there, adding) = (
+        tr(
+            "ProtonHub is in Steam's library; start Steam to see it",
+            &[],
+        ),
+        tr("ProtonHub is in Steam's library already", &[]),
+        tr("Adding ProtonHub to Steam", &[]),
+    );
+    for steam in steams {
+        let running = protonhub_core::games::is_running(&steam);
+        let row = adw::ActionRow::builder()
+            .title(steam.title())
+            .subtitle(if running {
+                tr(
+                    "Quit Steam first: it rewrites its library when it exits",
+                    &[],
+                )
+            } else {
+                String::new()
+            })
+            .build();
+        let button = gtk::Button::builder()
+            .label(tr("Add", &[]))
+            .valign(gtk::Align::Center)
+            .sensitive(!running)
+            .build();
+        button.connect_clicked(glib::clone!(
+            #[strong]
+            win,
+            #[strong]
+            added,
+            #[strong]
+            there,
+            #[strong]
+            adding,
+            #[strong]
+            missing,
+            move |_| {
+                let Some((shortcut, icon)) = steam::own_shortcut() else {
+                    win.report(adding.clone(), missing.clone());
+                    return;
+                };
+                match protonhub_core::games::add_shortcut(&steam, &shortcut, &icon) {
+                    Ok(true) => {
+                        win.toast(&added);
+                        win.reload();
+                    }
+                    Ok(false) => win.toast(&there),
+                    Err(e) => win.report(adding.clone(), e.to_string()),
+                }
+            }
+        ));
+        row.add_suffix(&button);
         group.add(&row);
     }
     Some(group)
